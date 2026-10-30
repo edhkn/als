@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ED Simulation Station | Supraventricular Tachycardia (SVT) ALS 6-Stage</title>
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
@@ -22,7 +21,6 @@
       --text-main: #F1F5F9;
       --text-muted: #94A3B8;
       --monitor-screen: #01080e;
-      --ecg-glow: #00ff66;
     }
 
     * {
@@ -44,7 +42,7 @@
         radial-gradient(circle at 90% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
     }
 
-    /* NAV BAR */
+    /* NAV */
     nav {
       background: rgba(8, 14, 28, 0.94);
       backdrop-filter: blur(14px);
@@ -144,7 +142,6 @@
       border-radius: 4px;
       animation: alertPulse 1.2s infinite;
       font-weight: 700;
-      letter-spacing: 0.5px;
     }
 
     @keyframes alertPulse {
@@ -184,7 +181,6 @@
       gap: 1.75rem;
     }
 
-    /* PANELS */
     .panel {
       background: var(--bg-panel);
       border: 1px solid var(--bg-panel-border);
@@ -217,7 +213,7 @@
       gap: 8px;
     }
 
-    /* CARDIAC MONITOR BEZEL */
+    /* MONITOR */
     .monitor-bezel {
       background: #080d17;
       border-radius: 12px;
@@ -258,7 +254,6 @@
       border-radius: 0 0 6px 6px;
     }
 
-    /* Medical ECG Grid Overlay */
     .canvas-wrapper::before {
       content: "";
       position: absolute;
@@ -313,11 +308,11 @@
       background: rgba(255, 59, 48, 0.25);
       border: 1px solid var(--danger);
       color: #ff6b6b;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       padding: 3px 8px;
       border-radius: 4px;
       font-weight: 800;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
     }
 
     .rhythm-alert.rosc-state {
@@ -340,7 +335,7 @@
       100% { opacity: 0.8; }
     }
 
-    /* VITALS TILES */
+    /* VITALS */
     .vitals-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -369,34 +364,25 @@
       color: #fff;
     }
 
-    .vital-value.alert {
-      color: #ff6b6b;
-    }
+    .vital-value.alert { color: #ff6b6b; }
+    .vital-value.good { color: var(--emerald); }
+    .vital-value.fatal { color: #ff2222; font-weight: 800; }
 
-    .vital-value.good {
-      color: var(--emerald);
-    }
-
-    .vital-value.fatal {
-      color: #ff2222;
-      font-weight: 800;
-    }
-
-    /* DECISION CARD */
+    /* DECISION PANEL */
     .scenario-card {
       background: rgba(255, 255, 255, 0.025);
       border-radius: 8px;
-      padding: 1.15rem;
-      font-size: 0.96rem;
-      line-height: 1.6;
+      padding: 1rem 1.15rem;
+      font-size: 0.94rem;
+      line-height: 1.55;
       border-left: 4px solid var(--gold);
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.1rem;
       color: #cbd5e1;
     }
 
     .stage-badge-level {
       display: inline-block;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       padding: 2px 8px;
       border-radius: 4px;
       background: rgba(255, 215, 0, 0.15);
@@ -410,14 +396,14 @@
     .question-banner {
       background: rgba(80, 200, 120, 0.08);
       border: 1px solid rgba(80, 200, 120, 0.35);
-      padding: 1.1rem;
+      padding: 0.9rem;
       border-radius: 8px;
       text-align: center;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.1rem;
     }
 
     .question-banner h3 {
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: var(--emerald);
       letter-spacing: 0.5px;
       font-weight: 700;
@@ -426,7 +412,7 @@
     .options-stack {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 1rem;
     }
 
@@ -434,29 +420,29 @@
       background: rgba(255, 255, 255, 0.035);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 10px;
-      padding: 1rem 1.25rem;
+      padding: 0.85rem 1.1rem;
       color: #fff;
-      font-size: 0.93rem;
+      font-size: 0.92rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
       display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      line-height: 1.45;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      align-items: center;
+      gap: 12px;
+      line-height: 1.4;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .btn-decision:hover {
       background: rgba(80, 200, 120, 0.1);
       border-color: var(--emerald);
-      box-shadow: 0 4px 20px rgba(80, 200, 120, 0.25);
+      box-shadow: 0 4px 16px rgba(80, 200, 120, 0.2);
       transform: translateX(4px);
     }
 
     .opt-circle {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: var(--gold);
       color: #070B19;
@@ -464,12 +450,11 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       flex-shrink: 0;
-      margin-top: 2px;
     }
 
-    /* CARDIOVERSION FLASH EFFECT */
+    /* FLASH SCREEN */
     .shock-flash-screen {
       position: fixed;
       inset: 0;
@@ -485,7 +470,7 @@
       100% { opacity: 0; }
     }
 
-    /* MODAL FEEDBACK */
+    /* MODAL */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -501,26 +486,26 @@
     .modal-box {
       background: #0c1424;
       border: 2px solid var(--emerald);
-      border-radius: 16px;
-      max-width: 650px;
+      border-radius: 14px;
+      max-width: 580px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
-      padding: 2rem;
-      box-shadow: 0 0 40px var(--emerald-glow);
+      padding: 1.75rem;
+      box-shadow: 0 0 35px var(--emerald-glow);
       transform: scale(0.95);
       opacity: 0;
-      transition: all 0.25s ease-out;
+      transition: all 0.2s ease-out;
     }
 
     .modal-box.incorrect {
       border-color: var(--danger);
-      box-shadow: 0 0 40px var(--danger-glow);
+      box-shadow: 0 0 35px var(--danger-glow);
     }
 
     .modal-box.asystole-fatal {
       border-color: var(--asystole-red);
-      box-shadow: 0 0 40px rgba(255, 34, 34, 0.6);
+      box-shadow: 0 0 35px rgba(255, 34, 34, 0.6);
       background: #140507;
     }
 
@@ -530,74 +515,61 @@
     }
 
     .modal-status-icon {
-      font-size: 2.8rem;
-      margin-bottom: 0.75rem;
+      font-size: 2.4rem;
+      margin-bottom: 0.5rem;
       text-align: center;
     }
 
     .modal-headline {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 800;
       letter-spacing: 0.5px;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.6rem;
       text-align: center;
     }
 
     .modal-body-text {
-      font-size: 0.92rem;
-      line-height: 1.65;
+      font-size: 0.9rem;
+      line-height: 1.5;
       color: #cbd5e1;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
       text-align: left;
-    }
-
-    .modal-body-text ol, .modal-body-text ul {
-      margin-left: 1.25rem;
-      margin-top: 0.5rem;
     }
 
     .modal-action-btn {
       width: 100%;
-      padding: 0.85rem;
-      border-radius: 30px;
+      padding: 0.75rem;
+      border-radius: 25px;
       border: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       transition: all 0.2s ease;
     }
 
     .btn-emerald {
       background: var(--emerald);
       color: #030712;
-      box-shadow: 0 0 16px var(--emerald-glow);
+      box-shadow: 0 0 14px var(--emerald-glow);
     }
-
-    .btn-emerald:hover {
-      background: #40b366;
-      transform: translateY(-2px);
-    }
+    .btn-emerald:hover { background: #40b366; }
 
     .btn-rose {
       background: var(--danger);
       color: #fff;
-      box-shadow: 0 0 16px var(--danger-glow);
+      box-shadow: 0 0 14px var(--danger-glow);
     }
-
-    .btn-rose:hover {
-      background: #e02f25;
-      transform: translateY(-2px);
-    }
+    .btn-rose:hover { background: #e02f25; }
 
     .btn-fatal-restart {
       background: #ff2222;
       color: #fff;
-      box-shadow: 0 0 20px rgba(255, 34, 34, 0.6);
+      box-shadow: 0 0 18px rgba(255, 34, 34, 0.6);
     }
 
-    /* ACTION OVERLAY (Vagal / Drug Flush) */
+    /* ACTION OVERLAY */
     .action-progress-overlay {
       position: fixed;
       inset: 0;
@@ -610,25 +582,25 @@
     }
 
     .action-headline {
-      font-size: 1.7rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: var(--emerald);
-      letter-spacing: 1.5px;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 15px var(--emerald-glow);
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 0 12px var(--emerald-glow);
       text-align: center;
     }
 
     .action-subline {
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: var(--gold);
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .action-bar-frame {
-      width: 50%;
-      min-width: 300px;
-      height: 20px;
+      width: 45%;
+      min-width: 280px;
+      height: 16px;
       background: #111b2d;
       border-radius: 20px;
       border: 1px solid var(--emerald);
@@ -639,10 +611,10 @@
       width: 0%;
       height: 100%;
       background: linear-gradient(90deg, #50C878, #FFD700);
-      box-shadow: 0 0 12px var(--emerald);
+      box-shadow: 0 0 10px var(--emerald);
     }
 
-    /* FINAL RESULTS TABLE */
+    /* RESULTS */
     .results-view {
       display: none;
       grid-column: span 2;
@@ -651,12 +623,12 @@
     .results-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 1.5rem 0;
-      font-size: 0.93rem;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
     }
 
     .results-table th, .results-table td {
-      padding: 12px 14px;
+      padding: 10px 14px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       text-align: left;
     }
@@ -664,7 +636,7 @@
     .results-table th {
       background: rgba(80, 200, 120, 0.12);
       color: var(--emerald);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
@@ -741,28 +713,11 @@
       font-weight: 600;
     }
 
-    .clinical-disclaimer {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.35);
-      max-width: 850px;
-      line-height: 1.4;
-      border-top: 1px dashed rgba(255, 255, 255, 0.1);
-      padding-top: 12px;
-    }
-
     @media (max-width: 992px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-      .results-view {
-        grid-column: span 1;
-      }
-      nav {
-        padding: 0.75rem 1rem;
-      }
-      .logo-text {
-        font-size: 1rem;
-      }
+      main { grid-template-columns: 1fr; }
+      .results-view { grid-column: span 1; }
+      nav { padding: 0.75rem 1rem; }
+      .logo-text { font-size: 1rem; }
     }
   </style>
 </head>
@@ -811,58 +766,56 @@
         <span style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">SPEED: 25mm/s | GAIN: 10mm/mV</span>
       </div>
 
-      <!-- Real Cardiac Monitor Bezel -->
       <div class="monitor-bezel">
         <div class="monitor-screen-header">
           <div class="monitor-lead-info" id="leadDisplay">
             <i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)
           </div>
           <div>SWEEP: 25.0 mm/s</div>
-          <div>FILTER: DIAGNOSTIC (0.05-150Hz)</div>
+          <div>DIAGNOSTIC (0.05-150Hz)</div>
         </div>
         
         <div class="canvas-wrapper">
           <canvas id="ecgCanvas"></canvas>
           <div class="monitor-readout">
-            <div class="rate-number" id="monitorHR">204</div>
+            <div class="rate-number" id="monitorHR">200</div>
             <div class="rate-label" id="rateLabelText">HR (BPM)</div>
             <div class="rhythm-alert" id="rhythmAlertTag">SUPRAVENTRICULAR TACHYCARDIA</div>
           </div>
         </div>
       </div>
 
-      <!-- Patient Vitals Table -->
-      <div class="panel-heading" style="margin-bottom: 0.75rem; font-size: 0.85rem;">
-        <i class="bi bi-person-fill-exclamation"></i> Patient Status & Hemodynamics
+      <div class="panel-heading" style="margin-bottom: 0.65rem; font-size: 0.85rem;">
+        <i class="bi bi-person-fill-exclamation"></i> Patient Status & Vitals
       </div>
       <div class="vitals-grid">
         <div class="vital-tile">
-          <div class="vital-title">Demographics</div>
+          <div class="vital-title">Patient Profile</div>
           <div class="vital-value">32 y/o Female</div>
         </div>
         <div class="vital-tile">
           <div class="vital-title">Consciousness</div>
-          <div class="vital-value" id="consciousVal" style="color: #fff;">Alert, Anxious</div>
+          <div class="vital-value" id="consciousVal">Alert, Anxious</div>
         </div>
         <div class="vital-tile">
           <div class="vital-title">Respiration</div>
-          <div class="vital-value" id="respVal" style="color: #fff;">Tachypneic (24/min)</div>
+          <div class="vital-value" id="respVal">24 /min (Tachypneic)</div>
         </div>
         <div class="vital-tile">
-          <div class="vital-title">Radial / Central Pulse</div>
-          <div class="vital-value alert" id="pulseVal">Rapid, Thready (204 bpm)</div>
+          <div class="vital-title">Radial Pulse</div>
+          <div class="vital-value alert" id="pulseVal">Rapid, Regular (200 bpm)</div>
         </div>
         <div class="vital-tile">
           <div class="vital-title">Blood Pressure</div>
           <div class="vital-value" id="bpVal">118/75 mmHg</div>
         </div>
         <div class="vital-tile">
-          <div class="vital-title">Oxygen Saturation</div>
-          <div class="vital-value" id="spo2Val" style="color: var(--emerald);">98% on High-Flow Mask</div>
+          <div class="vital-title">SpO2</div>
+          <div class="vital-value" id="spo2Val" style="color: var(--emerald);">98% on Room Air</div>
         </div>
         <div class="vital-tile" style="grid-column: span 2;">
-          <div class="vital-title">Active Clinical Status</div>
-          <div class="vital-value" id="activeInterventionText" style="color: var(--gold);">Palpitations, sudden onset racing heartbeat</div>
+          <div class="vital-title">Current Presentation</div>
+          <div class="vital-value" id="activeInterventionText" style="color: var(--gold);">Palpitations, sudden onset racing heart</div>
         </div>
       </div>
     </div>
@@ -871,27 +824,27 @@
     <div class="panel">
       <div class="panel-header">
         <div class="panel-heading">
-          <i class="bi bi-clipboard2-pulse"></i> Decision Stage <span id="displayStageNumber">1</span> of 6
+          <i class="bi bi-clipboard2-pulse"></i> Stage <span id="displayStageNumber">1</span> of 6
         </div>
-        <span style="font-size: 0.8rem; color: var(--emerald); font-weight: 600;" id="stageTitle">Vagal Maneuvers</span>
+        <span style="font-size: 0.8rem; color: var(--emerald); font-weight: 600;" id="stageTitle">Vagal Maneuver</span>
       </div>
 
-      <div class="stage-badge-level" id="difficultyTag">Initial Assessment & Non-Pharmacological</div>
+      <div class="stage-badge-level" id="difficultyTag">First-Line Assessment</div>
 
       <div class="scenario-card" id="scenarioDescription">
-        A 32-year-old female presents to the Emergency Department with sudden-onset palpitations and lightheadedness. She denies chest pain or shortness of breath. The cardiac monitor demonstrates a regular, narrow-complex tachycardia at 204 bpm without distinct P-waves, consistent with Supraventricular Tachycardia (SVT). Blood pressure is 118/75 mmHg. Central pulse is strong and regular.
+        <!-- Injected via JS -->
       </div>
 
       <div class="question-banner">
-        <h3 id="questionHeading">THE PATIENT IS CURRENTLY STABLE. WHAT IS YOUR FIRST IMMEDIATE MANAGEMENT STEP?</h3>
+        <h3 id="questionHeading"><!-- Injected via JS --></h3>
       </div>
 
       <div class="options-stack" id="optionsContainer">
-        <!-- Injected via JavaScript -->
+        <!-- Injected via JS -->
       </div>
     </div>
 
-    <!-- RESULTS SUMMARY SCREEN (Displays after Stage 6 or Fatal Asystole) -->
+    <!-- RESULTS SUMMARY SCREEN -->
     <div class="panel results-view" id="resultsView">
       <div class="panel-header">
         <div class="panel-heading"><i class="bi bi-award-fill"></i> Performance Assessment Summary (6 Stages)</div>
@@ -905,7 +858,7 @@
           <tr>
             <th>Stage</th>
             <th>Clinical ALS Competency</th>
-            <th>Performance Result</th>
+            <th>Result Status</th>
             <th>Marks</th>
           </tr>
         </thead>
@@ -913,18 +866,18 @@
       </table>
 
       <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
-        <button class="modal-action-btn btn-emerald" style="max-width: 280px;" onclick="restartSimulation()">
-          <i class="bi bi-arrow-counterclockwise"></i> Repeat Complete Simulation
+        <button class="modal-action-btn btn-emerald" style="max-width: 260px;" onclick="restartSimulation()">
+          <i class="bi bi-arrow-counterclockwise"></i> Repeat Simulation
         </button>
       </div>
     </div>
 
   </main>
 
-  <!-- INTERVENTION SIMULATION OVERLAY -->
+  <!-- ACTION OVERLAY -->
   <div class="action-progress-overlay" id="actionOverlay">
     <div class="action-headline" id="actionHeadlineText"><i class="bi bi-activity"></i> PERFORMING PROCEDURE</div>
-    <div class="action-subline" id="actionSublineText">Simulating clinical intervention...</div>
+    <div class="action-subline" id="actionSublineText">Executing intervention...</div>
     <div class="action-bar-frame">
       <div class="action-bar-fill" id="actionFill"></div>
     </div>
@@ -953,23 +906,12 @@
       </div>
       <div class="footer-status"><span class="pulse-dot"></span><span>EDHKN PORTAL Ver 2.0</span></div>
       <p class="footer-copyright">© 2026 <span>Yassin Razak</span> | All Rights Reserved</p>
-      
-      <p class="clinical-disclaimer">
-        DISCLAIMER: This interactive station is designed solely for clinical education and emergency training. Clinical resuscitation algorithms and drug dosages must strictly align with current Malaysian Ministry of Health guidelines and applicable Advanced Life Support (ALS) guidelines.
-      </p>
     </div>
   </footer>
 
-  <!-- JAVASCRIPT: ADVANCED SVT ENGINE, REALISTIC ECG MODES, & DYNAMIC OUTCOMES (ASYSTOLE vs ROSC) -->
   <script>
     /* ==========================================================
-       1. SYNTHETIC AUDIO ENGINE (Web Audio API)
-       Pure programmatic sound synthesis:
-       - SVT high-rate QRS chirp (204 bpm)
-       - ROSC normal-rate QRS chirp (76 bpm)
-       - Asystole flatline continuous alarm tone
-       - Correct chime & Wrong buzzer
-       - Synchronised DC Cardioversion discharge sound
+       1. SYNTHETIC AUDIO ENGINE
        ========================================================== */
     class AudioEngine {
       constructor() {
@@ -989,24 +931,20 @@
         }
       }
 
-      playECGBeep(pitch = 920) {
+      playECGBeep(pitch = 950) {
         if (!this.enabled) return;
         this.init();
         try {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-
           osc.type = 'sine';
           osc.frequency.setValueAtTime(pitch, this.ctx.currentTime);
-          
-          gain.gain.setValueAtTime(0.07, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.045);
-
+          gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.04);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
-
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.05);
+          osc.stop(this.ctx.currentTime + 0.045);
         } catch (e) {}
       }
 
@@ -1017,15 +955,11 @@
         try {
           this.asystoleOsc = this.ctx.createOscillator();
           this.asystoleGain = this.ctx.createGain();
-
           this.asystoleOsc.type = 'sawtooth';
-          this.asystoleOsc.frequency.setValueAtTime(780, this.ctx.currentTime); // Standard monitor flatline tone
-
-          this.asystoleGain.gain.setValueAtTime(0.09, this.ctx.currentTime);
-
+          this.asystoleOsc.frequency.setValueAtTime(780, this.ctx.currentTime);
+          this.asystoleGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
           this.asystoleOsc.connect(this.asystoleGain);
           this.asystoleGain.connect(this.ctx.destination);
-
           this.asystoleOsc.start();
         } catch (e) {}
       }
@@ -1043,7 +977,7 @@
       playCorrectSound() {
         if (!this.enabled) return;
         this.init();
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((freq, idx) => {
           setTimeout(() => {
             try {
@@ -1051,17 +985,14 @@
               const gain = this.ctx.createGain();
               osc.type = 'triangle';
               osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
-              gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.32);
-
+              gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.28);
               osc.connect(gain);
               gain.connect(this.ctx.destination);
-
               osc.start();
-              osc.stop(this.ctx.currentTime + 0.35);
+              osc.stop(this.ctx.currentTime + 0.3);
             } catch (err) {}
-          }, idx * 70);
+          }, idx * 60);
         });
       }
 
@@ -1072,24 +1003,19 @@
           const osc1 = this.ctx.createOscillator();
           const osc2 = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-
           osc1.type = 'sawtooth';
           osc2.type = 'sawtooth';
-
           osc1.frequency.setValueAtTime(140, this.ctx.currentTime);
-          osc2.frequency.setValueAtTime(98, this.ctx.currentTime); // Harsh dissonant tritone
-
-          gain.gain.setValueAtTime(0.16, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.45);
-
+          osc2.frequency.setValueAtTime(98, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.38);
           osc1.connect(gain);
           osc2.connect(gain);
           gain.connect(this.ctx.destination);
-
           osc1.start();
           osc2.start();
-          osc1.stop(this.ctx.currentTime + 0.45);
-          osc2.stop(this.ctx.currentTime + 0.45);
+          osc1.stop(this.ctx.currentTime + 0.4);
+          osc2.stop(this.ctx.currentTime + 0.4);
         } catch (e) {}
       }
 
@@ -1097,7 +1023,7 @@
         if (!this.enabled) return;
         this.init();
         try {
-          const bufferSize = this.ctx.sampleRate * 0.3;
+          const bufferSize = this.ctx.sampleRate * 0.25;
           const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
           const data = buffer.getChannelData(0);
           for (let i = 0; i < bufferSize; i++) {
@@ -1106,7 +1032,7 @@
           const noise = this.ctx.createBufferSource();
           noise.buffer = buffer;
           const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.45, this.ctx.currentTime);
+          noiseGain.gain.setValueAtTime(0.4, this.ctx.currentTime);
           noise.connect(noiseGain);
           noiseGain.connect(this.ctx.destination);
           noise.start();
@@ -1132,14 +1058,7 @@
     }
 
     /* ==========================================================
-       2. REALISTIC MULTI-MODE ECG ENGINE
-       Supports:
-       1) Mode 'SVT': Narrow QRS (<0.10s), absent visible P wave,
-          rate ~204 bpm, sharp R spikes, short cycle (~73 px).
-       2) Mode 'ASYSTOLE': Flatline with gentle biological wander,
-          rate 0 bpm, red monitor indicator, continuous tone.
-       3) Mode 'ROSC_SINUS': Normal Sinus Rhythm (NSR) at ~76 bpm,
-          crisp P wave, PR segment, narrow QRS, ST segment, T wave.
+       2. REALISTIC SVT ECG ENGINE (Continuous Gaussian Model)
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
@@ -1148,7 +1067,7 @@
     let lastY = 0;
     let isBeatArmed = true;
     let globalSample = 0;
-    let currentRhythmMode = 'SVT'; // 'SVT', 'ASYSTOLE', or 'ROSC_SINUS'
+    let currentRhythmMode = 'SVT'; // 'SVT', 'ASYSTOLE', 'ROSC_SINUS'
 
     function resizeCanvas() {
       const parent = canvas.parentElement;
@@ -1158,107 +1077,65 @@
       canvasH = canvas.height;
       lastY = canvasH * 0.52;
       sweepX = 0;
-
       ctx.fillStyle = '#01080e';
       ctx.fillRect(0, 0, canvasW, canvasH);
     }
     window.addEventListener('resize', resizeCanvas);
 
-    function calculateSVTWave(sampleIndex) {
-      const baseline = canvasH * 0.52;
-      const amplitude = canvasH * 0.38;
-      let yOffset = 0;
+    // Realistic Lead II SVT Waveform:
+    // HR: 200 bpm (RR = 300ms). QRS narrow (<80ms, sharp spike).
+    // P wave absent/buried. Rate-dependent J-point depression transitioning into T wave.
+    function calculateLeadIISample(sampleIndex) {
+      const baseline = canvasH * 0.54;
+      const amp = canvasH * 0.38;
 
       if (currentRhythmMode === 'SVT') {
-        // Narrow-complex regular SVT at 204 bpm (cycle ~73 px at 25mm/s)
-        const cycleLength = 73;
-        const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
-        const phi = phase / cycleLength;
-        let wave = 0;
+        const cycle = 66; // ~200 bpm at 2.2 px/frame
+        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        if (phi < 0.12) {
-          // Isoelectric / PR interval (No distinct P wave; buried in preceding T wave)
-          wave = 0.02 * Math.sin(phi * 20);
-        } else if (phi < 0.16) {
-          // Sharp Q dip
-          const t = (phi - 0.12) / 0.04;
-          wave = -0.15 * Math.sin(t * Math.PI);
-        } else if (phi < 0.24) {
-          // Rapid, tall narrow R wave (QRS < 100ms)
-          const t = (phi - 0.16) / 0.08;
-          wave = (t < 0.5) ? (t / 0.5) * 1.0 : (1.0 - (t - 0.5) / 0.5) * 1.0;
-        } else if (phi < 0.30) {
-          // Quick sharp S wave
-          const t = (phi - 0.24) / 0.06;
-          wave = -0.28 * Math.sin(t * Math.PI);
-        } else if (phi < 0.65) {
-          // Inverted or conjoined T wave merging into next complex
-          const t = (phi - 0.30) / 0.35;
-          wave = 0.28 * Math.sin(t * Math.PI);
-        } else {
-          // Pre-systolic transition
-          wave = 0.02;
-        }
+        const qWave = -0.08 * Math.exp(-Math.pow((phi - 0.12) / 0.012, 2));
+        const rWave =  1.08 * Math.exp(-Math.pow((phi - 0.155) / 0.018, 2));
+        const sWave = -0.28 * Math.exp(-Math.pow((phi - 0.195) / 0.016, 2));
+        const stDep = -0.07 * Math.exp(-Math.pow((phi - 0.28) / 0.07, 2));
+        const tWave =  0.26 * Math.exp(-Math.pow((phi - 0.50) / 0.13, 2));
 
-        const baselineNoise = (Math.random() - 0.5) * 0.02;
-        yOffset = -((wave + baselineNoise) * amplitude);
+        const wave = qWave + rWave + sWave + stDep + tWave;
+        const noise = (Math.random() - 0.5) * 0.015;
+        const y = baseline - (wave + noise) * amp;
 
-        if (phi >= 0.19 && phi <= 0.23 && isBeatArmed) {
-          audio.playECGBeep(920); // SVT high-frequency monitor beep
+        if (phi >= 0.145 && phi <= 0.175 && isBeatArmed) {
+          audio.playECGBeep(950);
           isBeatArmed = false;
         }
-        if (phi > 0.45) {
-          isBeatArmed = true;
-        }
+        if (phi > 0.45) isBeatArmed = true;
+        return y;
 
       } else if (currentRhythmMode === 'ASYSTOLE') {
-        // True Asystole: Flatline with subtle biological / respiratory wander
-        const baselineWander = Math.sin(sampleIndex * 0.02) * 1.8;
-        const noise = (Math.random() - 0.5) * 1.2;
-        yOffset = baselineWander + noise;
+        const wander = Math.sin(sampleIndex * 0.02) * 1.5;
+        const noise = (Math.random() - 0.5) * 1.0;
+        return baseline + wander + noise;
 
       } else if (currentRhythmMode === 'ROSC_SINUS') {
-        // Normal Sinus Rhythm (NSR) post-successful ROSC (~76 bpm, cycle ~154 px)
-        const cycleLength = 154;
-        const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
-        const phi = phase / cycleLength;
-        let wave = 0;
+        const cycle = 160; // ~75 bpm
+        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        if (phi >= 0.10 && phi < 0.22) {
-          // Normal upright P wave
-          const t = (phi - 0.10) / 0.12;
-          wave = 0.18 * Math.sin(t * Math.PI);
-        } else if (phi >= 0.28 && phi < 0.31) {
-          // Normal Q dip
-          const t = (phi - 0.28) / 0.03;
-          wave = -0.10 * Math.sin(t * Math.PI);
-        } else if (phi >= 0.31 && phi < 0.36) {
-          // Crisp tall narrow R wave
-          const t = (phi - 0.31) / 0.05;
-          wave = (t < 0.5) ? (t / 0.5) * 1.0 : (1.0 - (t - 0.5) / 0.5) * 1.0;
-        } else if (phi >= 0.36 && phi < 0.40) {
-          // S wave
-          const t = (phi - 0.36) / 0.04;
-          wave = -0.22 * Math.sin(t * Math.PI);
-        } else if (phi >= 0.50 && phi < 0.68) {
-          // Normal upright T wave
-          const t = (phi - 0.50) / 0.18;
-          wave = 0.32 * Math.sin(t * Math.PI);
-        }
+        const pWave =  0.15 * Math.exp(-Math.pow((phi - 0.14) / 0.035, 2));
+        const qWave = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.012, 2));
+        const rWave =  1.05 * Math.exp(-Math.pow((phi - 0.31) / 0.018, 2));
+        const sWave = -0.22 * Math.exp(-Math.pow((phi - 0.35) / 0.016, 2));
+        const tWave =  0.28 * Math.exp(-Math.pow((phi - 0.58) / 0.08, 2));
 
-        const mildPhysioNoise = (Math.random() - 0.5) * 0.015;
-        yOffset = -((wave + mildPhysioNoise) * amplitude);
+        const wave = pWave + qWave + rWave + sWave + tWave;
+        const noise = (Math.random() - 0.5) * 0.012;
+        const y = baseline - (wave + noise) * amp;
 
-        if (phi >= 0.32 && phi <= 0.35 && isBeatArmed) {
-          audio.playECGBeep(760); // Lower, relaxed physiological beep
+        if (phi >= 0.30 && phi <= 0.33 && isBeatArmed) {
+          audio.playECGBeep(750);
           isBeatArmed = false;
         }
-        if (phi > 0.50) {
-          isBeatArmed = true;
-        }
+        if (phi > 0.50) isBeatArmed = true;
+        return y;
       }
-
-      return baseline + yOffset;
     }
 
     function animateECG() {
@@ -1267,12 +1144,11 @@
 
       ctx.fillStyle = '#01080e';
       ctx.fillRect(sweepX, 0, eraseWidth, canvasH);
-
       ctx.fillStyle = 'rgba(1, 8, 14, 0.02)';
       ctx.fillRect(0, 0, canvasW, canvasH);
 
       const nextX = sweepX + step;
-      const nextY = calculateSVTWave(globalSample);
+      const nextY = calculateLeadIISample(globalSample);
 
       ctx.save();
       ctx.beginPath();
@@ -1285,15 +1161,15 @@
         ctx.shadowColor = '#ff2222';
       } else if (currentRhythmMode === 'ROSC_SINUS') {
         ctx.strokeStyle = 'rgba(80, 200, 120, 0.55)';
-        ctx.lineWidth = 5.0;
+        ctx.lineWidth = 4.5;
         ctx.shadowColor = '#00ff66';
       } else {
         ctx.strokeStyle = 'rgba(0, 255, 102, 0.45)';
-        ctx.lineWidth = 5.0;
+        ctx.lineWidth = 4.5;
         ctx.shadowColor = '#00ff66';
       }
 
-      ctx.shadowBlur = 12;
+      ctx.shadowBlur = 10;
       ctx.lineCap = 'round';
       ctx.stroke();
 
@@ -1301,16 +1177,16 @@
       ctx.moveTo(sweepX, lastY);
       ctx.lineTo(nextX, nextY);
       ctx.strokeStyle = currentRhythmMode === 'ASYSTOLE' ? '#ff9999' : '#bbfce0';
-      ctx.lineWidth = 2.0;
+      ctx.lineWidth = 1.8;
       ctx.shadowColor = '#ffffff';
       ctx.shadowBlur = 4;
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.arc(nextX, nextY, 3, 0, Math.PI * 2);
+      ctx.arc(nextX, nextY, 2.5, 0, Math.PI * 2);
       ctx.fillStyle = currentRhythmMode === 'ASYSTOLE' ? '#ff3333' : '#ffffff';
       ctx.shadowColor = currentRhythmMode === 'ASYSTOLE' ? '#ff0000' : '#00ff66';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 8;
       ctx.fill();
       ctx.restore();
 
@@ -1320,250 +1196,183 @@
 
       if (sweepX >= canvasW) {
         sweepX = 0;
-        lastY = calculateSVTWave(globalSample);
+        lastY = calculateLeadIISample(globalSample);
       }
 
       requestAnimationFrame(animateECG);
     }
 
     /* ==========================================================
-       3. 6-STAGE SUPRAVENTRICULAR TACHYCARDIA CLINICAL WORKFLOW
-       Follows Malaysian MOH & International ALS Adult Tachycardia Algorithm:
-       Stage 1: Stable SVT recognition & Modified Valsalva (REVERT)
-       Stage 2: Persistent SVT -> First-line Adenosine 6mg rapid push + flush
-       Stage 3: Refractory SVT -> Second-line Adenosine 12mg rapid push
-       Stage 4: Acute Deterioration -> Recognition of Unstable SVT (Shock/Adverse signs)
-       Stage 5: Synchronised DC Cardioversion Protocol (Sync ON vs Unsync VF/Asystole pitfall)
-       Stage 6: Post-Cardioversion Assessment: ROSC / Normal Sinus Rhythm vs Asystole
+       3. 6-STAGE SVT WORKFLOW (4 Options, 1 Correct, Short & Precise)
        ========================================================== */
     const stagesData = [
       {
         stageNumber: 1,
-        title: "Stable SVT & Non-Pharmacological Management",
-        badge: "Initial Assessment & Vagal Maneuver",
-        competency: "Recognition of stable SVT and execution of Modified Valsalva",
-        scenario: "A 32-year-old female presents with sudden-onset palpitations, lightheadedness, and a sensation of her heart 'racing out of her chest'.<br><br><b>Clinical Assessment:</b><br>• Conscious, alert, anxious<br>• BP 118/75 mmHg (hemodynamically stable)<br>• SpO2 98% on room air<br>• Radial pulse 204 bpm, rapid and regular<br>• No chest pain, syncope, or signs of heart failure<br>• Monitor: Regular narrow-complex tachycardia (QRS < 0.10s) at 204 bpm without distinct P-waves (SVT).",
-        interventionNote: "Initial ED presentation – Hemodynamically stable SVT",
-        vitals: {
-          conscious: "Alert, Anxious",
-          resp: "Tachypneic (24/min)",
-          pulse: "Rapid, Thready (204 bpm)",
-          bp: "118/75 mmHg",
-          spo2: "98% on High-Flow Mask"
-        },
-        question: "THE PATIENT IS STABLE WITHOUT ADVERSE FEATURES. WHAT IS THE RECOMMENDED INITIAL INTERVENTION?",
+        title: "Vagal Maneuver",
+        badge: "First-Line Assessment",
+        competency: "Execution of Modified Valsalva (REVERT)",
+        scenario: "A 32-year-old female presents with sudden palpitations. BP 118/75 mmHg, alert, no chest pain. Monitor: Regular narrow-complex SVT at 200 bpm.",
+        interventionNote: "Stable SVT – Regular narrow-complex at 200 bpm",
+        vitals: { conscious: "Alert", resp: "24 /min", pulse: "200 bpm (Regular)", bp: "118/75 mmHg", spo2: "98% (Air)" },
+        question: "Patient is hemodynamically stable. What is the immediate first-line action?",
         options: [
-          { 
-            label: "A", 
-            text: "PERFORM THE MODIFIED VALSALVA MANEUVER (REVERT TECHNIQUE): SEMI-RECUMBENT FORCED EXPIRATION AT 40 mmHg FOR 15 SECONDS, FOLLOWED IMMEDIATELY BY LYING FLAT WITH 45° PASSIVE LEG ELEVATION FOR 15 SECONDS." 
-          },
-          { 
-            label: "B", 
-            text: "DELIVER IMMEDIATE UNSYNCHRONISED DEFIBRILLATION 200 J TO TERMINATE THE ARRHYTHMIA RAPIDLY." 
-          }
+          { label: "A", text: "Perform the Modified Valsalva (REVERT) maneuver." },
+          { label: "B", text: "Deliver an immediate unsynchronised shock of 200 J." },
+          { label: "C", text: "Administer IV Adrenaline 1 mg bolus immediately." },
+          { label: "D", text: "Initiate immediate chest compressions at 100–120 bpm." }
         ],
         correctAnswer: 0,
         correctFeedback: {
-          title: "CORRECT! – EXCELLENT FIRST-LINE DECISION",
-          html: "<b>Modified Valsalva Maneuver (REVERT trial protocol):</b><br>In hemodynamically stable SVT, non-pharmacological vagal maneuvers are the first-line intervention.<br><br><b>Technique:</b><ol><li>Patient blows into a 10 mL syringe (generating ~40 mmHg pressure) for 15 seconds in a semi-recumbent position.</li><li>Immediately reposition the patient supine with legs passively elevated at 45° for 15 seconds.</li><li>This optimizes venous return, increases vagal tone at the AV node, and achieves conversion rates up to 43% without drugs.</li></ol>"
+          title: "CORRECT – VAGAL STIMULATION",
+          html: "Modified Valsalva increases venous return and vagal tone, converting up to 43% of stable SVT without medications."
         },
         incorrectFeedback: {
-          title: "INCORRECT – CONTRAINDICATED IN STABLE SVT",
-          html: "The patient is completely stable with normal blood pressure (118/75 mmHg) and no adverse features (no shock, syncope, severe heart failure, or myocardial ischemia). Immediate defibrillation is aggressive, unnecessary, painful, and contraindicated in stable SVT without trying non-pharmacological or medical interventions first."
+          title: "INCORRECT MANAGEMENT",
+          html: "Defibrillation, adrenaline, and CPR are inappropriate and contraindicated in a conscious, stable patient with normal blood pressure."
         },
-        actionName: "PERFORMING MODIFIED VALSALVA (REVERT)",
-        actionSub: "Forced expiration (40 mmHg / 15s) -> Supine with 45° passive leg elevation...",
+        actionName: "PERFORMING MODIFIED VALSALVA",
+        actionSub: "Strain for 15s, then supine with 45° leg elevation...",
         nextAction: () => advanceStage(2)
       },
       {
         stageNumber: 2,
-        title: "Persistent SVT – First-Line Pharmacotherapy",
-        badge: "Pharmacotherapy (Initial Dose)",
-        competency: "Safe administration of Adenosine 6mg rapid IV bolus and flush",
-        scenario: "The Modified Valsalva maneuver causes a transient 2-second rate slowing, but the heart rate abruptly snaps back into narrow-complex SVT at 204 bpm.<br>The patient remains stable: BP 116/74 mmHg, alert, but increasingly anxious.<br>A wide-bore (18G) IV cannula has been secured in the right antecubital fossa with continuous 12-lead ECG telemetry active.",
-        interventionNote: "Post-Valsalva – Persistent Regular Narrow-Complex SVT",
-        vitals: {
-          conscious: "Alert, Anxious",
-          resp: "22/min",
-          pulse: "204 bpm (Regular, Narrow)",
-          bp: "116/74 mmHg",
-          spo2: "98% on Mask"
-        },
-        question: "VALSALVA FAILED TO CONVERT THE SVT. WHAT IS THE FIRST-LINE PHARMACOLOGICAL AGENT ACCORDING TO ALS GUIDELINES?",
+        title: "First-Line Drug",
+        badge: "Pharmacotherapy",
+        competency: "Administration of Adenosine 6 mg rapid IV push",
+        scenario: "Valsalva caused brief rate slowing, but SVT abruptly recurred at 200 bpm. BP is 116/74 mmHg. Large-bore IV access secured in right antecubital fossa.",
+        interventionNote: "Post-Valsalva – Persistent SVT at 200 bpm",
+        vitals: { conscious: "Alert, Anxious", resp: "22 /min", pulse: "200 bpm", bp: "116/74 mmHg", spo2: "98%" },
+        question: "Vagal maneuver failed. What is the first-line drug therapy?",
         options: [
-          { 
-            label: "A", 
-            text: "ADMINISTER ADENOSINE 6 MG VIA RAPID IV BOLUS (OVER 1–2 SECONDS) FOLLOWED IMMEDIATELY BY A 20 mL NORMAL SALINE FLUSH AND LIMB ELEVATION." 
-          },
-          { 
-            label: "B", 
-            text: "ADMINISTER IV ADRENALINE 1 MG RAPID PUSH TO RESTORE AUTONOMIC BALANCE." 
-          }
+          { label: "A", text: "Administer IV Atropine 1 mg rapid bolus." },
+          { label: "B", text: "Administer Adenosine 6 mg rapid IV push + 20 mL saline flush." },
+          { label: "C", text: "Administer IV Amiodarone 300 mg over 10 minutes." },
+          { label: "D", text: "Administer IV Calcium Chloride 10% 10 mL bolus." }
         ],
-        correctAnswer: 0,
+        correctAnswer: 1,
         correctFeedback: {
-          title: "CORRECT! – ADENOSINE 6 MG RAPID FLUSH INDICATED",
-          html: "<b>ALS Pharmacotherapy for Stable Regular Narrow-Complex Tachycardia:</b><ol><li><b>Adenosine 6 mg</b> rapid IV bolus is the drug of choice.</li><li>Because Adenosine has an ultra-short plasma half-life (< 10 seconds), it must be injected as a rapid push via a large proximal vein (antecubital fossa) followed immediately by a <b>rapid 20 mL 0.9% NaCl flush</b> and limb elevation.</li><li>Warn the patient beforehand about transient flushing, chest tightness, and a sense of impending doom.</li></ol>"
+          title: "CORRECT – ADENOSINE 6 MG",
+          html: "Adenosine transiently blocks AV nodal conduction. Give 6 mg as a rapid push followed immediately by a 20 mL saline flush."
         },
         incorrectFeedback: {
-          title: "INCORRECT – SEVERE PHARMACOLOGICAL ERROR",
-          html: "Adrenaline is an alpha/beta agonist indicated in cardiac arrest or anaphylactic shock. Giving Adrenaline to an SVT patient with a heart rate of 204 bpm will cause extreme sympathetic overdrive, potentially triggering ventricular fibrillation or hypertensive crisis. Adenosine 6 mg is the mandatory drug of choice."
+          title: "INCORRECT DRUG SELECTION",
+          html: "Atropine worsens tachycardia, while calcium and amiodarone are not first-line agents for stable narrow-complex SVT."
         },
         actionName: "INJECTING ADENOSINE 6 MG + 20 mL FLUSH",
-        actionSub: "Rapid IV push through right antecubital cannula with immediate arm elevation...",
+        actionSub: "Rapid push via antecubital fossa with immediate limb elevation...",
         nextAction: () => advanceStage(3)
       },
       {
         stageNumber: 3,
-        title: "Refractory SVT – Pharmacological Escalation",
-        badge: "Dose Escalation Protocol",
-        competency: "Identification of non-conversion and correct administration of Adenosine 12mg",
-        scenario: "Following the 6 mg Adenosine bolus, the patient experiences brief facial flushing and chest tightness with a 2-second sinus pause. However, regular narrow-complex SVT immediately resumes at 204 bpm.<br>The patient remains conscious, BP is 112/72 mmHg, and pulse remains palpable and rapid at 204 bpm.",
-        interventionNote: "Post-Adenosine 6mg – Persistent SVT at 204 bpm",
-        vitals: {
-          conscious: "Conscious, Flushed",
-          resp: "24/min",
-          pulse: "204 bpm (Regular, Narrow)",
-          bp: "112/72 mmHg",
-          spo2: "97% on Mask"
-        },
-        question: "THE INITIAL 6 MG DOSE OF ADENOSINE WAS INEFFECTIVE. WHAT IS THE NEXT IMMEDIATE PHARMACOLOGICAL STEP?",
+        title: "Dose Escalation",
+        badge: "Refractory SVT",
+        competency: "Escalation to Adenosine 12 mg rapid IV push",
+        scenario: "Following Adenosine 6 mg, a 2-second sinus pause occurred, but SVT immediately resumed at 200 bpm. BP is 114/72 mmHg.",
+        interventionNote: "Post-Adenosine 6mg – Persistent SVT at 200 bpm",
+        vitals: { conscious: "Alert, Flushed", resp: "24 /min", pulse: "200 bpm", bp: "114/72 mmHg", spo2: "97%" },
+        question: "The 6 mg dose was ineffective. What is the next pharmacological step?",
         options: [
-          { 
-            label: "A", 
-            text: "ADMINISTER ADENOSINE 12 MG VIA RAPID IV BOLUS FOLLOWED BY A 20 mL RAPID SALINE FLUSH." 
-          },
-          { 
-            label: "B", 
-            text: "ADMINISTER IV ATROPINE 1 MG RAPID BOLUS TO STIMULATE SINOATRIAL CONDUCTION." 
-          }
+          { label: "A", text: "Administer IV Digoxin 0.5 mg slow bolus." },
+          { label: "B", text: "Administer Sublingual Glyceryl Trinitrate (GTN) 0.5 mg." },
+          { label: "C", text: "Administer Adenosine 12 mg rapid IV push + 20 mL saline flush." },
+          { label: "D", text: "Administer a reduced dose of Adenosine 3 mg IV push." }
         ],
-        correctAnswer: 0,
+        correctAnswer: 2,
         correctFeedback: {
-          title: "CORRECT! – ADENOSINE 12 MG ESCALATION EXECUTED",
-          html: "<b>ALS Escalation Protocol:</b><ol><li>If Adenosine 6 mg fails to convert SVT within 1–2 minutes, administer a <b>second dose of Adenosine 12 mg</b> rapid IV bolus followed by a 20 mL saline flush.</li><li>If 12 mg fails, a further 12 mg (or 18 mg depending on specific local protocol) may be considered, or alternative AV nodal blocking agents (IV Verapamil / Diltiazem or Beta-blocker) in consultation with senior clinicians, provided the patient remains stable.</li></ol>"
+          title: "CORRECT – ADENOSINE 12 MG",
+          html: "If Adenosine 6 mg fails to terminate SVT within 1–2 minutes, escalate to a second dose of 12 mg rapid IV push with flush."
         },
         incorrectFeedback: {
-          title: "INCORRECT – ATROPINE IS STRICTLY CONTRAINDICATED",
-          html: "Atropine is an anticholinergic vagolytic indicated for <i>bradycardia</i>. Administering Atropine in tachyarrhythmia abolishes any remaining parasympathetic braking and will severely exacerbate the tachycardia. The correct ALS action is escalating Adenosine to 12 mg rapid IV push."
+          title: "INCORRECT DRUG SELECTION",
+          html: "Digoxin has delayed onset, GTN causes vasodilation without rate control, and reducing the adenosine dose is ineffective."
         },
         actionName: "INJECTING ADENOSINE 12 MG + 20 mL FLUSH",
-        actionSub: "Rapid second-dose bolus and immediate 20 mL saline flush...",
+        actionSub: "Administering second-dose 12 mg rapid bolus...",
         nextAction: () => advanceStage(4)
       },
       {
         stageNumber: 4,
-        title: "Acute Hemodynamic Collapse – Unstable SVT",
-        badge: "Adverse Features Recognition (Critical)",
-        competency: "Recognition of adverse features requiring emergent Synchronised Cardioversion",
-        scenario: "Following the 12 mg Adenosine dose, the rhythm does NOT convert and remains in SVT at 210 bpm.<br><b>Suddenly, the patient turns ash-grey, cold, and diaphoretic:</b><br>• Patient gasps: <i>'Doctor, I have severe crushing chest pain, everything is going black!'</i><br>• Consciousness rapidly deteriorates: GCS 11 (E2V3M6, lethargic, confused)<br>• <b>Blood Pressure plunges to 72/40 mmHg (MAP 50 mmHg)</b><br>• Radial pulse is faint/thready, central carotid pulse is rapid and weak.",
-        interventionNote: "ACUTE COLLAPSE – SVT with Adverse Signs (Hypotension & Ischemia)",
-        vitals: {
-          conscious: "Lethargic, Confused (GCS 11)",
-          resp: "Labored, Shallow (28/min)",
-          pulse: "Weak, Thready (210 bpm)",
-          bp: "72/40 mmHg (Shock / Collapse)",
-          spo2: "90% on Room Air"
-        },
-        question: "THE PATIENT HAS DEVELOPED CLEAR ADVERSE FEATURES (SHOCK, CHEST PAIN, IMPAIRED CONSCIOUSNESS). WHAT IS THE MANDATORY IMMEDIATE MANAGEMENT?",
+        title: "Acute Instability",
+        badge: "Adverse Features",
+        competency: "Recognition of unstable tachycardia requiring electrical cardioversion",
+        scenario: "SVT persists at 200 bpm. The patient suddenly turns pale and sweaty, reporting severe crushing chest pain. BP drops to 72/40 mmHg (shock). GCS 11 (confused).",
+        interventionNote: "ACUTE COLLAPSE – SVT with Shock (BP 72/40) & Chest Pain",
+        vitals: { conscious: "Confused (GCS 11)", resp: "28 /min (Labored)", pulse: "200 bpm (Weak)", bp: "72/40 mmHg", spo2: "90%" },
+        question: "The patient developed shock and myocardial ischemia. What is the immediate action?",
         options: [
-          { 
-            label: "A", 
-            text: "INFUSE 1000 mL OF 5% DEXTROSE OVER 1 HOUR AND RE-ATTEMPT ANOTHER DOSE OF ADENOSINE." 
-          },
-          { 
-            label: "B", 
-            text: "PREPARE FOR IMMEDIATE SYNCHRONISED DC CARDIOVERSION WITH EMERGENCY AIRWAY SUPPORT AND PROCEDURAL SEDATION/ANALGESIA." 
-          }
+          { label: "A", text: "Infuse 1,000 mL 5% Dextrose over 10 minutes." },
+          { label: "B", text: "Prepare for immediate Synchronised DC Cardioversion." },
+          { label: "C", text: "Administer a third dose of Adenosine 18 mg IV." },
+          { label: "D", text: "Place the patient in Trendelenburg position and observe." }
         ],
         correctAnswer: 1,
         correctFeedback: {
-          title: "CORRECT! – URGENT CARDIOVERSION CRITERIA MET",
-          html: "<b>Emergency Electrical Cardioversion Indications:</b><br>The presence of any <b>Adverse Features</b> in tachyarrhythmia mandates immediate Synchronised DC Cardioversion:<ol><li><b>Shock:</b> Hypotension (BP 72/40 mmHg), cold clammy skin, pallor.</li><li><b>Syncope / Altered mental status:</b> Cerebral hypoperfusion (GCS 11).</li><li><b>Myocardial Ischemia:</b> Severe crushing retrosternal pain.</li><li><b>Heart Failure:</b> Pulmonary congestion, hypoxia.</li></ol>Do not waste precious minutes attempting further medical therapy when the patient is in cardiogenic shock."
+          title: "CORRECT – IMMEDIATE CARDIOVERSION",
+          html: "The presence of adverse features (hypotension/shock, chest pain, altered consciousness) mandates immediate electrical cardioversion."
         },
         incorrectFeedback: {
-          title: "INCORRECT – FATAL DELAY IN CARDIOGENIC SHOCK",
-          html: "With BP 72/40 mmHg and ischemic chest pain, the patient is in decompensated shock due to loss of cardiac output. Further drug attempts or slow fluid infusions will lead directly to cardiac arrest and asystole. Immediate Synchronised DC Cardioversion is required."
+          title: "INCORRECT MANAGEMENT",
+          html: "Do not delay electrical therapy with IV fluids, observation, or further drugs when the patient is in decompensated cardiogenic shock."
         },
-        actionName: "ATTACHING DEFIBRILLATOR PADS & AIRWAY PREPARATION",
-        actionSub: "Applying anterolateral pads, high-flow oxygen, preparing sedation...",
+        actionName: "ATTACHING DEFIBRILLATOR PADS",
+        actionSub: "Applying pads, high-flow oxygen, preparing procedural sedation...",
         nextAction: () => advanceStage(5)
       },
       {
         stageNumber: 5,
-        title: "Synchronised DC Cardioversion Technique",
-        badge: "Electrical Safety & Synchronization (High Difficulty)",
-        competency: "Correct application of 'SYNC' mode to prevent lethal R-on-T Ventricular Fibrillation & Asystole",
-        scenario: "The defibrillator pads are applied. Minimal procedural sedation (Midazolam 2 mg IV) is given.<br>The team prepares to deliver the shock.<br>A junior staff member reaches over and shouts: <i>'Let us shock immediately at 200 Joules without waiting for the sync markers to save time!'</i>",
-        interventionNote: "Peri-Shock Configuration – Narrow-Complex Unstable Tachycardia",
-        vitals: {
-          conscious: "Sedated / GCS 9",
-          resp: "Assisted via BVM (100% O2)",
-          pulse: "Weak Carotid (210 bpm)",
-          bp: "70/38 mmHg",
-          spo2: "92% on BVM"
-        },
-        question: "HOW MUST THE DEFIBRILLATOR BE CONFIGURED BEFORE DELIVERING THE SHOCK FOR NARROW-COMPLEX SVT?",
+        title: "Cardioversion Setup",
+        badge: "Critical Execution",
+        competency: "Activating SYNC mode to prevent lethal R-on-T Asystole",
+        scenario: "Defibrillator pads attached. Minimal IV sedation given. The team prepares to deliver the shock. Defibrillator is currently powered on.",
+        interventionNote: "Peri-Shock – Unstable SVT (BP 70/38 mmHg)",
+        vitals: { conscious: "Sedated", resp: "BVM 100% O2", pulse: "200 bpm (Weak)", bp: "70/38 mmHg", spo2: "92%" },
+        question: "How must the defibrillator be configured for unstable narrow-complex SVT?",
         options: [
-          { 
-            label: "A", 
-            text: "DELIVER AN UNSYNCHRONISED SHOCK (200 J BIPHASIC) IMMEDIATELY WITHOUT ACTIVATING SYNC MODE." 
-          },
-          { 
-            label: "B", 
-            text: "ACTIVATE 'SYNC' MODE ON THE DEFIBRILLATOR, CONFIRM SYNC MARKERS ON EACH R-WAVE TO PREVENT R-ON-T INDUCTION, SELECT 70–100 J BIPHASIC (OR 100 J MONOPHASIC), ENSURE ALL PERSONNEL ARE CLEAR, AND PRESS AND HOLD THE SHOCK BUTTON." 
-          }
+          { label: "A", text: "Deliver an UNSYNCHRONISED shock of 200 J immediately." },
+          { label: "B", text: "Charge to 360 J monophasic with SYNC deactivated." },
+          { label: "C", text: "Administer IV Lignocaine 100 mg instead of electrical therapy." },
+          { label: "D", text: "Activate SYNC mode, verify R-wave markers, and deliver 70–100 J biphasic." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 3,
         isLethalStage: true,
         correctFeedback: {
-          title: "CORRECT! – SYNCHRONISED CARDIOVERSION SAFELY EXECUTED",
-          html: "<b>Crucial Safety Concept in Cardioversion:</b><ol><li><b>The SYNC Function:</b> In a patient with an organized cardiac rhythm (even rapid SVT), the shock <b>must be synchronized with the R-wave</b>.</li><li><b>Avoid R-on-T Phenomenon:</b> If an unsynchronised shock is delivered during the vulnerable repolarization period (peak or downslope of the T-wave), it triggers lethal <b>Ventricular Fibrillation or immediate Asystolic arrest</b>.</li><li><b>Initial Energy:</b> For narrow-complex SVT, the recommended initial biphasic energy is <b>70–100 Joules</b>.</li></ol>"
+          title: "CORRECT – SYNCHRONISED SHOCK DELIVERED",
+          html: "Synchronisation delivers energy on the R-wave, completely preventing shock delivery during the vulnerable T-wave repolarization window."
         },
         incorrectFeedback: {
-          title: "CATASTROPHIC ERROR – UNSYNCHRONISED SHOCK INDUCED ASYSTOLE!",
-          html: "<b>Fatal R-on-T Phenomenon Triggered:</b><br>Delivering an unsynchronised shock struck the cardiac cycle directly during the vulnerable T-wave repolarization phase!<br><br>The heart immediately degenerated into Ventricular Fibrillation followed by total electrical standstill: <b>ASYSTOLE (FLATLINE)</b>.<br>The patient has lost all central pulse and is now in full cardiac arrest."
+          title: "FATAL ERROR – UNSYNCHRONISED SHOCK",
+          html: "Unsynchronised delivery fired directly during the vulnerable T-wave (R-on-T phenomenon), triggering VF and total electrical standstill: <b>ASYSTOLE</b>."
         },
-        actionName: "DELIVERING SYNCHRONISED DC SHOCK",
-        actionSub: "Sync verified on R-waves -> Charging 100 J -> 'STAND CLEAR' -> Discharging...",
+        actionName: "DELIVERING SYNCHRONISED CARDIOVERSION",
+        actionSub: "Sync verified -> Charging 100 J -> Stand clear -> Discharging...",
         nextAction: () => advanceStage(6)
       },
       {
         stageNumber: 6,
-        title: "Post-Cardioversion Assessment: ROSC & Stabilization",
-        badge: "Post-Resuscitation Care Bundle",
-        competency: "Confirmation of ROSC, 12-lead ECG analysis, and post-stabilization bundle",
-        scenario: "The shock is safely discharged synchronously on the R-wave.<br><b>A dramatic transition occurs on the monitor:</b><br>The racing narrow SVT ceases! A brief 1.5-second pause occurs, followed by regular, crisp P-QRS-T complexes at <b>76 bpm</b>.<br>The nurse palpates the right carotid and radial artery: <i>'Strong, bounding radial pulse detected!'</i><br>The patient opens her eyes, breathing normally: <i>'My chest feels so much lighter, the racing has stopped!'</i>",
-        interventionNote: "ROSC ACHIEVED – Conversion to Normal Sinus Rhythm (NSR)",
-        vitals: {
-          conscious: "Alert, Calm (GCS 15)",
-          resp: "16/min (Unlabored)",
-          pulse: "Strong, Regular (76 bpm)",
-          bp: "122/78 mmHg (Normalized)",
-          spo2: "99% on 2L Nasal Cannula"
-        },
-        question: "ROSC AND NORMAL SINUS RHYTHM HAVE BEEN ACHIEVED. WHAT IS THE ESSENTIAL POST-CARDIOVERSION MANAGEMENT BUNDLE?",
+        title: "ROSC & Post-Care",
+        badge: "Stabilization",
+        competency: "Confirmation of ROSC and post-cardioversion bundle",
+        scenario: "Synchronised shock delivered. Racing SVT terminates. Monitor shows regular Normal Sinus Rhythm at 76 bpm. Strong radial pulse palpated. BP 122/78 mmHg. Patient alert.",
+        interventionNote: "ROSC ACHIEVED – Converted to Normal Sinus Rhythm (76 bpm)",
+        vitals: { conscious: "Alert (GCS 15)", resp: "16 /min", pulse: "76 bpm (Strong)", bp: "122/78 mmHg", spo2: "99%" },
+        question: "ROSC achieved. What is the essential post-conversion care bundle?",
         options: [
-          { 
-            label: "A", 
-            text: "IMMEDIATELY DISCONNECT THE DEFIBRILLATOR PADS, STOP THE IV LINE, AND DISCHARGE THE PATIENT DIRECTLY HOME WITH ORAL SEDATIVES." 
-          },
-          { 
-            label: "B", 
-            text: "CONFIRM HEMODYNAMIC STABILITY (BP 122/78 mmHg, STRONG PULSES), ACQUIRE AN IMMEDIATE 12-LEAD ECG (ASSESS FOR WPW DELTA WAVES, QT PROLONGATION, OR ISCHEMIC CHANGES), CHECK SERUM ELECTROLYTES (K+, Mg2+) AND CARDIAC ENZYMES, AND ARRANGE INPATIENT CARDIOLOGY EVALUATION." 
-          }
+          { label: "A", text: "Record an immediate 12-lead ECG, check electrolytes, and maintain monitoring." },
+          { label: "B", text: "Disconnect all monitoring and discharge the patient home immediately." },
+          { label: "C", text: "Start an IV Adrenaline infusion at 10 mcg/min maintenance." },
+          { label: "D", text: "Administer IV Adenosine 6 mg as prophylaxis to prevent recurrence." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 0,
         correctFeedback: {
-          title: "CORRECT! – MASTER CLINICIAN POST-ROSC MANAGEMENT",
-          html: "<b>Post-Conversion Care Bundle:</b><ol><li><b>Immediate 12-lead ECG:</b> Crucial to analyze underlying etiology in sinus rhythm. Look closely for short PR and <b>delta waves (Wolff-Parkinson-White syndrome)</b>, underlying myocardial ischemia, or pre-existing bundle branch blocks.</li><li><b>Laboratory Investigation:</b> Check serum electrolytes (hypokalemia or hypomagnesemia lower the arrhythmia threshold), cardiac biomarkers, and thyroid function.</li><li><b>Continuous Monitoring:</b> Keep defibrillator pads and monitoring leads attached; SVT can recur if the pre-excitation pathway remains irritable.</li><li><b>Cardiology Referral:</b> Refer for electrophysiological study (EPS) and catheter ablation if recurrent AVNRT or AVRT/WPW is suspected.</li></ol>"
+          title: "CORRECT – ROSC CARE BUNDLE",
+          html: "A post-conversion 12-lead ECG evaluates for underlying pre-excitation (WPW delta waves) or ischemia. Electrolyte evaluation prevents recurrence."
         },
         incorrectFeedback: {
-          title: "INCORRECT – PREMATURE DISCHARGE HAZARD",
-          html: "Post-cardioversion patients require systematic post-resuscitation evaluation. An immediate 12-lead ECG in sinus rhythm is essential to identify the underlying cause (such as Wolff-Parkinson-White syndrome), verify electrolyte stability, and observe for recurrence in an monitored emergency bed."
+          title: "INCORRECT MANAGEMENT",
+          html: "Premature discharge is unsafe, adrenaline infusion is contraindicated in normotensive sinus rhythm, and prophylactic adenosine is inappropriate."
         },
-        actionName: "ACQUIRING 12-LEAD ECG & STABILIZING",
-        actionSub: "Recording 12-lead ECG, assessing delta waves, confirming hemodynamics...",
+        actionName: "RECORDING 12-LEAD ECG & STABILIZING",
+        actionSub: "Assessing PR interval, delta waves, and hemodynamic stability...",
         nextAction: () => displayFinalAssessment()
       }
     ];
@@ -1582,7 +1391,6 @@
       document.getElementById('questionHeading').innerText = data.question;
       document.getElementById('activeInterventionText').innerText = data.interventionNote;
 
-      // Update vitals
       if (data.vitals) {
         document.getElementById('consciousVal').innerText = data.vitals.conscious;
         document.getElementById('respVal').innerText = data.vitals.resp;
@@ -1591,7 +1399,6 @@
         document.getElementById('spo2Val').innerText = data.vitals.spo2;
 
         if (stageIdx === 5) {
-          // Stage 6 ROSC
           document.getElementById('consciousVal').style.color = "var(--emerald)";
           document.getElementById('pulseVal').className = "vital-value good";
           document.getElementById('bpVal').className = "vital-value good";
@@ -1601,9 +1408,7 @@
         }
       }
 
-      // Rhythm update
       if (stageIdx === 5) {
-        // Stage 6 achieved: ROSC
         currentRhythmMode = 'ROSC_SINUS';
         document.getElementById('monitorHR').innerText = "76";
         document.getElementById('monitorHR').style.color = "var(--emerald)";
@@ -1615,7 +1420,7 @@
         document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse-fill" style="color: var(--emerald);"></i> LEAD II (PERFUSING)';
       } else {
         currentRhythmMode = 'SVT';
-        document.getElementById('monitorHR').innerText = "204";
+        document.getElementById('monitorHR').innerText = "200";
         document.getElementById('monitorHR').style.color = "#00ff66";
         document.getElementById('rateLabelText').style.color = "#00ff66";
         const alertTag = document.getElementById('rhythmAlertTag');
@@ -1625,10 +1430,8 @@
         document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)';
       }
 
-      // Populate options
       const optsBox = document.getElementById('optionsContainer');
       optsBox.innerHTML = '';
-
       data.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'btn-decision';
@@ -1641,7 +1444,6 @@
     function handleAnswer(selectedIdx) {
       const data = stagesData[currentStage];
       attempts[currentStage]++;
-
       const isCorrect = (selectedIdx === data.correctAnswer);
       
       const backdrop = document.getElementById('feedbackBackdrop');
@@ -1656,9 +1458,7 @@
 
       if (isCorrect) {
         audio.playCorrectSound();
-        if (attempts[currentStage] === 1) {
-          scores[currentStage] = 1;
-        }
+        if (attempts[currentStage] === 1) scores[currentStage] = 1;
         updateScoreHUD();
 
         box.classList.remove('incorrect', 'asystole-fatal');
@@ -1668,14 +1468,14 @@
         body.innerHTML = data.correctFeedback.html;
 
         actionBtn.className = 'modal-action-btn btn-emerald';
-        actionBtn.innerText = currentStage === 5 ? 'VIEW FINAL PERFORMANCE SUMMARY' : 'EXECUTE PROCEDURE & ADVANCE';
+        actionBtn.innerText = currentStage === 5 ? 'VIEW FINAL PERFORMANCE' : 'CONTINUE';
         actionBtn.onclick = () => {
           closeModal();
           triggerActionSimulation(data.actionName, data.actionSub, data.nextAction);
         };
       } else {
-        // Check if lethal failure occurred (e.g. Unsynchronised shock in Stage 5)
-        if (data.isLethalStage && selectedIdx === 0) {
+        // Lethal pitfall check in Stage 5: Unsynchronised shocks (Options A or B)
+        if (data.isLethalStage && (selectedIdx === 0 || selectedIdx === 1)) {
           triggerFatalAsystole();
           return;
         }
@@ -1689,18 +1489,16 @@
         body.innerHTML = data.incorrectFeedback.html;
 
         actionBtn.className = 'modal-action-btn btn-rose';
-        actionBtn.innerText = 'RETRY CLINICAL DECISION';
+        actionBtn.innerText = 'RETRY';
         actionBtn.onclick = closeModal;
       }
     }
 
-    /* Trigger Asystole Lethal Outcome */
     function triggerFatalAsystole() {
       simulationTerminatedInAsystole = true;
       currentRhythmMode = 'ASYSTOLE';
       audio.startAsystoleTone();
 
-      // Update Monitor Telemetry to Flatline
       document.getElementById('monitorHR').innerText = "0";
       document.getElementById('monitorHR').style.color = "var(--asystole-red)";
       document.getElementById('rateLabelText').style.color = "var(--asystole-red)";
@@ -1708,14 +1506,13 @@
       alertTag.innerText = "ASYSTOLE / CARDIAC ARREST";
       alertTag.className = "rhythm-alert asystole-state";
       document.getElementById('statusBadgeTag').innerText = "CARDIAC ARREST (ASYSTOLE)";
-      document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--asystole-red);"></i> LEAD II (NO ELECTRICAL ACTIVITY)';
+      document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--asystole-red);"></i> LEAD II (ASYSTOLE)';
 
-      // Update Vitals to Arrest
-      document.getElementById('consciousVal').innerText = "Unresponsive (GCS 3)";
+      document.getElementById('consciousVal').innerText = "Unresponsive";
       document.getElementById('consciousVal').className = "vital-value fatal";
-      document.getElementById('respVal').innerText = "Apneic (0/min)";
+      document.getElementById('respVal').innerText = "Apneic (0 /min)";
       document.getElementById('respVal').className = "vital-value fatal";
-      document.getElementById('pulseVal').innerText = "NO CENTRAL PULSE (PULSELESS)";
+      document.getElementById('pulseVal').innerText = "NO CENTRAL PULSE";
       document.getElementById('pulseVal').className = "vital-value fatal";
       document.getElementById('bpVal').innerText = "0 / 0 mmHg";
       document.getElementById('bpVal').className = "vital-value fatal";
@@ -1730,22 +1527,15 @@
       box.classList.add('asystole-fatal');
       icon.innerHTML = '<i class="bi bi-heartbreak-fill" style="color: var(--asystole-red);"></i>';
       title.style.color = 'var(--asystole-red)';
-      title.innerText = "PATIENT COLLAPSED INTO ASYSTOLE!";
+      title.innerText = "PATIENT COLLAPSED INTO ASYSTOLE";
       body.innerHTML = `
-        <div style="background: rgba(255,34,34,0.15); border: 1px solid var(--asystole-red); padding: 12px; border-radius: 8px; margin-bottom: 12px; color: #ffcccc;">
-          <strong>CRITICAL ALS PITFALL OCCURRED:</strong><br>
-          An unsynchronised shock of 200 J was fired blindly. The electrical discharge collided directly with the T-wave repolarization limb (R-on-T phenomenon). The heart instantly degenerated into Ventricular Fibrillation and deteriorated into <b>FLATLINE ASYSTOLE</b>.
-        </div>
-        <b>Consequences:</b>
-        <ul>
-          <li>Patient is pulseless and non-breathing (Cardiac Arrest).</li>
-          <li>Monitor displays Asystole (0 BPM).</li>
-          <li>Immediate high-quality CPR and the non-shockable ALS algorithm (Adrenaline 1mg IV every 3–5 min) must now be initiated.</li>
-        </ul>
+        <b>CRITICAL PITFALL: R-on-T PHENOMENON</b><br>
+        An unsynchronised shock struck during the vulnerable T-wave repolarization phase, causing Ventricular Fibrillation and rapid decay into <b>FLATLINE ASYSTOLE</b>.<br>
+        Patient is pulseless. Immediate CPR is required.
       `;
 
       actionBtn.className = 'modal-action-btn btn-fatal-restart';
-      actionBtn.innerText = 'VIEW FATAL TERMINATION SUMMARY';
+      actionBtn.innerText = 'VIEW FATAL SUMMARY';
       actionBtn.onclick = () => {
         closeModal();
         audio.stopAsystoleTone();
@@ -1770,7 +1560,6 @@
       loadStageUI(currentStage);
     }
 
-    /* Animated Procedure Overlay */
     function triggerActionSimulation(name, sub, callback) {
       const overlay = document.getElementById('actionOverlay');
       const fill = document.getElementById('actionFill');
@@ -1783,8 +1572,8 @@
       if (name.includes("CARDIOVERSION")) {
         audio.playCardioversionSound();
         const flash = document.getElementById('shockFlash');
-        flash.style.animation = 'cardioversionFlash 0.4s ease-out forwards';
-        setTimeout(() => { flash.style.animation = 'none'; }, 450);
+        flash.style.animation = 'cardioversionFlash 0.35s ease-out forwards';
+        setTimeout(() => { flash.style.animation = 'none'; }, 400);
       }
 
       overlay.style.display = 'flex';
@@ -1792,25 +1581,24 @@
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 3;
+        progress += 4;
         fill.style.width = progress + '%';
         if (progress >= 100) {
           clearInterval(interval);
           setTimeout(() => {
             overlay.style.display = 'none';
             if (callback) callback();
-          }, 300);
+          }, 250);
         }
-      }, 25);
+      }, 20);
     }
 
-    /* Final 6-Stage Assessment Results */
     function displayFinalAssessment() {
       audio.stopAsystoleTone();
       document.getElementById('mainGrid').style.display = 'none';
       const resultsView = document.getElementById('resultsView');
       resultsView.style.display = 'flex';
-      resultsView.style.maxWidth = '950px';
+      resultsView.style.maxWidth = '900px';
       resultsView.style.margin = '2rem auto';
       document.querySelector('main').parentNode.insertBefore(resultsView, document.querySelector('footer'));
 
@@ -1821,19 +1609,16 @@
       const verdictEl = document.getElementById('verdictText');
       if (simulationTerminatedInAsystole) {
         verdictEl.style.color = 'var(--asystole-red)';
-        verdictEl.innerText = "SIMULATION FAILED: PATIENT DETERIORATED INTO ASYSTOLE DUE TO PROTOCOL DEVIATION";
+        verdictEl.innerText = "UNSUCCESSFUL: PATIENT DETERIORATED INTO ASYSTOLE";
       } else if (totalScore === 6) {
         verdictEl.style.color = 'var(--emerald)';
-        verdictEl.innerText = "6/6: EXCELLENT – SUCCESSFUL ROSC ACHIEVED! (MASTER CLINICIAN SVT MANAGEMENT)";
+        verdictEl.innerText = "EXCELLENT (6/6): SUCCESSFUL ROSC & CLINICAL COMPETENCE";
       } else if (totalScore === 5) {
         verdictEl.style.color = 'var(--gold)';
-        verdictEl.innerText = "5/6: SATISFACTORY – SUCCESSFUL ROSC WITH MINOR ALS REMEDIATION REQUIRED";
-      } else if (totalScore >= 3) {
-        verdictEl.style.color = '#FFA500';
-        verdictEl.innerText = `${totalScore}/6: NEEDS IMPROVEMENT – REVIEW ALS TACHYCARDIA & CARDIOVERSION PROTOCOLS`;
+        verdictEl.innerText = "SATISFACTORY (5/6): ROSC ACHIEVED WITH MINOR IMPROVEMENT NEEDED";
       } else {
         verdictEl.style.color = 'var(--danger)';
-        verdictEl.innerText = `${totalScore}/6: UNSUCCESSFUL – REPEAT SVT SIMULATION STATION`;
+        verdictEl.innerText = `${totalScore}/6: NEEDS IMPROVEMENT – REPEAT SIMULATION`;
       }
 
       const tbody = document.getElementById('resultsTableContent');
@@ -1845,7 +1630,7 @@
           <td><strong>Stage ${stg.stageNumber}</strong></td>
           <td>${stg.competency}</td>
           <td style="color: ${pass ? 'var(--emerald)' : 'var(--danger)'}; font-weight: 600;">
-            ${pass ? '<i class="bi bi-check-lg"></i> Correct (1st Attempt)' : '<i class="bi bi-x-lg"></i> Remediation Required'}
+            ${pass ? '<i class="bi bi-check-lg"></i> Correct' : '<i class="bi bi-x-lg"></i> Incorrect'}
           </td>
           <td style="font-weight: 700; color: ${pass ? 'var(--emerald)' : 'var(--danger)'};">${scores[i]} / 1</td>
         `;
@@ -1869,16 +1654,11 @@
       loadStageUI(0);
     }
 
-    // Initialize application on DOM load
     window.addEventListener('DOMContentLoaded', () => {
       resizeCanvas();
       animateECG();
       loadStageUI(0);
-
-      // Auto-unlock Web Audio on first user interaction anywhere
-      document.body.addEventListener('click', () => {
-        audio.init();
-      }, { once: true });
+      document.body.addEventListener('click', () => { audio.init(); }, { once: true });
     });
   </script>
 </body>
