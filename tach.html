@@ -1,0 +1,907 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Simulation: Pulseless Ventricular Tachycardia</title>
+    <style>
+        /* CSS Variables for Elegant Theme */
+        :root {
+            --bg-dark: #070B19;
+            --bg-panel: rgba(16, 26, 48, 0.7);
+            --bg-panel-border: rgba(80, 200, 120, 0.2);
+            --emerald: #50C878;
+            --emerald-glow: rgba(80, 200, 120, 0.6);
+            --gold: #FFD700;
+            --gold-glow: rgba(255, 215, 0, 0.4);
+            --danger: #FF4C4C;
+            --text-main: #E2E8F0;
+            --text-muted: #94A3B8;
+            --monitor-bg: #030611;
+            --ecg-green: #00FF41;
+        }
+
+        /* Global Reset & Typography */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Background effects */
+        .background-glow {
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, var(--emerald-glow) 0%, transparent 70%);
+            opacity: 0.15;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .background-glow-alt {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+            opacity: 0.1;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        /* Header */
+        header {
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--bg-panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(7, 11, 25, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--emerald);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .score-display {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        /* Main Content Grid */
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--bg-panel-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Cardiac Monitor */
+        .monitor-container {
+            background: var(--monitor-bg);
+            border-radius: 8px;
+            border: 2px solid #1a2c4e;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,1);
+        }
+
+        /* CSS Grid overlay for monitor */
+        .monitor-container::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: 20px 20px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 255, 65, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
+            pointer-events: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .monitor-stats {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: var(--ecg-green);
+            font-family: monospace;
+            text-align: right;
+            text-shadow: 0 0 5px var(--ecg-green);
+        }
+
+        .heart-rate {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .rhythm-label {
+            font-size: 1rem;
+            color: #FF0000;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Patient Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.75rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--emerald);
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Decision Section */
+        .scenario-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-box {
+            background: rgba(80, 200, 120, 0.1);
+            border: 1px solid var(--emerald);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--emerald);
+            text-align: center;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--gold);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .btn-option .opt-letter {
+            background: var(--gold);
+            color: black;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        /* Modals & Overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--bg-panel);
+            border: 2px solid var(--emerald);
+            border-radius: 12px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 30px var(--emerald-glow);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-content.incorrect {
+            border-color: var(--danger);
+            box-shadow: 0 0 30px rgba(255, 76, 76, 0.3);
+        }
+
+        .modal-content.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .modal-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+            text-align: left;
+        }
+
+        .modal-text ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            background: var(--emerald);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-action:hover {
+            box-shadow: 0 0 20px var(--emerald-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-action.btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-action.btn-danger:hover {
+            box-shadow: 0 0 20px rgba(255, 76, 76, 0.5);
+        }
+
+        /* Special Animations */
+        .shock-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        @keyframes shockFlash {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* CPR Progress */
+        .cpr-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 50;
+        }
+
+        .cpr-text {
+            font-size: 2rem;
+            color: var(--emerald);
+            margin-bottom: 2rem;
+            animation: pulse 1s infinite;
+        }
+
+        .progress-bar {
+            width: 60%;
+            height: 20px;
+            background: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--emerald);
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--emerald);
+            box-shadow: 0 0 10px var(--emerald);
+            transition: width 0.1s linear;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Final Results Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        th, td {
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: rgba(80, 200, 120, 0.1);
+            color: var(--emerald);
+            text-transform: uppercase;
+        }
+
+        /* Disclaimer */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-glow"></div>
+    <div class="background-glow-alt"></div>
+    <div class="shock-overlay" id="shockOverlay"></div>
+
+    <header>
+        <div>
+            <div class="header-title">ED Simulation Station</div>
+            <div class="header-subtitle">Adult Tachyarrhythmia – Ventricular Tachycardia</div>
+        </div>
+        <div class="score-display">Score: <span id="scoreDisplay">0</span>/4</div>
+    </header>
+
+    <main id="mainContainer">
+        <!-- Left Panel: Patient Status -->
+        <div class="panel">
+            <div class="panel-title">Clinical Monitor & Status</div>
+            
+            <div class="monitor-container">
+                <canvas id="ecgCanvas"></canvas>
+                <div class="monitor-stats">
+                    <div class="heart-rate">210</div>
+                    <div>HR (bpm)</div>
+                    <div class="rhythm-label">VT</div>
+                </div>
+            </div>
+
+            <div class="info-grid" id="patientStatusGrid">
+                <div class="info-item">
+                    <div class="info-label">Age / Gender</div>
+                    <div class="info-value">40 years / Male</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Consciousness</div>
+                    <div class="info-value" id="statusConscious">Unresponsive</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Breathing</div>
+                    <div class="info-value">Absent / Agonal</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Pulse</div>
+                    <div class="info-value" id="statusPulse">Absent</div>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <div class="info-label">Current Intervention</div>
+                    <div class="info-value" id="statusCPR" style="color: var(--gold);">CPR Ongoing during transport</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Decision Making -->
+        <div class="panel">
+            <div class="panel-title">Stage <span id="stageNumber">1</span>: Decision Making</div>
+            
+            <div class="scenario-text" id="scenarioText">
+                A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The cardiac monitor displays a regular broad-complex tachycardia consistent with Ventricular Tachycardia.
+            </div>
+
+            <div class="question-box">
+                <div class="question-text" id="questionText">WHAT IS YOUR NEXT IMMEDIATE ACTION?</div>
+            </div>
+
+            <div class="options-container" id="optionsContainer">
+                <!-- Options injected via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Results Screen (Hidden initially) -->
+    <main id="resultsContainer" style="display: none; grid-template-columns: 1fr; max-width: 900px;">
+        <div class="panel">
+            <div class="panel-title" style="text-align: center; font-size: 1.5rem;">Assessment Summary</div>
+            <div id="finalGrade" style="text-align: center; font-size: 2rem; margin: 1rem 0; color: var(--gold);"></div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stage</th>
+                        <th>Clinical Competency</th>
+                        <th>Marks</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTableBody">
+                </tbody>
+            </table>
+
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                <button class="btn-action" onclick="resetSimulation()">Restart Simulation</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Feedback Modal -->
+    <div class="modal-overlay" id="feedbackModal">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-text" id="modalText"></div>
+            <button class="btn-action" id="modalBtn" onclick="closeModalAndProceed()">CONTINUE</button>
+        </div>
+    </div>
+
+    <!-- CPR Accelerated Progress -->
+    <div class="cpr-container" id="cprContainer">
+        <div class="cpr-text">SIMULATING 2 MINUTES OF CPR...</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="cprProgressFill"></div>
+        </div>
+    </div>
+
+    <footer>
+        DISCLAIMER: This is an educational simulation. Clinical management should always follow current Malaysian Ministry of Health and applicable Advanced Life Support (ALS) guidelines.
+    </footer>
+
+    <script>
+        /* --- ECG Canvas Animation Logic --- */
+        const canvas = document.getElementById('ecgCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let xPos = 0;
+        let ecgAnimationId;
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            width = canvas.width;
+            height = canvas.height;
+            ctx.fillStyle = '#030611';
+            ctx.fillRect(0, 0, width, height);
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#00FF41';
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function drawVTWave() {
+            // Mathematical approximation of wide-complex Ventricular Tachycardia
+            let baseline = height / 2;
+            let amplitude = height * 0.35;
+            let frequency = 0.08;
+            
+            // Generate VT shape: Sine wave with slight modulation for organic look
+            let y = baseline + amplitude * Math.sin(xPos * frequency) * (1 + 0.1 * Math.sin(xPos * 0.03));
+            
+            // Add a slight notch/sharpness simulating QRS wide complex
+            y += Math.sin(xPos * frequency * 2) * (amplitude * 0.2);
+
+            ctx.strokeStyle = '#00FF41';
+            ctx.lineTo(xPos, y);
+            ctx.stroke();
+
+            // Clear ahead
+            xPos += 3;
+            ctx.clearRect(xPos, 0, 15, height);
+            ctx.fillStyle = '#030611';
+            ctx.fillRect(xPos, 0, 15, height);
+
+            if (xPos >= width) {
+                xPos = 0;
+                ctx.moveTo(xPos, y);
+            }
+
+            ecgAnimationId = requestAnimationFrame(drawVTWave);
+        }
+
+        function startECG() {
+            resizeCanvas();
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            cancelAnimationFrame(ecgAnimationId);
+            drawVTWave();
+        }
+
+        /* --- Simulation Data & Logic --- */
+        const stages = [
+            {
+                id: 1,
+                competency: "Recognition of pulseless VT and defibrillation",
+                scenario: "A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. <br><br>The ambulance team assesses the patient:<br>- Unresponsive<br>- Not breathing normally<br>- No palpable central pulse<br>- CPR has been initiated<br>- Monitor displays broad-complex tachycardia (VT).",
+                statusUpdate: { cpr: "CPR Ongoing during transport" },
+                question: "WHAT IS YOUR NEXT IMMEDIATE ACTION?",
+                options: [
+                    "CONTINUE CPR",
+                    "DEFIBRILLATE THE PATIENT"
+                ],
+                correctIndex: 1,
+                feedbackCorrect: {
+                    title: "CORRECT! – IMMEDIATE DEFIBRILLATION INDICATED.",
+                    text: "Pulseless ventricular tachycardia is a shockable rhythm.<br><br><b>Immediate management:</b><br>1. Deliver an unsynchronised defibrillation shock.<br>2. Resume CPR immediately for 2 minutes without checking the pulse immediately after the shock.<br>3. Reassess the rhythm after 2 minutes.<br>4. Continue the ALS cardiac arrest algorithm."
+                },
+                feedbackIncorrect: {
+                    title: "INCORRECT – REASSESS YOUR MANAGEMENT.",
+                    text: "The patient has pulseless ventricular tachycardia, a shockable cardiac arrest rhythm. Defibrillation is required as soon as possible."
+                },
+                postAction: triggerShock
+            },
+            {
+                id: 2,
+                competency: "Immediate CPR after first shock",
+                scenario: "<b>Defibrillation shock delivered.</b><br>The patient remains unresponsive.<br>CPR has been paused for the shock.<br>The cardiac monitor displays the post-shock status.",
+                statusUpdate: { cpr: "Paused for shock delivery" },
+                question: "WHAT SHOULD YOU DO IMMEDIATELY AFTER DELIVERING THE SHOCK?",
+                options: [
+                    "CHECK THE PATIENT'S PULSE AND RHYTHM IMMEDIATELY",
+                    "RESUME CPR IMMEDIATELY FOR 2 MINUTES"
+                ],
+                correctIndex: 1,
+                feedbackCorrect: {
+                    title: "CORRECT! – EXCELLENT CLINICAL DECISION.",
+                    text: "Immediately resume CPR for 2 minutes following defibrillation.<br><br><b>Key actions:</b><br>1. Resume chest compressions immediately.<br>2. Continue CPR for 2 minutes.<br>3. Establish IV/IO access.<br>4. Administer adrenaline according to algorithm.<br>5. Consider amiodarone per sequence.<br>6. Reassess cardiac rhythm after 2 minutes."
+                },
+                feedbackIncorrect: {
+                    title: "INCORRECT – DO NOT DELAY CPR.",
+                    text: "After defibrillation, do not immediately check the pulse or reassess the rhythm. Immediate CPR is required to maintain circulation while preparing for the next rhythm assessment."
+                },
+                postAction: simulateCPR
+            },
+            {
+                id: 3,
+                competency: "Rhythm reassessment and repeat defibrillation",
+                scenario: "<b>The 2-minute CPR cycle is completed.</b><br>The cardiac monitor displays persistent Ventricular Tachycardia.",
+                statusUpdate: { cpr: "CPR completed for 2 minutes" },
+                question: "THE 2-MINUTE CPR CYCLE IS COMPLETED. THE MONITOR STILL SHOWS PULSELESS VT. WHAT IS YOUR NEXT ACTION?",
+                options: [
+                    "CONTINUE CPR FOR ANOTHER 2 MINUTES",
+                    "DELIVER ANOTHER UNSYNCHRONISED DEFIBRILLATION SHOCK"
+                ],
+                correctIndex: 1,
+                feedbackCorrect: {
+                    title: "CORRECT! – DELIVER ANOTHER DEFIBRILLATION SHOCK.",
+                    text: "<b>Actions:</b><br>1. Deliver an unsynchronised shock.<br>2. Immediately resume CPR for 2 minutes.<br>3. Continue the ALS algorithm.<br>4. Establish IV/IO access if not done.<br>5. Continue assessment for reversible causes."
+                },
+                feedbackIncorrect: {
+                    title: "INCORRECT – PERSISTENT PULSELESS VT IS A SHOCKABLE RHYTHM.",
+                    text: "Defibrillation is indicated. Do not delay the next shock."
+                },
+                postAction: triggerShockAndAdvance
+            },
+            {
+                id: 4,
+                competency: "ALS medication management after third shock",
+                scenario: "Subsequent CPR and defibrillation cycles have been simulated.<br><b>The patient has received THREE defibrillation shocks in total.</b><br>The cardiac monitor continues to show pulseless VT.",
+                statusUpdate: { cpr: "Post 3rd Shock" },
+                question: "POST-THIRD SHOCK: WHAT ARE THE NEXT IMPORTANT MANAGEMENT ACTIONS?",
+                options: [
+                    "STOP CPR, CHECK THE PULSE AND WAIT FOR SPONTANEOUS RECOVERY",
+                    "RESUME CPR IMMEDIATELY, ADMINISTER ADRENALINE 1 MG IV/IO AND AMIODARONE 300 MG IV/IO ACCORDING TO THE ALS ALGORITHM"
+                ],
+                correctIndex: 1,
+                feedbackCorrect: {
+                    title: "CORRECT! – APPROPRIATE ALS MANAGEMENT.",
+                    text: "<b>Following the third shock:</b><br>1. Resume CPR immediately for 2 minutes.<br>2. Administer adrenaline 1 mg IV/IO.<br>3. Administer amiodarone 300 mg IV/IO.<br>4. Continue CPR with minimal interruptions.<br>5. Identify and treat reversible causes (4Hs and 4Ts).<br>6. Give subsequent adrenaline every 3–5 minutes."
+                },
+                feedbackIncorrect: {
+                    title: "INCORRECT – DO NOT INTERRUPT CPR UNNECESSARILY.",
+                    text: "The patient remains in pulseless VT. Continue the cardiac arrest algorithm with minimal interruptions."
+                },
+                postAction: finishSimulation
+            }
+        ];
+
+        let currentStageIndex = 0;
+        let scores = [0, 0, 0, 0];
+        let firstAttempt = [true, true, true, true];
+
+        function initSimulation() {
+            currentStageIndex = 0;
+            scores = [0, 0, 0, 0];
+            firstAttempt = [true, true, true, true];
+            updateScoreDisplay();
+            document.getElementById('mainContainer').style.display = 'grid';
+            document.getElementById('resultsContainer').style.display = 'none';
+            startECG();
+            loadStage();
+        }
+
+        function loadStage() {
+            const stageData = stages[currentStageIndex];
+            
+            // Update UI
+            document.getElementById('stageNumber').innerText = stageData.id;
+            document.getElementById('scenarioText').innerHTML = stageData.scenario;
+            document.getElementById('questionText').innerText = stageData.question;
+            
+            if(stageData.statusUpdate && stageData.statusUpdate.cpr) {
+                document.getElementById('statusCPR').innerText = stageData.statusUpdate.cpr;
+            }
+
+            // Build Options
+            const optsContainer = document.getElementById('optionsContainer');
+            optsContainer.innerHTML = '';
+            
+            stageData.options.forEach((optText, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                const letter = index === 0 ? 'A' : 'B';
+                btn.innerHTML = `<span class="opt-letter">${letter}</span> ${optText}`;
+                btn.onclick = () => handleSelection(index);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function handleSelection(selectedIndex) {
+            const stageData = stages[currentStageIndex];
+            const isCorrect = (selectedIndex === stageData.correctIndex);
+            
+            const modalOverlay = document.getElementById('feedbackModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalText = document.getElementById('modalText');
+            const modalBtn = document.getElementById('modalBtn');
+
+            modalOverlay.style.display = 'flex';
+            setTimeout(() => modalContent.classList.add('show'), 10);
+
+            if (isCorrect) {
+                if (firstAttempt[currentStageIndex]) {
+                    scores[currentStageIndex] = 1;
+                    updateScoreDisplay();
+                }
+                modalContent.classList.remove('incorrect');
+                modalTitle.style.color = 'var(--emerald)';
+                modalTitle.innerText = stageData.feedbackCorrect.title;
+                modalText.innerHTML = stageData.feedbackCorrect.text;
+                
+                modalBtn.className = 'btn-action';
+                modalBtn.innerText = 'PROCEED TO NEXT STEP';
+                modalBtn.onclick = () => {
+                    closeModal();
+                    if (stageData.postAction) stageData.postAction();
+                };
+            } else {
+                firstAttempt[currentStageIndex] = false;
+                modalContent.classList.add('incorrect');
+                modalTitle.style.color = 'var(--danger)';
+                modalTitle.innerText = stageData.feedbackIncorrect.title;
+                modalText.innerHTML = stageData.feedbackIncorrect.text;
+                
+                modalBtn.className = 'btn-action btn-danger';
+                modalBtn.innerText = 'RETRY';
+                modalBtn.onclick = closeModal;
+            }
+        }
+
+        function closeModal() {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.classList.remove('show');
+            setTimeout(() => {
+                document.getElementById('feedbackModal').style.display = 'none';
+            }, 300);
+        }
+
+        function updateScoreDisplay() {
+            const total = scores.reduce((a, b) => a + b, 0);
+            document.getElementById('scoreDisplay').innerText = total;
+        }
+
+        /* --- Transitions & Effects --- */
+        function triggerShock() {
+            const overlay = document.getElementById('shockOverlay');
+            overlay.style.animation = 'none';
+            void overlay.offsetWidth; // trigger reflow
+            overlay.style.animation = 'shockFlash 0.3s ease-out';
+            
+            // Temporarily flatline, then resume VT
+            ctx.clearRect(0,0,width,height);
+            setTimeout(() => {
+                currentStageIndex++;
+                loadStage();
+            }, 300);
+        }
+
+        function simulateCPR() {
+            const cprBox = document.getElementById('cprContainer');
+            const fill = document.getElementById('cprProgressFill');
+            cprBox.style.display = 'flex';
+            
+            let progress = 0;
+            fill.style.width = '0%';
+            
+            const interval = setInterval(() => {
+                progress += 2;
+                fill.style.width = `${progress}%`;
+                if(progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        cprBox.style.display = 'none';
+                        currentStageIndex++;
+                        loadStage();
+                    }, 300);
+                }
+            }, 30);
+        }
+
+        function triggerShockAndAdvance() {
+            triggerShock();
+            // triggerShock already advances to next stage inside its timeout
+        }
+
+        function finishSimulation() {
+            document.getElementById('mainContainer').style.display = 'none';
+            const results = document.getElementById('resultsContainer');
+            results.style.display = 'block';
+            
+            const totalScore = scores.reduce((a, b) => a + b, 0);
+            const gradeEl = document.getElementById('finalGrade');
+            
+            let gradeText = "";
+            if (totalScore === 4) {
+                gradeText = "4/4: Excellent – Competent decision-making.";
+                gradeEl.style.color = "var(--emerald)";
+            } else if (totalScore === 3) {
+                gradeText = "3/4: Satisfactory – Minor improvement required.";
+                gradeEl.style.color = "var(--gold)";
+            } else if (totalScore === 2) {
+                gradeText = "2/4: Needs Improvement – Review the ALS algorithm.";
+                gradeEl.style.color = "orange";
+            } else {
+                gradeText = `${totalScore}/4: Unsuccessful – Repeat the simulation.`;
+                gradeEl.style.color = "var(--danger)";
+            }
+            gradeEl.innerText = gradeText;
+
+            const tbody = document.getElementById('resultsTableBody');
+            tbody.innerHTML = '';
+            stages.forEach((stage, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>Stage ${stage.id}</td>
+                    <td>${stage.competency}</td>
+                    <td style="color: ${scores[i] === 1 ? 'var(--emerald)' : 'var(--danger)'}; font-weight: bold;">
+                        ${scores[i]} / 1
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function resetSimulation() {
+            initSimulation();
+        }
+
+        // Initialize on load
+        window.onload = initSimulation;
+
+    </script>
+</body>
+</html>
+
+```
