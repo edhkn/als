@@ -47,8 +47,8 @@
     .ready-modal-backdrop {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(13, 22, 42, 0.96) 0%, rgba(3, 6, 15, 0.99) 100%);
-      backdrop-filter: blur(16px);
+      background: radial-gradient(circle at center, rgba(13, 22, 42, 0.97) 0%, rgba(3, 6, 15, 0.99) 100%);
+      backdrop-filter: blur(18px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -64,10 +64,10 @@
     }
 
     .ready-modal-box {
-      background: rgba(16, 26, 48, 0.92);
+      background: rgba(16, 26, 48, 0.94);
       border: 2px solid var(--emerald);
       border-radius: 20px;
-      max-width: 580px;
+      max-width: 560px;
       width: 100%;
       padding: 2.5rem 2rem;
       text-align: center;
@@ -76,8 +76,8 @@
     }
 
     @keyframes readyPulse {
-      0% { box-shadow: 0 0 35px rgba(80, 200, 120, 0.25); }
-      100% { box-shadow: 0 0 60px rgba(80, 200, 120, 0.5); }
+      0% { box-shadow: 0 0 30px rgba(80, 200, 120, 0.25); }
+      100% { box-shadow: 0 0 60px rgba(80, 200, 120, 0.55); }
     }
 
     .ready-dept-logo {
@@ -104,7 +104,7 @@
     }
 
     .ready-title {
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 800;
       color: #fff;
       letter-spacing: 0.5px;
@@ -141,7 +141,7 @@
     }
 
     .ready-instruction {
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       color: var(--text-muted);
       line-height: 1.5;
       margin-bottom: 2rem;
@@ -153,7 +153,7 @@
       border: none;
       padding: 1rem 2.8rem;
       border-radius: 35px;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 900;
       letter-spacing: 1.5px;
       cursor: pointer;
@@ -387,7 +387,6 @@
       border-radius: 0 0 6px 6px;
     }
 
-    /* Calibrated ECG Grid (25mm/s, 10mm/mV: 5mm large boxes, 1mm small boxes) */
     .canvas-wrapper::before {
       content: "";
       position: absolute;
@@ -874,12 +873,12 @@
       
       <div class="ready-specs">
         <div class="ready-spec-item"><i class="bi bi-person-fill"></i> 32 y/o Female</div>
-        <div class="ready-spec-item"><i class="bi bi-activity"></i> HR 200–210 BPM</div>
-        <div class="ready-spec-item"><i class="bi bi-volume-up-fill"></i> Live Sound Telemetry</div>
+        <div class="ready-spec-item"><i class="bi bi-activity"></i> HR 204 BPM (Narrow QRS)</div>
+        <div class="ready-spec-item"><i class="bi bi-volume-up-fill"></i> Continuous Telemetry Audio</div>
       </div>
       
       <p class="ready-instruction">
-        Put on headphones or ensure device volume is active. Clicking below activates the live cardiac telemetry audio and begins the simulation.
+        Check your device volume or headphones. Clicking below starts the high-speed cardiac telemetry audio and loads the clinical station.
       </p>
 
       <button class="ready-btn" id="readyBtn" onclick="startSimulationSession()">
@@ -943,7 +942,7 @@
         <div class="canvas-wrapper">
           <canvas id="ecgCanvas"></canvas>
           <div class="monitor-readout">
-            <div class="rate-number" id="monitorHR">200</div>
+            <div class="rate-number" id="monitorHR">204</div>
             <div class="rate-label" id="rateLabelText">HR (BPM)</div>
             <div class="rhythm-alert" id="rhythmAlertTag">SUPRAVENTRICULAR TACHYCARDIA</div>
           </div>
@@ -968,7 +967,7 @@
         </div>
         <div class="vital-tile">
           <div class="vital-title">Radial Pulse</div>
-          <div class="vital-value alert" id="pulseVal">Rapid, Regular (200 bpm)</div>
+          <div class="vital-value alert" id="pulseVal">Rapid, Regular (204 bpm)</div>
         </div>
         <div class="vital-tile">
           <div class="vital-title">Blood Pressure</div>
@@ -1117,13 +1116,13 @@
           osc.frequency.setValueAtTime(pitch, now);
           
           gain.gain.setValueAtTime(0.18, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start(now);
-          osc.stop(now + 0.05);
+          osc.stop(now + 0.045);
         } catch (e) {}
       }
 
@@ -1245,7 +1244,6 @@
 
     const audio = new AudioEngine();
 
-    // Universal background interaction listener ensures audio stays unlocked on any interaction
     function autoResumeAudio() {
       if (audio.ctx && audio.ctx.state === 'suspended') {
         audio.ctx.resume().catch(() => {});
@@ -1277,20 +1275,16 @@
 
     /* Start Simulation Session from "READY TO GO" Button */
     function startSimulationSession() {
-      // 1. Initialize and resume Web Audio immediately on direct user click
       audio.init();
       if (audio.ctx && audio.ctx.state === 'suspended') {
         audio.ctx.resume();
       }
 
-      // 2. Play initial chime sound to confirm active audio
       audio.playCorrectSound();
 
-      // 3. Hide the pop-up overlay smoothly
       const readyBackdrop = document.getElementById('readyModalBackdrop');
       readyBackdrop.classList.add('hidden');
 
-      // 4. Ensure canvas animation and first stage are ready
       if (!animRunning) {
         animRunning = true;
         animateECG();
@@ -1298,11 +1292,12 @@
     }
 
     /* ==========================================================
-       2. REFINED ULTRA-NARROW & RAPID SVT ECG ENGINE
-       - True clinical SVT: Narrow QRS (<0.075s, needle-thin spike)
-       - High rate (200–210 BPM): cycle length = 32 px at 2.4 px/frame
-       - J-point depression & smooth conjoined T-wave
-       - Decelerates to Normal Sinus Rhythm (76 BPM) on ROSC
+       2. REFINED ULTRA-REALISTIC & RAPID SVT ECG ENGINE
+       - Genuine high-frequency 204 BPM ($RR = 294\text{ ms}$)
+       - Narrow QRS (<0.075s, needle-thin vertical spike)
+       - Absent visible P wave (retrograde P buried in terminal QRS/ST)
+       - Rate-dependent J-point depression & conjoined asymmetric T-wave
+       - Decelerates seamlessly to Normal Sinus Rhythm (76 BPM) upon ROSC
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
@@ -1332,22 +1327,23 @@
       const amp = canvasH * 0.40;
 
       if (currentRhythmMode === 'SVT') {
-        // Ultra-narrow and fast SVT at 200–210 BPM (cycle length = 32 px)
-        const cycle = 32;
+        // Fast, authentic narrow SVT at 204 BPM: cycle length = 33 px
+        const cycle = 33;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        // Needle-sharp narrow QRS complex (< 0.075s)
-        const qWave = -0.10 * Math.exp(-Math.pow((phi - 0.14) / 0.007, 2));
-        const rWave =  1.28 * Math.exp(-Math.pow((phi - 0.17) / 0.009, 2)); // Ultra-narrow vertical needle spike
-        const sWave = -0.32 * Math.exp(-Math.pow((phi - 0.20) / 0.008, 2));
-        const stDep = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.045, 2)); // Rate-dependent ST/J-point depression
-        const tWave =  0.28 * Math.exp(-Math.pow((phi - 0.54) / 0.13, 2));  // Smooth conjoined repolarization wave
+        // Mathematical formulation of Lead II AVNRT SVT:
+        // Razor-thin QRS complex (< 0.075s), sharp Q dip, needle R-spike, sharp S with buried retrograde P
+        const qWave = -0.11 * Math.exp(-Math.pow((phi - 0.13) / 0.008, 2));
+        const rWave =  1.32 * Math.exp(-Math.pow((phi - 0.165) / 0.009, 2)); // Needle-sharp vertical spike
+        const sWave = -0.34 * Math.exp(-Math.pow((phi - 0.198) / 0.009, 2)); // Rapid S nadir
+        const stDep = -0.07 * Math.exp(-Math.pow((phi - 0.28) / 0.05, 2));   // Classic rate-dependent ST depression
+        const tWave =  0.27 * Math.exp(-Math.pow((phi - 0.54) / 0.13, 2));   // Asymmetrical upright T-wave
 
         const wave = qWave + rWave + sWave + stDep + tWave;
-        const noise = (Math.random() - 0.5) * 0.012;
+        const noise = (Math.random() - 0.5) * 0.012; // Fine electrical noise
         const y = baseline - (wave + noise) * amp;
 
-        // Beep synchronized with razor-thin R-wave peak
+        // Beep triggers directly on the razor-sharp R-wave peak
         if (phi >= 0.155 && phi <= 0.185 && isBeatArmed) {
           audio.playECGBeep(950);
           isBeatArmed = false;
@@ -1386,7 +1382,7 @@
     }
 
     function animateECG() {
-      const step = 2.4;
+      const step = 2.4; // Calibrated fast sweep
       const eraseWidth = 26;
 
       ctx.fillStyle = '#01080e';
@@ -1458,9 +1454,9 @@
         title: "Vagal Maneuver",
         badge: "First-Line Assessment",
         competency: "Execution of Modified Valsalva (REVERT)",
-        scenario: "A 32-year-old female presents with sudden palpitations. BP 118/75 mmHg, alert, no chest pain. Monitor: Regular narrow-complex SVT at 200 bpm.",
-        interventionNote: "Stable SVT – Regular narrow-complex at 200 bpm",
-        vitals: { conscious: "Alert", resp: "24 /min", pulse: "200 bpm (Regular)", bp: "118/75 mmHg", spo2: "98% (Air)" },
+        scenario: "A 32-year-old female presents with sudden palpitations. BP 118/75 mmHg, alert, no chest pain. Monitor: Regular narrow-complex SVT at 204 bpm.",
+        interventionNote: "Stable SVT – Regular narrow-complex at 204 bpm",
+        vitals: { conscious: "Alert", resp: "24 /min", pulse: "204 bpm (Regular)", bp: "118/75 mmHg", spo2: "98% (Air)" },
         question: "Patient is hemodynamically stable. What is the immediate first-line action?",
         options: [
           { label: "A", text: "Perform the Modified Valsalva (REVERT) maneuver." },
@@ -1486,9 +1482,9 @@
         title: "First-Line Drug",
         badge: "Pharmacotherapy",
         competency: "Administration of Adenosine 6 mg rapid IV push",
-        scenario: "Valsalva caused brief rate slowing, but SVT abruptly recurred at 200 bpm. BP is 116/74 mmHg. Large-bore IV access secured in right antecubital fossa.",
-        interventionNote: "Post-Valsalva – Persistent SVT at 200 bpm",
-        vitals: { conscious: "Alert, Anxious", resp: "22 /min", pulse: "200 bpm", bp: "116/74 mmHg", spo2: "98%" },
+        scenario: "Valsalva caused brief rate slowing, but SVT abruptly recurred at 204 bpm. BP is 116/74 mmHg. Large-bore IV access secured in right antecubital fossa.",
+        interventionNote: "Post-Valsalva – Persistent SVT at 204 bpm",
+        vitals: { conscious: "Alert, Anxious", resp: "22 /min", pulse: "204 bpm", bp: "116/74 mmHg", spo2: "98%" },
         question: "Vagal maneuver failed. What is the first-line drug therapy?",
         options: [
           { label: "A", text: "Administer IV Atropine 1 mg rapid bolus." },
@@ -1514,9 +1510,9 @@
         title: "Dose Escalation",
         badge: "Refractory SVT",
         competency: "Escalation to Adenosine 12 mg rapid IV push",
-        scenario: "Following Adenosine 6 mg, a 2-second sinus pause occurred, but SVT immediately resumed at 200 bpm. BP is 114/72 mmHg.",
-        interventionNote: "Post-Adenosine 6mg – Persistent SVT at 200 bpm",
-        vitals: { conscious: "Alert, Flushed", resp: "24 /min", pulse: "200 bpm", bp: "114/72 mmHg", spo2: "97%" },
+        scenario: "Following Adenosine 6 mg, a 2-second sinus pause occurred, but SVT immediately resumed at 204 bpm. BP is 114/72 mmHg.",
+        interventionNote: "Post-Adenosine 6mg – Persistent SVT at 204 bpm",
+        vitals: { conscious: "Alert, Flushed", resp: "24 /min", pulse: "204 bpm", bp: "114/72 mmHg", spo2: "97%" },
         question: "The 6 mg dose was ineffective. What is the next pharmacological step?",
         options: [
           { label: "A", text: "Administer IV Digoxin 0.5 mg slow bolus." },
@@ -1542,9 +1538,9 @@
         title: "Acute Instability",
         badge: "Adverse Features",
         competency: "Recognition of unstable tachycardia requiring electrical cardioversion",
-        scenario: "SVT persists at 200 bpm. The patient suddenly turns pale and sweaty, reporting severe crushing chest pain. BP drops to 72/40 mmHg (shock). GCS 11 (confused).",
+        scenario: "SVT persists at 204 bpm. The patient suddenly turns pale and sweaty, reporting severe crushing chest pain. BP drops to 72/40 mmHg (shock). GCS 11 (confused).",
         interventionNote: "ACUTE COLLAPSE – SVT with Shock (BP 72/40) & Chest Pain",
-        vitals: { conscious: "Confused (GCS 11)", resp: "28 /min (Labored)", pulse: "200 bpm (Weak)", bp: "72/40 mmHg", spo2: "90%" },
+        vitals: { conscious: "Confused (GCS 11)", resp: "28 /min (Labored)", pulse: "204 bpm (Weak)", bp: "72/40 mmHg", spo2: "90%" },
         question: "The patient developed shock and myocardial ischemia. What is the immediate action?",
         options: [
           { label: "A", text: "Prepare for immediate Synchronised DC Cardioversion." },
@@ -1572,7 +1568,7 @@
         competency: "Activating SYNC mode to prevent lethal R-on-T Asystole",
         scenario: "Defibrillator pads attached. Minimal IV sedation given. The team prepares to deliver the shock. Defibrillator is currently powered on.",
         interventionNote: "Peri-Shock – Unstable SVT (BP 70/38 mmHg)",
-        vitals: { conscious: "Sedated", resp: "BVM 100% O2", pulse: "200 bpm (Weak)", bp: "70/38 mmHg", spo2: "92%" },
+        vitals: { conscious: "Sedated", resp: "BVM 100% O2", pulse: "204 bpm (Weak)", bp: "70/38 mmHg", spo2: "92%" },
         question: "How must the defibrillator be configured for unstable narrow-complex SVT?",
         options: [
           { label: "A", text: "Deliver an UNSYNCHRONISED shock of 200 J immediately." },
@@ -1667,7 +1663,7 @@
         document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse-fill" style="color: var(--emerald);"></i> LEAD II (PERFUSING)';
       } else {
         currentRhythmMode = 'SVT';
-        document.getElementById('monitorHR').innerText = "200";
+        document.getElementById('monitorHR').innerText = "204";
         document.getElementById('monitorHR').style.color = "#00ff66";
         document.getElementById('rateLabelText').style.color = "#00ff66";
         const alertTag = document.getElementById('rhythmAlertTag');
