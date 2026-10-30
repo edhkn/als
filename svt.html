@@ -314,6 +314,7 @@
       gap: 1.75rem;
     }
 
+    /* PANELS */
     .panel {
       background: var(--bg-panel);
       border: 1px solid var(--bg-panel-border);
@@ -346,7 +347,7 @@
       gap: 8px;
     }
 
-    /* MONITOR */
+    /* CARDIAC MONITOR BEZEL */
     .monitor-bezel {
       background: #080d17;
       border-radius: 12px;
@@ -387,6 +388,7 @@
       border-radius: 0 0 6px 6px;
     }
 
+    /* Calibrated Medical ECG Grid (5px = 1mm at 25mm/s standard scaling) */
     .canvas-wrapper::before {
       content: "";
       position: absolute;
@@ -468,7 +470,7 @@
       100% { opacity: 0.8; }
     }
 
-    /* VITALS */
+    /* VITALS TILES */
     .vitals-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -501,7 +503,7 @@
     .vital-value.good { color: var(--emerald); }
     .vital-value.fatal { color: #ff2222; font-weight: 800; }
 
-    /* DECISION PANEL */
+    /* DECISION CARD */
     .scenario-card {
       background: rgba(255, 255, 255, 0.025);
       border-radius: 8px;
@@ -555,7 +557,7 @@
       border-radius: 10px;
       padding: 0.85rem 1.1rem;
       color: #fff;
-      font-size: 0.91rem;
+      font-size: 0.92rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
@@ -1116,13 +1118,13 @@
           osc.frequency.setValueAtTime(pitch, now);
           
           gain.gain.setValueAtTime(0.18, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start(now);
-          osc.stop(now + 0.045);
+          osc.stop(now + 0.05);
         } catch (e) {}
       }
 
@@ -1244,6 +1246,7 @@
 
     const audio = new AudioEngine();
 
+    // Universal background interaction listener ensures audio stays unlocked on any interaction
     function autoResumeAudio() {
       if (audio.ctx && audio.ctx.state === 'suspended') {
         audio.ctx.resume().catch(() => {});
@@ -1275,16 +1278,20 @@
 
     /* Start Simulation Session from "READY TO GO" Button */
     function startSimulationSession() {
+      // 1. Initialize and resume Web Audio immediately on direct user click
       audio.init();
       if (audio.ctx && audio.ctx.state === 'suspended') {
         audio.ctx.resume();
       }
 
+      // 2. Play initial chime sound to confirm active audio
       audio.playCorrectSound();
 
+      // 3. Hide the pop-up overlay smoothly
       const readyBackdrop = document.getElementById('readyModalBackdrop');
       readyBackdrop.classList.add('hidden');
 
+      // 4. Ensure canvas animation and first stage are ready
       if (!animRunning) {
         animRunning = true;
         animateECG();
@@ -1292,10 +1299,10 @@
     }
 
     /* ==========================================================
-       2. REFINED ULTRA-REALISTIC & RAPID SVT ECG ENGINE
+       2. REFINED ULTRA-NARROW & RAPID SVT ECG ENGINE
        - Genuine high-frequency 204 BPM ($RR = 294\text{ ms}$)
-       - Narrow QRS (<0.075s, needle-thin vertical spike)
-       - Absent visible P wave (retrograde P buried in terminal QRS/ST)
+       - Narrow QRS (<0.08s, needle-thin vertical spike)
+       - Absent visible P wave (retrograde P buried in ST)
        - Rate-dependent J-point depression & conjoined asymmetric T-wave
        - Decelerates seamlessly to Normal Sinus Rhythm (76 BPM) upon ROSC
        ========================================================== */
@@ -1327,24 +1334,25 @@
       const amp = canvasH * 0.40;
 
       if (currentRhythmMode === 'SVT') {
-        // Fast, authentic narrow SVT at 204 BPM: cycle length = 33 px
-        const cycle = 33;
+        // Highly realistic SVT: 204 BPM. 
+        // 25mm/s standard speed -> step = 2.1 px/frame (approx 125 px/sec).
+        // 204 BPM = 3.4 beats/sec. 125 / 3.4 = ~37 px per beat.
+        const cycle = 37;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        // Mathematical formulation of Lead II AVNRT SVT:
-        // Razor-thin QRS complex (< 0.075s), sharp Q dip, needle R-spike, sharp S with buried retrograde P
-        const qWave = -0.11 * Math.exp(-Math.pow((phi - 0.13) / 0.008, 2));
-        const rWave =  1.32 * Math.exp(-Math.pow((phi - 0.165) / 0.009, 2)); // Needle-sharp vertical spike
-        const sWave = -0.34 * Math.exp(-Math.pow((phi - 0.198) / 0.009, 2)); // Rapid S nadir
-        const stDep = -0.07 * Math.exp(-Math.pow((phi - 0.28) / 0.05, 2));   // Classic rate-dependent ST depression
-        const tWave =  0.27 * Math.exp(-Math.pow((phi - 0.54) / 0.13, 2));   // Asymmetrical upright T-wave
+        // Narrow QRS complex (< 0.10s), absent P wave, rate-dependent ST depression
+        const qWave = -0.15 * Math.exp(-Math.pow((phi - 0.15) / 0.02, 2));
+        const rWave =  1.35 * Math.exp(-Math.pow((phi - 0.20) / 0.018, 2)); // Needle-sharp R spike
+        const sWave = -0.45 * Math.exp(-Math.pow((phi - 0.25) / 0.018, 2)); // Deep narrow S
+        const stDep = -0.15 * Math.exp(-Math.pow((phi - 0.35) / 0.04, 2));  // ST depression / retrograde P
+        const tWave =  0.30 * Math.exp(-Math.pow((phi - 0.65) / 0.15, 2));  // T wave blending into next beat
 
         const wave = qWave + rWave + sWave + stDep + tWave;
-        const noise = (Math.random() - 0.5) * 0.012; // Fine electrical noise
+        const noise = (Math.random() - 0.5) * 0.015;
         const y = baseline - (wave + noise) * amp;
 
         // Beep triggers directly on the razor-sharp R-wave peak
-        if (phi >= 0.155 && phi <= 0.185 && isBeatArmed) {
+        if (phi >= 0.18 && phi <= 0.22 && isBeatArmed) {
           audio.playECGBeep(950);
           isBeatArmed = false;
         }
@@ -1358,15 +1366,15 @@
         return baseline + wander + noise;
 
       } else if (currentRhythmMode === 'ROSC_SINUS') {
-        // Normal Sinus Rhythm at 76 BPM: cycle length = 110 px
-        const cycle = 110;
+        // Normal Sinus Rhythm at 76 BPM: cycle length = 100 px
+        const cycle = 100;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        const pWave =  0.15 * Math.exp(-Math.pow((phi - 0.14) / 0.035, 2));
-        const qWave = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.012, 2));
-        const rWave =  1.05 * Math.exp(-Math.pow((phi - 0.31) / 0.018, 2));
-        const sWave = -0.22 * Math.exp(-Math.pow((phi - 0.35) / 0.016, 2));
-        const tWave =  0.28 * Math.exp(-Math.pow((phi - 0.58) / 0.08, 2));
+        const pWave =  0.15 * Math.exp(-Math.pow((phi - 0.15) / 0.04, 2));
+        const qWave = -0.08 * Math.exp(-Math.pow((phi - 0.28) / 0.015, 2));
+        const rWave =  1.10 * Math.exp(-Math.pow((phi - 0.31) / 0.02, 2));
+        const sWave = -0.25 * Math.exp(-Math.pow((phi - 0.35) / 0.02, 2));
+        const tWave =  0.30 * Math.exp(-Math.pow((phi - 0.60) / 0.08, 2));
 
         const wave = pWave + qWave + rWave + sWave + tWave;
         const noise = (Math.random() - 0.5) * 0.012;
@@ -1382,7 +1390,7 @@
     }
 
     function animateECG() {
-      const step = 2.4; // Calibrated fast sweep
+      const step = 2.1; // Calibrated fast sweep (25mm/s scale)
       const eraseWidth = 26;
 
       ctx.fillStyle = '#01080e';
