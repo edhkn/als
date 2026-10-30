@@ -1344,25 +1344,38 @@
       const amp = canvasH * 0.40;
 
       if (currentRhythmMode === 'TACHY') {
-        // High-frequency narrow-complex tachycardia at 208 BPM
+        // High-velocity narrow-complex tachycardia at ~204-208 BPM (RR = ~290 ms)
         const cycle = 33;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        const qWave = -0.11 * Math.exp(-Math.pow((phi - 0.13) / 0.008, 2));
-        const rWave =  1.32 * Math.exp(-Math.pow((phi - 0.165) / 0.009, 2)); // Needle-sharp spike
-        const sWave = -0.34 * Math.exp(-Math.pow((phi - 0.198) / 0.009, 2));
-        const stDep = -0.07 * Math.exp(-Math.pow((phi - 0.28) / 0.05, 2));   // ST depression
-        const tWave =  0.27 * Math.exp(-Math.pow((phi - 0.54) / 0.13, 2));   // Smooth T wave
+        // 1. Initial sharp septal q-dip (< 0.02s)
+        const qWave = -0.09 * Math.exp(-Math.pow((phi - 0.095) / 0.009, 2));
 
-        const wave = qWave + rWave + sWave + stDep + tWave;
-        const noise = (Math.random() - 0.5) * 0.012;
+        // 2. Needle-sharp, narrow R-wave spike (QRS duration < 75 ms)
+        const rWave =  1.38 * Math.exp(-Math.pow((phi - 0.130) / 0.011, 2));
+
+        // 3. Deep S-wave with negative terminal deflection (retrograde P / pseudo-s notch in Lead II)
+        const sWave = -0.42 * Math.exp(-Math.pow((phi - 0.168) / 0.012, 2));
+        const pseudoS = -0.12 * Math.exp(-Math.pow((phi - 0.205) / 0.018, 2));
+
+        // 4. Rate-dependent upsloping ST depression (J-point depression)
+        const stDep = -0.14 * Math.exp(-Math.pow((phi - 0.280) / 0.055, 2));
+
+        // 5. Asymmetric T-wave spanning across cycle to eliminate unnatural flat baseline pauses
+        const tWave =  0.34 * Math.exp(-Math.pow((phi - 0.550) / 0.160, 2));
+
+        // Composite wave with fine analog telemetry noise
+        const wave = qWave + rWave + sWave + pseudoS + stDep + tWave;
+        const noise = (Math.random() - 0.5) * 0.014;
         const y = baseline - ((wave + noise) * amp);
 
-        if (phi >= 0.155 && phi <= 0.185 && isBeatArmed) {
+        // Synchronize audio monitor beep precisely with peak R-wave spike
+        if (phi >= 0.115 && phi <= 0.145 && isBeatArmed) {
           audio.playECGBeep(950);
           isBeatArmed = false;
         }
         if (phi > 0.45) isBeatArmed = true;
+
         return y;
 
       } else if (currentRhythmMode === 'ASYSTOLE') {
