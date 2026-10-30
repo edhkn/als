@@ -1,907 +1,1436 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALS Simulation: Pulseless Ventricular Tachycardia</title>
-    <style>
-        /* CSS Variables for Elegant Theme */
-        :root {
-            --bg-dark: #070B19;
-            --bg-panel: rgba(16, 26, 48, 0.7);
-            --bg-panel-border: rgba(80, 200, 120, 0.2);
-            --emerald: #50C878;
-            --emerald-glow: rgba(80, 200, 120, 0.6);
-            --gold: #FFD700;
-            --gold-glow: rgba(255, 215, 0, 0.4);
-            --danger: #FF4C4C;
-            --text-main: #E2E8F0;
-            --text-muted: #94A3B8;
-            --monitor-bg: #030611;
-            --ecg-green: #00FF41;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ED Simulation Station | Adult Pulseless Ventricular Tachycardia</title>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    :root {
+      --bg-dark: #050813;
+      --bg-panel: rgba(13, 21, 38, 0.78);
+      --bg-panel-border: rgba(80, 200, 120, 0.22);
+      --emerald: #50C878;
+      --emerald-glow: rgba(80, 200, 120, 0.5);
+      --gold: #FFD700;
+      --gold-glow: rgba(255, 215, 0, 0.4);
+      --danger: #FF3B30;
+      --danger-glow: rgba(255, 59, 48, 0.4);
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --monitor-screen: #02060d;
+      --ecg-glow: #00ff73;
+    }
 
-        /* Global Reset & Typography */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(80, 200, 120, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
+    }
 
-        /* Background effects */
-        .background-glow {
-            position: fixed;
-            top: -20%;
-            left: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: radial-gradient(circle, var(--emerald-glow) 0%, transparent 70%);
-            opacity: 0.15;
-            z-index: -1;
-            border-radius: 50%;
-        }
+    /* NAV BAR - Required Specification */
+    nav {
+      background: rgba(8, 14, 28, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(80, 200, 120, 0.2);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
 
-        .background-glow-alt {
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 50vw;
-            height: 50vw;
-            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
-            opacity: 0.1;
-            z-index: -1;
-            border-radius: 50%;
-        }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: #fff;
+    }
 
-        /* Header */
-        header {
-            padding: 1rem 2rem;
-            border-bottom: 1px solid var(--bg-panel-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(7, 11, 25, 0.8);
-            backdrop-filter: blur(10px);
-        }
+    .dept-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(80, 200, 120, 0.4));
+    }
 
-        .header-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--emerald);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+    .logo-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+    }
 
-        .header-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
+    .logo-text span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--emerald);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
 
-        .score-display {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid var(--gold);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            color: var(--gold);
-            box-shadow: 0 0 10px var(--gold-glow);
-        }
+    .back-portal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 215, 0, 0.08);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      color: var(--gold);
+      padding: 0.55rem 1.15rem;
+      border-radius: 24px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
 
-        /* Main Content Grid */
-        main {
-            flex: 1;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-            position: relative;
-        }
+    .back-portal-btn:hover {
+      background: var(--gold);
+      color: #070B19;
+      box-shadow: 0 0 16px var(--gold-glow);
+      transform: translateX(-3px);
+    }
 
-        /* Panels */
-        .panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--bg-panel-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-        }
+    /* Subheader Telemetry Status */
+    .station-bar {
+      background: rgba(13, 22, 40, 0.65);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
 
-        .panel-title {
-            font-size: 1rem;
-            color: var(--gold);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-            padding-bottom: 0.5rem;
-        }
+    .station-title-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--emerald);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-        /* Cardiac Monitor */
-        .monitor-container {
-            background: var(--monitor-bg);
-            border-radius: 8px;
-            border: 2px solid #1a2c4e;
-            height: 200px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            box-shadow: inset 0 0 20px rgba(0,0,0,1);
-        }
+    .live-tag {
+      background: rgba(255, 59, 48, 0.2);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      animation: flash 1.2s infinite;
+      font-weight: 700;
+    }
 
-        /* CSS Grid overlay for monitor */
-        .monitor-container::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-size: 20px 20px;
-            background-image: 
-                linear-gradient(to right, rgba(0, 255, 65, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
-            pointer-events: none;
-        }
+    .audio-toggle-btn {
+      background: rgba(80, 200, 120, 0.12);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
+    .audio-toggle-btn:hover {
+      background: var(--emerald);
+      color: #050813;
+    }
 
-        .monitor-stats {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: var(--ecg-green);
-            font-family: monospace;
-            text-align: right;
-            text-shadow: 0 0 5px var(--ecg-green);
-        }
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 1.75rem 2rem;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.75rem;
+    }
 
-        .heart-rate {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
+    /* Card Panels */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--bg-panel-border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
 
-        .rhythm-label {
-            font-size: 1rem;
-            color: #FF0000;
-            animation: blink 1s infinite;
-        }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(80, 200, 120, 0.2);
+    }
 
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
+    .panel-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        /* Patient Info Grid */
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
+    /* REALISTIC ECG MONITOR */
+    .monitor-bezel {
+      background: #0d121c;
+      border-radius: 10px;
+      padding: 8px;
+      border: 2px solid #233149;
+      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 8px 24px rgba(0,0,0,0.6);
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
 
-        .info-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0.75rem;
-            border-radius: 6px;
-            border-left: 3px solid var(--emerald);
-        }
+    .monitor-screen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 10px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #64748b;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: #02060d;
+    }
 
-        .info-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-        }
+    .monitor-lead-info {
+      color: #00ff73;
+      font-weight: bold;
+    }
 
-        .info-value {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 220px;
+      background-color: var(--monitor-screen);
+      overflow: hidden;
+    }
 
-        /* Decision Section */
-        .scenario-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
+    /* Medical Telemetry Grid */
+    .canvas-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-size: 20px 20px, 4px 4px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 255, 115, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 115, 0.08) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0, 255, 115, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 115, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 2;
+    }
 
-        .question-box {
-            background: rgba(80, 200, 120, 0.1);
-            border: 1px solid var(--emerald);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
 
-        .question-text {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--emerald);
-            text-align: center;
-        }
+    .monitor-readout {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      z-index: 3;
+      text-align: right;
+      font-family: 'Courier New', Courier, monospace;
+      pointer-events: none;
+    }
 
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+    .rate-number {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #00ff73;
+      text-shadow: 0 0 10px rgba(0, 255, 115, 0.6);
+      line-height: 1;
+    }
 
-        .btn-option {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 1.25rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            display: flex;
-            align-items: center;
-        }
+    .rate-label {
+      font-size: 0.75rem;
+      color: #00ff73;
+      letter-spacing: 1px;
+    }
 
-        .btn-option:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--gold);
-            transform: translateX(5px);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-        }
+    .rhythm-alert {
+      display: inline-block;
+      margin-top: 4px;
+      background: rgba(255, 59, 48, 0.25);
+      border: 1px solid var(--danger);
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      animation: flash 0.8s infinite alternate;
+    }
 
-        .btn-option .opt-letter {
-            background: var(--gold);
-            color: black;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 15px;
-            font-weight: bold;
-        }
+    @keyframes flash {
+      from { opacity: 1; }
+      to { opacity: 0.3; }
+    }
 
-        /* Modals & Overlays */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
+    /* Clinical Vitals Grid */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
 
-        .modal-content {
-            background: var(--bg-panel);
-            border: 2px solid var(--emerald);
-            border-radius: 12px;
-            padding: 2.5rem;
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 0 30px var(--emerald-glow);
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
+    .vital-tile {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--emerald);
+      padding: 10px 14px;
+      border-radius: 8px;
+    }
 
-        .modal-content.incorrect {
-            border-color: var(--danger);
-            box-shadow: 0 0 30px rgba(255, 76, 76, 0.3);
-        }
+    .vital-title {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 2px;
+    }
 
-        .modal-content.show {
-            transform: scale(1);
-            opacity: 1;
-        }
+    .vital-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+    }
 
-        .modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-        }
+    .vital-value.alert {
+      color: #ff6b6b;
+    }
 
-        .modal-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            color: var(--text-muted);
-            text-align: left;
-        }
+    /* Decision Panel Styles */
+    .scenario-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      padding: 1.15rem;
+      font-size: 0.96rem;
+      line-height: 1.6;
+      border-left: 4px solid var(--gold);
+      margin-bottom: 1.25rem;
+      color: #cbd5e1;
+    }
 
-        .modal-text ul {
-            margin-left: 20px;
-            margin-top: 10px;
-        }
+    .question-banner {
+      background: rgba(80, 200, 120, 0.08);
+      border: 1px solid rgba(80, 200, 120, 0.35);
+      padding: 1.1rem;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
 
-        .btn-action {
-            background: var(--emerald);
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+    .question-banner h3 {
+      font-size: 1.05rem;
+      color: var(--emerald);
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
 
-        .btn-action:hover {
-            box-shadow: 0 0 20px var(--emerald-glow);
-            transform: translateY(-2px);
-        }
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
 
-        .btn-action.btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        .btn-action.btn-danger:hover {
-            box-shadow: 0 0 20px rgba(255, 76, 76, 0.5);
-        }
+    .btn-decision {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        /* Special Animations */
-        .shock-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 999;
-            pointer-events: none;
-            opacity: 0;
-        }
+    .btn-decision:hover {
+      background: rgba(80, 200, 120, 0.1);
+      border-color: var(--emerald);
+      box-shadow: 0 4px 20px rgba(80, 200, 120, 0.25);
+      transform: translateX(4px);
+    }
 
-        @keyframes shockFlash {
-            0% { opacity: 0; }
-            10% { opacity: 1; }
-            100% { opacity: 0; }
-        }
+    .opt-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #070B19;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
 
-        /* CPR Progress */
-        .cpr-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 50;
-        }
+    /* Defibrillation Shock Visual */
+    .shock-flash-screen {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-        .cpr-text {
-            font-size: 2rem;
-            color: var(--emerald);
-            margin-bottom: 2rem;
-            animation: pulse 1s infinite;
-        }
+    @keyframes defibrillate {
+      0% { opacity: 0; }
+      15% { opacity: 0.95; }
+      100% { opacity: 0; }
+    }
 
-        .progress-bar {
-            width: 60%;
-            height: 20px;
-            background: #222;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid var(--emerald);
-        }
+    /* Modal Feedback */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 17, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
 
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--emerald);
-            box-shadow: 0 0 10px var(--emerald);
-            transition: width 0.1s linear;
-        }
+    .modal-box {
+      background: #0c1424;
+      border: 2px solid var(--emerald);
+      border-radius: 16px;
+      max-width: 580px;
+      width: 100%;
+      padding: 2rem;
+      box-shadow: 0 0 40px var(--emerald-glow);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.25s ease-out;
+    }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
+    .modal-box.incorrect {
+      border-color: var(--danger);
+      box-shadow: 0 0 40px var(--danger-glow);
+    }
 
-        /* Final Results Table */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2rem;
-            color: white;
-        }
-        th, td {
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 12px;
-            text-align: left;
-        }
-        th {
-            background: rgba(80, 200, 120, 0.1);
-            color: var(--emerald);
-            text-transform: uppercase;
-        }
+    .modal-box.active {
+      transform: scale(1);
+      opacity: 1;
+    }
 
-        /* Disclaimer */
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: rgba(255,255,255,0.4);
-            font-size: 0.8rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: auto;
-        }
+    .modal-status-icon {
+      font-size: 2.8rem;
+      margin-bottom: 0.75rem;
+    }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            main {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    .modal-headline {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.8rem;
+    }
+
+    .modal-body-text {
+      font-size: 0.93rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .modal-body-text ol, .modal-body-text ul {
+      margin-left: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .modal-action-btn {
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 30px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-emerald {
+      background: var(--emerald);
+      color: #030712;
+      box-shadow: 0 0 16px var(--emerald-glow);
+    }
+
+    .btn-emerald:hover {
+      background: #40b366;
+      transform: translateY(-2px);
+    }
+
+    .btn-rose {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 0 16px var(--danger-glow);
+    }
+
+    .btn-rose:hover {
+      background: #e02f25;
+      transform: translateY(-2px);
+    }
+
+    /* CPR Timer Overlay */
+    .cpr-timer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.92);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 900;
+    }
+
+    .cpr-headline {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--emerald);
+      letter-spacing: 1.5px;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px var(--emerald-glow);
+      text-align: center;
+    }
+
+    .cpr-subline {
+      font-size: 1rem;
+      color: var(--gold);
+      margin-bottom: 2rem;
+    }
+
+    .cpr-bar-frame {
+      width: 50%;
+      min-width: 300px;
+      height: 20px;
+      background: #111b2d;
+      border-radius: 20px;
+      border: 1px solid var(--emerald);
+      overflow: hidden;
+    }
+
+    .cpr-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #50C878, #FFD700);
+      box-shadow: 0 0 12px var(--emerald);
+    }
+
+    /* Summary / Results View */
+    .results-view {
+      display: none;
+      grid-column: span 2;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .results-table th, .results-table td {
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .results-table th {
+      background: rgba(80, 200, 120, 0.12);
+      color: var(--emerald);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* FOOTER - Required Specification */
+    footer {
+      background: #040711;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 2rem 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+    }
+
+    .footer-logos {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-logos img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.15));
+    }
+
+    .logo-divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: dotPulse 1.5s infinite;
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .footer-copyright {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .footer-copyright span {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .clinical-disclaimer {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.35);
+      max-width: 800px;
+      line-height: 1.4;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      padding-top: 12px;
+    }
+
+    @media (max-width: 992px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .results-view {
+        grid-column: span 1;
+      }
+      nav {
+        padding: 0.75rem 1rem;
+      }
+      .logo-text {
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="background-glow"></div>
-    <div class="background-glow-alt"></div>
-    <div class="shock-overlay" id="shockOverlay"></div>
+  <!-- NAVIGATION -->
+  <nav>
+    <a href="index.html" class="logo-group">
+      <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="Logo Jabatan" class="dept-logo">
+      <div class="logo-text">
+        Hospital Kuala Nerang
+        <span>Jabatan Kecemasan & Trauma</span>
+      </div>
+    </a>
+    <a href="index.html" class="back-portal-btn">
+      <i class="bi bi-arrow-left"></i> Hub Portal
+    </a>
+  </nav>
 
-    <header>
-        <div>
-            <div class="header-title">ED Simulation Station</div>
-            <div class="header-subtitle">Adult Tachyarrhythmia – Ventricular Tachycardia</div>
+  <!-- TELEMETRY / CONTROL SUBHEADER -->
+  <div class="station-bar">
+    <div class="station-title-badge">
+      <span class="live-tag">CRITICAL SIMULATION</span>
+      <span>Adult Tachyarrhythmia: Pulseless VT</span>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <button class="audio-toggle-btn" id="audioToggleBtn" onclick="toggleAudioState()">
+        <i class="bi bi-volume-up-fill" id="audioIcon"></i>
+        <span id="audioText">Monitor Audio: Active</span>
+      </button>
+      <div style="font-weight: bold; color: var(--gold); font-size: 0.95rem;">
+        Score: <span id="currentScore">0</span> / 4
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SIMULATION AREA -->
+  <main id="mainGrid">
+    
+    <!-- LEFT PANEL: HIGH-FIDELITY MONITOR -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-heading">
+          <i class="bi bi-activity"></i> Clinical ECG Telemetry
         </div>
-        <div class="score-display">Score: <span id="scoreDisplay">0</span>/4</div>
-    </header>
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">PAPER: 25mm/s | GAIN: 10mm/mV</span>
+      </div>
 
-    <main id="mainContainer">
-        <!-- Left Panel: Patient Status -->
-        <div class="panel">
-            <div class="panel-title">Clinical Monitor & Status</div>
-            
-            <div class="monitor-container">
-                <canvas id="ecgCanvas"></canvas>
-                <div class="monitor-stats">
-                    <div class="heart-rate">210</div>
-                    <div>HR (bpm)</div>
-                    <div class="rhythm-label">VT</div>
-                </div>
-            </div>
-
-            <div class="info-grid" id="patientStatusGrid">
-                <div class="info-item">
-                    <div class="info-label">Age / Gender</div>
-                    <div class="info-value">40 years / Male</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Consciousness</div>
-                    <div class="info-value" id="statusConscious">Unresponsive</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Breathing</div>
-                    <div class="info-value">Absent / Agonal</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Pulse</div>
-                    <div class="info-value" id="statusPulse">Absent</div>
-                </div>
-                <div class="info-item" style="grid-column: span 2;">
-                    <div class="info-label">Current Intervention</div>
-                    <div class="info-value" id="statusCPR" style="color: var(--gold);">CPR Ongoing during transport</div>
-                </div>
-            </div>
+      <!-- Real Cardiac Monitor Bezel -->
+      <div class="monitor-bezel">
+        <div class="monitor-screen-header">
+          <div class="monitor-lead-info">LEAD II (MONITORING)</div>
+          <div>SWEEP SPEED: 25 mm/s</div>
+          <div>FILTER: DIAGNOSTIC (0.05-150Hz)</div>
         </div>
-
-        <!-- Right Panel: Decision Making -->
-        <div class="panel">
-            <div class="panel-title">Stage <span id="stageNumber">1</span>: Decision Making</div>
-            
-            <div class="scenario-text" id="scenarioText">
-                A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The cardiac monitor displays a regular broad-complex tachycardia consistent with Ventricular Tachycardia.
-            </div>
-
-            <div class="question-box">
-                <div class="question-text" id="questionText">WHAT IS YOUR NEXT IMMEDIATE ACTION?</div>
-            </div>
-
-            <div class="options-container" id="optionsContainer">
-                <!-- Options injected via JS -->
-            </div>
+        
+        <div class="canvas-wrapper">
+          <canvas id="ecgCanvas"></canvas>
+          <div class="monitor-readout">
+            <div class="rate-number" id="monitorHR">210</div>
+            <div class="rate-label">BPM</div>
+            <div class="rhythm-alert">VENTRICULAR TACHYCARDIA</div>
+          </div>
         </div>
-    </main>
+      </div>
 
-    <!-- Results Screen (Hidden initially) -->
-    <main id="resultsContainer" style="display: none; grid-template-columns: 1fr; max-width: 900px;">
-        <div class="panel">
-            <div class="panel-title" style="text-align: center; font-size: 1.5rem;">Assessment Summary</div>
-            <div id="finalGrade" style="text-align: center; font-size: 2rem; margin: 1rem 0; color: var(--gold);"></div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Stage</th>
-                        <th>Clinical Competency</th>
-                        <th>Marks</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsTableBody">
-                </tbody>
-            </table>
-
-            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
-                <button class="btn-action" onclick="resetSimulation()">Restart Simulation</button>
-            </div>
+      <!-- Patient Clinical Status -->
+      <div class="panel-heading" style="margin-bottom: 0.75rem; font-size: 0.85rem;">
+        <i class="bi bi-person-fill-exclamation"></i> Patient Status Parameters
+      </div>
+      <div class="vitals-grid">
+        <div class="vital-tile">
+          <div class="vital-title">Patient Profile</div>
+          <div class="vital-value">40 y/o Male</div>
         </div>
-    </main>
-
-    <!-- Feedback Modal -->
-    <div class="modal-overlay" id="feedbackModal">
-        <div class="modal-content" id="modalContent">
-            <div class="modal-title" id="modalTitle"></div>
-            <div class="modal-text" id="modalText"></div>
-            <button class="btn-action" id="modalBtn" onclick="closeModalAndProceed()">CONTINUE</button>
+        <div class="vital-tile">
+          <div class="vital-title">Consciousness Level</div>
+          <div class="vital-value alert">Unresponsive (U)</div>
         </div>
+        <div class="vital-tile">
+          <div class="vital-title">Respiratory Drive</div>
+          <div class="vital-value alert">Absent / Agonal</div>
+        </div>
+        <div class="vital-tile">
+          <div class="vital-title">Central Pulse (Carotid)</div>
+          <div class="vital-value alert">No Palpable Pulse</div>
+        </div>
+        <div class="vital-tile" style="grid-column: span 2;">
+          <div class="vital-title">Active Intervention</div>
+          <div class="vital-value" id="activeInterventionText" style="color: var(--gold);">CPR in progress during ambulance transport</div>
+        </div>
+      </div>
     </div>
 
-    <!-- CPR Accelerated Progress -->
-    <div class="cpr-container" id="cprContainer">
-        <div class="cpr-text">SIMULATING 2 MINUTES OF CPR...</div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="cprProgressFill"></div>
+    <!-- RIGHT PANEL: INTERACTIVE CLINICAL DECISION -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-heading">
+          <i class="bi bi-clipboard2-pulse"></i> Decision Stage <span id="displayStageNumber">1</span> of 4
         </div>
+        <span style="font-size: 0.8rem; color: var(--emerald); font-weight: 600;" id="stageTitle">Recognition & Action</span>
+      </div>
+
+      <div class="scenario-card" id="scenarioDescription">
+        A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The cardiac monitor displays a regular broad-complex tachycardia consistent with Ventricular Tachycardia. Central pulse is verified absent.
+      </div>
+
+      <div class="question-banner">
+        <h3 id="questionHeading">WHAT IS YOUR NEXT IMMEDIATE ACTION?</h3>
+      </div>
+
+      <div class="options-stack" id="optionsContainer">
+        <!-- Interactive buttons inserted via JS -->
+      </div>
     </div>
 
-    <footer>
-        DISCLAIMER: This is an educational simulation. Clinical management should always follow current Malaysian Ministry of Health and applicable Advanced Life Support (ALS) guidelines.
-    </footer>
+    <!-- RESULTS SUMMARY VIEW (Appears after completion) -->
+    <div class="panel results-view" id="resultsView">
+      <div class="panel-header">
+        <div class="panel-heading"><i class="bi bi-award-fill"></i> Performance Assessment Summary</div>
+        <div style="font-size: 1.1rem; font-weight: bold; color: var(--gold);" id="finalScoreSummary"></div>
+      </div>
 
-    <script>
-        /* --- ECG Canvas Animation Logic --- */
-        const canvas = document.getElementById('ecgCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let xPos = 0;
-        let ecgAnimationId;
+      <div id="verdictText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;"></div>
 
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            width = canvas.width;
-            height = canvas.height;
-            ctx.fillStyle = '#030611';
-            ctx.fillRect(0, 0, width, height);
-            ctx.lineWidth = 2.5;
-            ctx.lineJoin = 'round';
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = '#00FF41';
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Clinical Competency</th>
+            <th>Performance Result</th>
+            <th>Marks</th>
+          </tr>
+        </thead>
+        <tbody id="resultsTableContent"></tbody>
+      </table>
+
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+        <button class="modal-action-btn btn-emerald" style="max-width: 260px;" onclick="restartSimulation()">
+          <i class="bi bi-arrow-counterclockwise"></i> Repeat Simulation
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- CPR 2-MINUTE TIMER MODAL -->
+  <div class="cpr-timer-overlay" id="cprOverlay">
+    <div class="cpr-headline"><i class="bi bi-heart-pulse-fill"></i> CPR CYCLE IN PROGRESS</div>
+    <div class="cpr-subline">Accelerated simulation: High-quality chest compressions (100–120 bpm)</div>
+    <div class="cpr-bar-frame">
+      <div class="cpr-bar-fill" id="cprFill"></div>
+    </div>
+  </div>
+
+  <!-- SHOCK FLASH EFFECT -->
+  <div class="shock-flash-screen" id="shockFlash"></div>
+
+  <!-- FEEDBACK MODAL -->
+  <div class="modal-backdrop" id="feedbackBackdrop">
+    <div class="modal-box" id="feedbackBox">
+      <div class="modal-status-icon" id="feedbackIcon"></div>
+      <div class="modal-headline" id="feedbackTitle"></div>
+      <div class="modal-body-text" id="feedbackContent"></div>
+      <button class="modal-action-btn" id="feedbackButton">PROCEED</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-logos">
+        <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="HKN Logo">
+        <div class="logo-divider"></div>
+        <img src="https://lh3.googleusercontent.com/d/1LdMRx-PF49CWOcrjthClGLJg-yQoJ2mt" alt="MOH Logo">
+      </div>
+      <div class="footer-status"><span class="pulse-dot"></span><span>EDHKN PORTAL Ver 2.0</span></div>
+      <p class="footer-copyright">© 2026 <span>Yassin Razak</span> | All Rights Reserved</p>
+      
+      <p class="clinical-disclaimer">
+        DISCLAIMER: This interactive station is designed solely for clinical education and emergency training. Clinical resuscitation algorithms and drug dosages must strictly align with current Malaysian Ministry of Health guidelines and international Advanced Life Support (ALS) consensus.
+      </p>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT: SIMULATION, REALISTIC ECG & WEB AUDIO SYNTHESIS -->
+  <script>
+    /* ==========================================================
+       1. SYNTHETIC AUDIO ENGINE (Web Audio API)
+       Pure programmatic sound synthesis: No external MP3 downloads
+       ========================================================== */
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
         }
-        window.addEventListener('resize', resizeCanvas);
-
-        function drawVTWave() {
-            // Mathematical approximation of wide-complex Ventricular Tachycardia
-            let baseline = height / 2;
-            let amplitude = height * 0.35;
-            let frequency = 0.08;
-            
-            // Generate VT shape: Sine wave with slight modulation for organic look
-            let y = baseline + amplitude * Math.sin(xPos * frequency) * (1 + 0.1 * Math.sin(xPos * 0.03));
-            
-            // Add a slight notch/sharpness simulating QRS wide complex
-            y += Math.sin(xPos * frequency * 2) * (amplitude * 0.2);
-
-            ctx.strokeStyle = '#00FF41';
-            ctx.lineTo(xPos, y);
-            ctx.stroke();
-
-            // Clear ahead
-            xPos += 3;
-            ctx.clearRect(xPos, 0, 15, height);
-            ctx.fillStyle = '#030611';
-            ctx.fillRect(xPos, 0, 15, height);
-
-            if (xPos >= width) {
-                xPos = 0;
-                ctx.moveTo(xPos, y);
-            }
-
-            ecgAnimationId = requestAnimationFrame(drawVTWave);
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
         }
+      }
 
-        function startECG() {
-            resizeCanvas();
-            ctx.beginPath();
-            ctx.moveTo(0, height / 2);
-            cancelAnimationFrame(ecgAnimationId);
-            drawVTWave();
+      // ECG Synchronized Beep (QRS sync)
+      playECGBeep() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, this.ctx.currentTime); // Standard patient monitor high frequency chirp
+
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.055);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.06);
+        } catch (e) {
+          console.warn("Audio error:", e);
         }
+      }
 
-        /* --- Simulation Data & Logic --- */
-        const stages = [
-            {
-                id: 1,
-                competency: "Recognition of pulseless VT and defibrillation",
-                scenario: "A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. <br><br>The ambulance team assesses the patient:<br>- Unresponsive<br>- Not breathing normally<br>- No palpable central pulse<br>- CPR has been initiated<br>- Monitor displays broad-complex tachycardia (VT).",
-                statusUpdate: { cpr: "CPR Ongoing during transport" },
-                question: "WHAT IS YOUR NEXT IMMEDIATE ACTION?",
-                options: [
-                    "CONTINUE CPR",
-                    "DEFIBRILLATE THE PATIENT"
-                ],
-                correctIndex: 1,
-                feedbackCorrect: {
-                    title: "CORRECT! – IMMEDIATE DEFIBRILLATION INDICATED.",
-                    text: "Pulseless ventricular tachycardia is a shockable rhythm.<br><br><b>Immediate management:</b><br>1. Deliver an unsynchronised defibrillation shock.<br>2. Resume CPR immediately for 2 minutes without checking the pulse immediately after the shock.<br>3. Reassess the rhythm after 2 minutes.<br>4. Continue the ALS cardiac arrest algorithm."
-                },
-                feedbackIncorrect: {
-                    title: "INCORRECT – REASSESS YOUR MANAGEMENT.",
-                    text: "The patient has pulseless ventricular tachycardia, a shockable cardiac arrest rhythm. Defibrillation is required as soon as possible."
-                },
-                postAction: triggerShock
-            },
-            {
-                id: 2,
-                competency: "Immediate CPR after first shock",
-                scenario: "<b>Defibrillation shock delivered.</b><br>The patient remains unresponsive.<br>CPR has been paused for the shock.<br>The cardiac monitor displays the post-shock status.",
-                statusUpdate: { cpr: "Paused for shock delivery" },
-                question: "WHAT SHOULD YOU DO IMMEDIATELY AFTER DELIVERING THE SHOCK?",
-                options: [
-                    "CHECK THE PATIENT'S PULSE AND RHYTHM IMMEDIATELY",
-                    "RESUME CPR IMMEDIATELY FOR 2 MINUTES"
-                ],
-                correctIndex: 1,
-                feedbackCorrect: {
-                    title: "CORRECT! – EXCELLENT CLINICAL DECISION.",
-                    text: "Immediately resume CPR for 2 minutes following defibrillation.<br><br><b>Key actions:</b><br>1. Resume chest compressions immediately.<br>2. Continue CPR for 2 minutes.<br>3. Establish IV/IO access.<br>4. Administer adrenaline according to algorithm.<br>5. Consider amiodarone per sequence.<br>6. Reassess cardiac rhythm after 2 minutes."
-                },
-                feedbackIncorrect: {
-                    title: "INCORRECT – DO NOT DELAY CPR.",
-                    text: "After defibrillation, do not immediately check the pulse or reassess the rhythm. Immediate CPR is required to maintain circulation while preparing for the next rhythm assessment."
-                },
-                postAction: simulateCPR
-            },
-            {
-                id: 3,
-                competency: "Rhythm reassessment and repeat defibrillation",
-                scenario: "<b>The 2-minute CPR cycle is completed.</b><br>The cardiac monitor displays persistent Ventricular Tachycardia.",
-                statusUpdate: { cpr: "CPR completed for 2 minutes" },
-                question: "THE 2-MINUTE CPR CYCLE IS COMPLETED. THE MONITOR STILL SHOWS PULSELESS VT. WHAT IS YOUR NEXT ACTION?",
-                options: [
-                    "CONTINUE CPR FOR ANOTHER 2 MINUTES",
-                    "DELIVER ANOTHER UNSYNCHRONISED DEFIBRILLATION SHOCK"
-                ],
-                correctIndex: 1,
-                feedbackCorrect: {
-                    title: "CORRECT! – DELIVER ANOTHER DEFIBRILLATION SHOCK.",
-                    text: "<b>Actions:</b><br>1. Deliver an unsynchronised shock.<br>2. Immediately resume CPR for 2 minutes.<br>3. Continue the ALS algorithm.<br>4. Establish IV/IO access if not done.<br>5. Continue assessment for reversible causes."
-                },
-                feedbackIncorrect: {
-                    title: "INCORRECT – PERSISTENT PULSELESS VT IS A SHOCKABLE RHYTHM.",
-                    text: "Defibrillation is indicated. Do not delay the next shock."
-                },
-                postAction: triggerShockAndAdvance
-            },
-            {
-                id: 4,
-                competency: "ALS medication management after third shock",
-                scenario: "Subsequent CPR and defibrillation cycles have been simulated.<br><b>The patient has received THREE defibrillation shocks in total.</b><br>The cardiac monitor continues to show pulseless VT.",
-                statusUpdate: { cpr: "Post 3rd Shock" },
-                question: "POST-THIRD SHOCK: WHAT ARE THE NEXT IMPORTANT MANAGEMENT ACTIONS?",
-                options: [
-                    "STOP CPR, CHECK THE PULSE AND WAIT FOR SPONTANEOUS RECOVERY",
-                    "RESUME CPR IMMEDIATELY, ADMINISTER ADRENALINE 1 MG IV/IO AND AMIODARONE 300 MG IV/IO ACCORDING TO THE ALS ALGORITHM"
-                ],
-                correctIndex: 1,
-                feedbackCorrect: {
-                    title: "CORRECT! – APPROPRIATE ALS MANAGEMENT.",
-                    text: "<b>Following the third shock:</b><br>1. Resume CPR immediately for 2 minutes.<br>2. Administer adrenaline 1 mg IV/IO.<br>3. Administer amiodarone 300 mg IV/IO.<br>4. Continue CPR with minimal interruptions.<br>5. Identify and treat reversible causes (4Hs and 4Ts).<br>6. Give subsequent adrenaline every 3–5 minutes."
-                },
-                feedbackIncorrect: {
-                    title: "INCORRECT – DO NOT INTERRUPT CPR UNNECESSARILY.",
-                    text: "The patient remains in pulseless VT. Continue the cardiac arrest algorithm with minimal interruptions."
-                },
-                postAction: finishSimulation
-            }
-        ];
+      // Correct Answer Harmonious Chime (Major triad C5 -> E5 -> G5)
+      playCorrectSound() {
+        if (!this.enabled) return;
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          setTimeout(() => {
+            try {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
 
-        let currentStageIndex = 0;
-        let scores = [0, 0, 0, 0];
-        let firstAttempt = [true, true, true, true];
+              gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
 
-        function initSimulation() {
-            currentStageIndex = 0;
-            scores = [0, 0, 0, 0];
-            firstAttempt = [true, true, true, true];
-            updateScoreDisplay();
-            document.getElementById('mainContainer').style.display = 'grid';
-            document.getElementById('resultsContainer').style.display = 'none';
-            startECG();
-            loadStage();
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+
+              osc.start();
+              osc.stop(this.ctx.currentTime + 0.38);
+            } catch (err) {}
+          }, idx * 75);
+        });
+      }
+
+      // Wrong Answer Dissonant Low Buzz
+      playWrongSound() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc1.type = 'sawtooth';
+          osc2.type = 'sawtooth';
+
+          osc1.frequency.setValueAtTime(140, this.ctx.currentTime);
+          osc2.frequency.setValueAtTime(98, this.ctx.currentTime); // dissonant tritone interval
+
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.45);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc1.start();
+          osc2.start();
+          osc1.stop(this.ctx.currentTime + 0.45);
+          osc2.stop(this.ctx.currentTime + 0.45);
+        } catch (e) {}
+      }
+
+      // Defibrillation Capacitor Charge & Discharge Sound
+      playShockSound() {
+        if (!this.enabled) return;
+        this.init();
+        try {
+          // Rapid discharge boom
+          const bufferSize = this.ctx.sampleRate * 0.25;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.05));
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const noiseGain = this.ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+          noise.connect(noiseGain);
+          noiseGain.connect(this.ctx.destination);
+          noise.start();
+        } catch (e) {}
+      }
+    }
+
+    const audio = new AudioEngine();
+
+    function toggleAudioState() {
+      audio.enabled = !audio.enabled;
+      const icon = document.getElementById('audioIcon');
+      const text = document.getElementById('audioText');
+      if (audio.enabled) {
+        audio.init();
+        icon.className = 'bi bi-volume-up-fill';
+        text.innerText = 'Monitor Audio: Active';
+      } else {
+        icon.className = 'bi bi-volume-mute-fill';
+        text.innerText = 'Monitor Audio: Muted';
+      }
+    }
+
+    /* ==========================================================
+       2. REALISTIC MONOMORPHIC VENTRICULAR TACHYCARDIA CANVAS
+       Simulates an authentic sweeping electron beam with phosphor
+       persistence, wide slurred notched QRS complexes, discordant
+       T-waves and realistic physiological wandering.
+       ========================================================== */
+    const canvas = document.getElementById('ecgCanvas');
+    const ctx = canvas.getContext('2d');
+    let canvasW, canvasH;
+    let sweepX = 0;
+    let lastY = 0;
+    let animId = null;
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      canvasW = canvas.width;
+      canvasH = canvas.height;
+      lastY = canvasH / 2;
+      sweepX = 0;
+      
+      // Clear background
+      ctx.fillStyle = '#02060d';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Realistic Monomorphic VT Waveform Calculation
+    // HR ~210 bpm: Wide QRS (>140ms), notched slurred peak, deep discordant S wave
+    function getVTY(time) {
+      const baseline = canvasH * 0.52;
+      const scale = canvasH * 0.38;
+      
+      // Period for ~210 bpm at sweep rate
+      const period = 75; 
+      const phase = (time % period) / period; // 0.0 to 1.0
+
+      let yOffset = 0;
+
+      if (phase < 0.12) {
+        // Slow slurred upstroke (loss of rapid septal activation)
+        const t = phase / 0.12;
+        yOffset = -scale * 0.35 * Math.sin(t * Math.PI * 0.5);
+      } else if (phase < 0.32) {
+        // Broad notched peak of wide QRS complex
+        const t = (phase - 0.12) / 0.20;
+        // Dual peak notch characteristic of ectopic ventricular origin
+        const notch = 0.08 * Math.sin(t * Math.PI * 3);
+        yOffset = -scale * (0.35 + 0.65 * Math.sin(t * Math.PI) + notch);
+      } else if (phase < 0.52) {
+        // Rapid steep plunge into discordant wide deep S-wave
+        const t = (phase - 0.32) / 0.20;
+        yOffset = -scale + scale * 1.85 * Math.sin(t * Math.PI * 0.5);
+      } else if (phase < 0.72) {
+        // Discordant secondary repolarization (broad inverted T-wave)
+        const t = (phase - 0.52) / 0.20;
+        yOffset = scale * 0.85 * (1 - Math.sin(t * Math.PI * 0.5));
+      } else {
+        // Pre-excitation isoelectric transition with minor baseline noise
+        yOffset = Math.sin(phase * 40) * 1.5;
+      }
+
+      // Trigger audio beep precisely at the R-wave peak
+      if (Math.abs(phase - 0.22) < 0.015 && isNewBeatTrigger) {
+        audio.playECGBeep();
+        isNewBeatTrigger = false;
+      }
+      if (phase > 0.4) {
+        isNewBeatTrigger = true;
+      }
+
+      return baseline + yOffset;
+    }
+
+    let isNewBeatTrigger = true;
+    let globalTime = 0;
+
+    function renderECGSweep() {
+      const speed = 2.4; // 25mm/s speed simulation
+      const eraseWidth = 24;
+
+      ctx.save();
+
+      // Clear the sweep head region ahead with phosphor trail effect
+      ctx.fillStyle = '#02060d';
+      ctx.fillRect(sweepX, 0, eraseWidth, canvasH);
+
+      // Faint phosphor decay overlay
+      ctx.fillStyle = 'rgba(2, 6, 13, 0.02)';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+
+      // Draw ECG vector
+      const newX = sweepX + speed;
+      const newY = getVTY(globalTime);
+
+      ctx.beginPath();
+      ctx.moveTo(sweepX, lastY);
+      ctx.lineTo(newX, newY);
+      
+      // Neon green glow
+      ctx.strokeStyle = '#00ff73';
+      ctx.lineWidth = 2.2;
+      ctx.shadowColor = '#00ff73';
+      ctx.shadowBlur = 6;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // Draw active bright beam tip
+      ctx.beginPath();
+      ctx.arc(newX, newY, 2.5, 0, 2 * Math.PI);
+      ctx.fillStyle = '#b3ffcf';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = '#ffffff';
+      ctx.fill();
+
+      ctx.restore();
+
+      lastY = newY;
+      sweepX = newX;
+      globalTime += 1;
+
+      if (sweepX >= canvasW) {
+        sweepX = 0;
+        lastY = canvasH / 2;
+      }
+
+      animId = requestAnimationFrame(renderECGSweep);
+    }
+
+    /* ==========================================================
+       3. CLINICAL SIMULATION SCENARIO WORKFLOW (STAGES 1 - 4)
+       ========================================================== */
+    const stagesData = [
+      {
+        stageNumber: 1,
+        title: "Recognition of Pulseless VT",
+        competency: "Recognition of pulseless VT and prompt defibrillation",
+        scenario: "A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive.<br><br>The ambulance team assesses the patient:<br>• Unresponsive<br>• Not breathing normally (absent/agonal)<br>• No palpable carotid pulse<br>• CPR has been initiated<br>• Cardiac monitor displays regular broad-complex tachycardia (VT).",
+        interventionNote: "CPR ongoing during ambulance transport",
+        question: "WHAT IS YOUR NEXT IMMEDIATE ACTION?",
+        options: [
+          { label: "A", text: "CONTINUE CPR" },
+          { label: "B", text: "DEFIBRILLATE THE PATIENT" }
+        ],
+        correctAnswer: 1, // Option B
+        correctFeedback: {
+          title: "CORRECT! – IMMEDIATE DEFIBRILLATION INDICATED",
+          html: "Pulseless ventricular tachycardia is a shockable cardiac arrest rhythm.<br><br><b>Immediate Management:</b><ol><li>Deliver an unsynchronised defibrillation shock (biphasic 150J–200J or monophasic 360J).</li><li>Resume CPR immediately for 2 minutes without checking the pulse immediately after the shock.</li><li>Reassess the rhythm after 2 minutes.</li><li>Continue the ALS cardiac arrest algorithm.</li></ol>"
+        },
+        incorrectFeedback: {
+          title: "INCORRECT – REASSESS YOUR MANAGEMENT",
+          html: "The patient has pulseless ventricular tachycardia, which is a shockable cardiac arrest rhythm. Immediate defibrillation is required as soon as a defibrillator is available. Do not delay defibrillation by solely continuing CPR."
+        },
+        nextAction: () => executeDefibrillationSequence(1)
+      },
+      {
+        stageNumber: 2,
+        title: "Immediate Post-Shock Action",
+        competency: "Immediate CPR resumption post-defibrillation",
+        scenario: "<b>Defibrillation shock delivered.</b><br>The patient remains unresponsive.<br>CPR has been temporarily paused for shock delivery.<br>The cardiac monitor displays the post-shock status.",
+        interventionNote: "Shock delivered – CPR paused",
+        question: "WHAT SHOULD YOU DO IMMEDIATELY AFTER DELIVERING THE SHOCK?",
+        options: [
+          { label: "A", text: "CHECK THE PATIENT'S PULSE AND RHYTHM IMMEDIATELY" },
+          { label: "B", text: "RESUME CPR IMMEDIATELY FOR 2 MINUTES" }
+        ],
+        correctAnswer: 1, // Option B
+        correctFeedback: {
+          title: "CORRECT! – EXCELLENT CLINICAL DECISION",
+          html: "Immediately resume CPR for 2 minutes following defibrillation.<br><br><b>Key actions:</b><ol><li>Resume chest compressions immediately without checking the pulse or rhythm.</li><li>Continue CPR for 2 minutes (30:2 or continuous compressions with advanced airway).</li><li>Establish IV/IO access if not already established.</li><li>Prepare adrenaline and amiodarone for subsequent cycles.</li><li>Reassess cardiac rhythm only after completing the 2-minute cycle.</li></ol>"
+        },
+        incorrectFeedback: {
+          title: "INCORRECT – DO NOT DELAY CPR",
+          html: "After defibrillation, do not immediately check the pulse or reassess the rhythm. Immediate CPR is mandatory to maintain myocardial and cerebral perfusion while preparing for the next scheduled rhythm assessment."
+        },
+        nextAction: () => executeCPR2MinuteCycle(2)
+      },
+      {
+        stageNumber: 3,
+        title: "Rhythm Reassessment & Repeat Shock",
+        competency: "Rhythm reassessment and repeat defibrillation",
+        scenario: "<b>The 2-minute CPR cycle is completed.</b><br>The resuscitation team briefly pauses CPR to check the rhythm.<br>The monitor continues to display persistent Ventricular Tachycardia.<br>Carotid pulse check confirms NO pulse.",
+        interventionNote: "CPR completed for 2 minutes – Rhythm reassessed",
+        question: "THE 2-MINUTE CPR CYCLE IS COMPLETED. THE MONITOR STILL SHOWS PULSELESS VT. WHAT IS YOUR NEXT ACTION?",
+        options: [
+          { label: "A", text: "CONTINUE CPR FOR ANOTHER 2 MINUTES" },
+          { label: "B", text: "DELIVER ANOTHER UNSYNCHRONISED DEFIBRILLATION SHOCK" }
+        ],
+        correctAnswer: 1, // Option B
+        correctFeedback: {
+          title: "CORRECT! – DELIVER ANOTHER DEFIBRILLATION SHOCK",
+          html: "Persistent pulseless VT is a shockable rhythm. Deliver a second unsynchronised shock without delay.<br><br><b>Actions:</b><ol><li>Deliver another unsynchronised shock.</li><li>Immediately resume CPR for 2 minutes.</li><li>Ensure high-quality chest compressions and minimal interruptions.</li><li>Establish secure IV/IO access.</li><li>Actively search for reversible causes (4Hs & 4Ts).</li></ol>"
+        },
+        incorrectFeedback: {
+          title: "INCORRECT – PERSISTENT VT IS A SHOCKABLE RHYTHM",
+          html: "Defibrillation is indicated immediately. Continuing CPR without delivering the shock allows ventricular fibrillation or asystole to deteriorate further. Do not delay defibrillation."
+        },
+        nextAction: () => executeDefibrillationSequence(3)
+      },
+      {
+        stageNumber: 4,
+        title: "ALS Medication Administration",
+        competency: "ALS medication management after 3rd shock",
+        scenario: "Subsequent CPR cycles and defibrillations have been conducted according to protocol.<br><b>The patient has now received THREE defibrillation shocks in total.</b><br>The cardiac monitor continues to show pulseless Ventricular Tachycardia.",
+        interventionNote: "Post-3rd Shock – CPR in progress",
+        question: "POST-THIRD SHOCK: WHAT ARE THE NEXT IMPORTANT MANAGEMENT ACTIONS?",
+        options: [
+          { label: "A", text: "STOP CPR, CHECK THE PULSE AND WAIT FOR SPONTANEOUS RECOVERY" },
+          { label: "B", text: "RESUME CPR IMMEDIATELY, ADMINISTER ADRENALINE 1 MG IV/IO AND AMIODARONE 300 MG IV/IO ACCORDING TO THE ALS ALGORITHM" }
+        ],
+        correctAnswer: 1, // Option B
+        correctFeedback: {
+          title: "CORRECT! – APPROPRIATE ALS MANAGEMENT",
+          html: "Following the third shock in refractory shockable cardiac arrest:<br><ol><li>Resume CPR immediately for 2 minutes.</li><li>Administer Adrenaline 1 mg IV/IO.</li><li>Administer Amiodarone 300 mg IV/IO bolus.</li><li>Continue CPR with minimal interruptions.</li><li>Identify and treat reversible causes (Hypoxia, Hypovolaemia, Hypo/hyperkalaemia, Hypothermia, Tension pneumothorax, Tamponade, Toxins, Thrombosis).</li><li>Give subsequent adrenaline every 3–5 minutes (alternate cycles).</li><li>Consider Amiodarone 150 mg IV/IO after the 5th shock.</li></ol>"
+        },
+        incorrectFeedback: {
+          title: "INCORRECT – DO NOT INTERRUPT CPR UNNECESSARILY",
+          html: "The patient remains in pulseless VT. Stopping CPR to wait for spontaneous recovery will result in irreversible brain ischemia. Continue CPR immediately and administer ALS resuscitation drugs (Adrenaline 1mg + Amiodarone 300mg)."
+        },
+        nextAction: () => displayFinalAssessment()
+      }
+    ];
+
+    let currentStage = 0;
+    let scores = [0, 0, 0, 0];
+    let attempts = [0, 0, 0, 0];
+
+    function loadStageUI(stageIdx) {
+      const data = stagesData[stageIdx];
+      document.getElementById('displayStageNumber').innerText = data.stageNumber;
+      document.getElementById('stageTitle').innerText = data.title;
+      document.getElementById('scenarioDescription').innerHTML = data.scenario;
+      document.getElementById('questionHeading').innerText = data.question;
+      document.getElementById('activeInterventionText').innerText = data.interventionNote;
+
+      const optsBox = document.getElementById('optionsContainer');
+      optsBox.innerHTML = '';
+
+      data.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-decision';
+        btn.innerHTML = `<span class="opt-circle">${opt.label}</span> <span>${opt.text}</span>`;
+        btn.onclick = () => handleAnswer(idx);
+        optsBox.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIdx) {
+      const data = stagesData[currentStage];
+      attempts[currentStage]++;
+
+      const isCorrect = (selectedIdx === data.correctAnswer);
+      
+      const backdrop = document.getElementById('feedbackBackdrop');
+      const box = document.getElementById('feedbackBox');
+      const icon = document.getElementById('feedbackIcon');
+      const title = document.getElementById('feedbackTitle');
+      const body = document.getElementById('feedbackContent');
+      const actionBtn = document.getElementById('feedbackButton');
+
+      backdrop.style.display = 'flex';
+      setTimeout(() => box.classList.add('active'), 20);
+
+      if (isCorrect) {
+        audio.playCorrectSound();
+        if (attempts[currentStage] === 1) {
+          scores[currentStage] = 1;
         }
+        updateScoreHUD();
 
-        function loadStage() {
-            const stageData = stages[currentStageIndex];
-            
-            // Update UI
-            document.getElementById('stageNumber').innerText = stageData.id;
-            document.getElementById('scenarioText').innerHTML = stageData.scenario;
-            document.getElementById('questionText').innerText = stageData.question;
-            
-            if(stageData.statusUpdate && stageData.statusUpdate.cpr) {
-                document.getElementById('statusCPR').innerText = stageData.statusUpdate.cpr;
-            }
+        box.classList.remove('incorrect');
+        icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color: var(--emerald);"></i>';
+        title.style.color = 'var(--emerald)';
+        title.innerText = data.correctFeedback.title;
+        body.innerHTML = data.correctFeedback.html;
 
-            // Build Options
-            const optsContainer = document.getElementById('optionsContainer');
-            optsContainer.innerHTML = '';
-            
-            stageData.options.forEach((optText, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-option';
-                const letter = index === 0 ? 'A' : 'B';
-                btn.innerHTML = `<span class="opt-letter">${letter}</span> ${optText}`;
-                btn.onclick = () => handleSelection(index);
-                optsContainer.appendChild(btn);
-            });
+        actionBtn.className = 'modal-action-btn btn-emerald';
+        actionBtn.innerText = 'PROCEED TO NEXT ACTION';
+        actionBtn.onclick = () => {
+          closeModal();
+          data.nextAction();
+        };
+      } else {
+        audio.playWrongSound();
+        box.classList.add('incorrect');
+        icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>';
+        title.style.color = 'var(--danger)';
+        title.innerText = data.incorrectFeedback.title;
+        body.innerHTML = data.incorrectFeedback.html;
+
+        actionBtn.className = 'modal-action-btn btn-rose';
+        actionBtn.innerText = 'RETRY CLINICAL DECISION';
+        actionBtn.onclick = closeModal;
+      }
+    }
+
+    function closeModal() {
+      const box = document.getElementById('feedbackBox');
+      const backdrop = document.getElementById('feedbackBackdrop');
+      box.classList.remove('active');
+      setTimeout(() => { backdrop.style.display = 'none'; }, 200);
+    }
+
+    function updateScoreHUD() {
+      const total = scores.reduce((a, b) => a + b, 0);
+      document.getElementById('currentScore').innerText = total;
+    }
+
+    /* Actions: Shock & CPR Simulation */
+    function executeDefibrillationSequence(fromStage) {
+      audio.playShockSound();
+      const flash = document.getElementById('shockFlash');
+      flash.style.animation = 'defibrillate 0.35s ease-out forwards';
+
+      setTimeout(() => {
+        flash.style.animation = 'none';
+        currentStage++;
+        loadStageUI(currentStage);
+      }, 400);
+    }
+
+    function executeCPR2MinuteCycle(fromStage) {
+      const overlay = document.getElementById('cprOverlay');
+      const fill = document.getElementById('cprFill');
+      overlay.style.display = 'flex';
+      fill.style.width = '0%';
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 2;
+        fill.style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            currentStage++;
+            loadStageUI(currentStage);
+          }, 300);
         }
+      }, 30);
+    }
 
-        function handleSelection(selectedIndex) {
-            const stageData = stages[currentStageIndex];
-            const isCorrect = (selectedIndex === stageData.correctIndex);
-            
-            const modalOverlay = document.getElementById('feedbackModal');
-            const modalContent = document.getElementById('modalContent');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalText = document.getElementById('modalText');
-            const modalBtn = document.getElementById('modalBtn');
+    /* Final Assessment Results Table */
+    function displayFinalAssessment() {
+      document.getElementById('mainGrid').style.display = 'none';
+      const resultsView = document.getElementById('resultsView');
+      resultsView.style.display = 'flex';
+      resultsView.style.maxWidth = '900px';
+      resultsView.style.margin = '2rem auto';
+      document.querySelector('main').parentNode.insertBefore(resultsView, document.querySelector('footer'));
 
-            modalOverlay.style.display = 'flex';
-            setTimeout(() => modalContent.classList.add('show'), 10);
+      const totalScore = scores.reduce((a, b) => a + b, 0);
+      const percentage = (totalScore / 4) * 100;
+      document.getElementById('finalScoreSummary').innerText = `TOTAL SCORE: ${totalScore} / 4 (${percentage}%)`;
 
-            if (isCorrect) {
-                if (firstAttempt[currentStageIndex]) {
-                    scores[currentStageIndex] = 1;
-                    updateScoreDisplay();
-                }
-                modalContent.classList.remove('incorrect');
-                modalTitle.style.color = 'var(--emerald)';
-                modalTitle.innerText = stageData.feedbackCorrect.title;
-                modalText.innerHTML = stageData.feedbackCorrect.text;
-                
-                modalBtn.className = 'btn-action';
-                modalBtn.innerText = 'PROCEED TO NEXT STEP';
-                modalBtn.onclick = () => {
-                    closeModal();
-                    if (stageData.postAction) stageData.postAction();
-                };
-            } else {
-                firstAttempt[currentStageIndex] = false;
-                modalContent.classList.add('incorrect');
-                modalTitle.style.color = 'var(--danger)';
-                modalTitle.innerText = stageData.feedbackIncorrect.title;
-                modalText.innerHTML = stageData.feedbackIncorrect.text;
-                
-                modalBtn.className = 'btn-action btn-danger';
-                modalBtn.innerText = 'RETRY';
-                modalBtn.onclick = closeModal;
-            }
-        }
+      const verdictEl = document.getElementById('verdictText');
+      if (totalScore === 4) {
+        verdictEl.style.color = 'var(--emerald)';
+        verdictEl.innerText = "EXCELLENT – CLINICALLY COMPETENT (4/4)";
+      } else if (totalScore === 3) {
+        verdictEl.style.color = 'var(--gold)';
+        verdictEl.innerText = "SATISFACTORY – MINOR IMPROVEMENT REQUIRED (3/4)";
+      } else if (totalScore === 2) {
+        verdictEl.style.color = '#FFA500';
+        verdictEl.innerText = "NEEDS IMPROVEMENT – REVIEW ALS ALGORITHM (2/4)";
+      } else {
+        verdictEl.style.color = 'var(--danger)';
+        verdictEl.innerText = "UNSUCCESSFUL – REPEAT SIMULATION (0–1/4)";
+      }
 
-        function closeModal() {
-            const modalContent = document.getElementById('modalContent');
-            modalContent.classList.remove('show');
-            setTimeout(() => {
-                document.getElementById('feedbackModal').style.display = 'none';
-            }, 300);
-        }
+      const tbody = document.getElementById('resultsTableContent');
+      tbody.innerHTML = '';
+      stagesData.forEach((stg, i) => {
+        const tr = document.createElement('tr');
+        const pass = scores[i] === 1;
+        tr.innerHTML = `
+          <td><strong>Stage ${stg.stageNumber}</strong></td>
+          <td>${stg.competency}</td>
+          <td style="color: ${pass ? 'var(--emerald)' : 'var(--danger)'}; font-weight: 600;">
+            ${pass ? '<i class="bi bi-check-lg"></i> Correct on First Attempt' : '<i class="bi bi-x-lg"></i> Required Remediation'}
+          </td>
+          <td style="font-weight: 700; color: ${pass ? 'var(--emerald)' : 'var(--danger)'};">${scores[i]} / 1</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-        function updateScoreDisplay() {
-            const total = scores.reduce((a, b) => a + b, 0);
-            document.getElementById('scoreDisplay').innerText = total;
-        }
+    function restartSimulation() {
+      currentStage = 0;
+      scores = [0, 0, 0, 0];
+      attempts = [0, 0, 0, 0];
+      updateScoreHUD();
 
-        /* --- Transitions & Effects --- */
-        function triggerShock() {
-            const overlay = document.getElementById('shockOverlay');
-            overlay.style.animation = 'none';
-            void overlay.offsetWidth; // trigger reflow
-            overlay.style.animation = 'shockFlash 0.3s ease-out';
-            
-            // Temporarily flatline, then resume VT
-            ctx.clearRect(0,0,width,height);
-            setTimeout(() => {
-                currentStageIndex++;
-                loadStage();
-            }, 300);
-        }
+      const resultsView = document.getElementById('resultsView');
+      resultsView.style.display = 'none';
+      document.getElementById('mainGrid').style.display = 'grid';
 
-        function simulateCPR() {
-            const cprBox = document.getElementById('cprContainer');
-            const fill = document.getElementById('cprProgressFill');
-            cprBox.style.display = 'flex';
-            
-            let progress = 0;
-            fill.style.width = '0%';
-            
-            const interval = setInterval(() => {
-                progress += 2;
-                fill.style.width = `${progress}%`;
-                if(progress >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        cprBox.style.display = 'none';
-                        currentStageIndex++;
-                        loadStage();
-                    }, 300);
-                }
-            }, 30);
-        }
+      loadStageUI(0);
+    }
 
-        function triggerShockAndAdvance() {
-            triggerShock();
-            // triggerShock already advances to next stage inside its timeout
-        }
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', () => {
+      resizeCanvas();
+      renderECGSweep();
+      loadStageUI(0);
 
-        function finishSimulation() {
-            document.getElementById('mainContainer').style.display = 'none';
-            const results = document.getElementById('resultsContainer');
-            results.style.display = 'block';
-            
-            const totalScore = scores.reduce((a, b) => a + b, 0);
-            const gradeEl = document.getElementById('finalGrade');
-            
-            let gradeText = "";
-            if (totalScore === 4) {
-                gradeText = "4/4: Excellent – Competent decision-making.";
-                gradeEl.style.color = "var(--emerald)";
-            } else if (totalScore === 3) {
-                gradeText = "3/4: Satisfactory – Minor improvement required.";
-                gradeEl.style.color = "var(--gold)";
-            } else if (totalScore === 2) {
-                gradeText = "2/4: Needs Improvement – Review the ALS algorithm.";
-                gradeEl.style.color = "orange";
-            } else {
-                gradeText = `${totalScore}/4: Unsuccessful – Repeat the simulation.`;
-                gradeEl.style.color = "var(--danger)";
-            }
-            gradeEl.innerText = gradeText;
-
-            const tbody = document.getElementById('resultsTableBody');
-            tbody.innerHTML = '';
-            stages.forEach((stage, i) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>Stage ${stage.id}</td>
-                    <td>${stage.competency}</td>
-                    <td style="color: ${scores[i] === 1 ? 'var(--emerald)' : 'var(--danger)'}; font-weight: bold;">
-                        ${scores[i]} / 1
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function resetSimulation() {
-            initSimulation();
-        }
-
-        // Initialize on load
-        window.onload = initSimulation;
-
-    </script>
+      // Auto-unlock Web Audio on first user interaction
+      document.body.addEventListener('click', () => {
+        audio.init();
+      }, { once: true });
+    });
+  </script>
 </body>
 </html>
-
-```
