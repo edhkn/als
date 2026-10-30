@@ -10,18 +10,19 @@
   <style>
     :root {
       --bg-dark: #050813;
-      --bg-panel: rgba(13, 21, 38, 0.78);
+      --bg-panel: rgba(13, 21, 38, 0.82);
       --bg-panel-border: rgba(80, 200, 120, 0.22);
       --emerald: #50C878;
-      --emerald-glow: rgba(80, 200, 120, 0.5);
+      --emerald-glow: rgba(80, 200, 120, 0.55);
       --gold: #FFD700;
       --gold-glow: rgba(255, 215, 0, 0.4);
       --danger: #FF3B30;
-      --danger-glow: rgba(255, 59, 48, 0.4);
+      --danger-glow: rgba(255, 59, 48, 0.45);
       --text-main: #F1F5F9;
       --text-muted: #94A3B8;
-      --monitor-screen: #02060d;
-      --ecg-glow: #00ff73;
+      --monitor-screen: #01080e;
+      --ecg-core: #bbfce0;
+      --ecg-glow: #00ff66;
     }
 
     * {
@@ -39,13 +40,13 @@
       flex-direction: column;
       overflow-x: hidden;
       background-image: 
-        radial-gradient(circle at 15% 20%, rgba(80, 200, 120, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 80%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
+        radial-gradient(circle at 10% 15%, rgba(80, 200, 120, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
     }
 
     /* NAV BAR - Required Specification */
     nav {
-      background: rgba(8, 14, 28, 0.88);
+      background: rgba(8, 14, 28, 0.92);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(80, 200, 120, 0.2);
       padding: 0.85rem 2rem;
@@ -115,7 +116,7 @@
 
     /* Subheader Telemetry Status */
     .station-bar {
-      background: rgba(13, 22, 40, 0.65);
+      background: rgba(13, 22, 40, 0.7);
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       padding: 0.75rem 2rem;
       display: flex;
@@ -135,27 +136,34 @@
     }
 
     .live-tag {
-      background: rgba(255, 59, 48, 0.2);
+      background: rgba(255, 59, 48, 0.25);
       border: 1px solid var(--danger);
-      color: var(--danger);
+      color: #ff6b6b;
       font-size: 0.7rem;
       padding: 2px 8px;
       border-radius: 4px;
-      animation: flash 1.2s infinite;
+      animation: alertPulse 1.2s infinite;
       font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes alertPulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.97); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     .audio-toggle-btn {
       background: rgba(80, 200, 120, 0.12);
       border: 1px solid var(--emerald);
       color: var(--emerald);
-      padding: 0.4rem 0.9rem;
+      padding: 0.45rem 1rem;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s;
     }
 
@@ -183,7 +191,7 @@
       border-radius: 14px;
       padding: 1.5rem;
       backdrop-filter: blur(16px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
       display: flex;
       flex-direction: column;
       position: relative;
@@ -193,7 +201,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.1rem;
       padding-bottom: 0.6rem;
       border-bottom: 1px solid rgba(80, 200, 120, 0.2);
     }
@@ -209,13 +217,13 @@
       gap: 8px;
     }
 
-    /* REALISTIC ECG MONITOR */
+    /* REALISTIC CLINICAL ECG MONITOR */
     .monitor-bezel {
-      background: #0d121c;
-      border-radius: 10px;
-      padding: 8px;
-      border: 2px solid #233149;
-      box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9), 0 8px 24px rgba(0,0,0,0.6);
+      background: #080d17;
+      border-radius: 12px;
+      padding: 10px;
+      border: 2px solid #1a2638;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.95), 0 8px 24px rgba(0, 0, 0, 0.6);
       position: relative;
       margin-bottom: 1.25rem;
     }
@@ -224,38 +232,43 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 4px 10px;
-      font-family: monospace;
-      font-size: 0.75rem;
+      padding: 6px 12px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.78rem;
       color: #64748b;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      background: #02060d;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: #01080e;
+      border-radius: 6px 6px 0 0;
     }
 
     .monitor-lead-info {
-      color: #00ff73;
+      color: #00ff66;
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .canvas-wrapper {
       position: relative;
       width: 100%;
-      height: 220px;
+      height: 235px;
       background-color: var(--monitor-screen);
       overflow: hidden;
+      border-radius: 0 0 6px 6px;
     }
 
-    /* Medical Telemetry Grid */
+    /* Medical Standard ECG Grid Overlay (1mm and 5mm blocks) */
     .canvas-wrapper::before {
       content: "";
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
-      background-size: 20px 20px, 4px 4px;
+      background-size: 25px 25px, 5px 5px;
       background-image: 
-        linear-gradient(to right, rgba(0, 255, 115, 0.08) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 255, 115, 0.08) 1px, transparent 1px),
-        linear-gradient(to right, rgba(0, 255, 115, 0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 255, 115, 0.02) 1px, transparent 1px);
+        linear-gradient(to right, rgba(0, 255, 102, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 102, 0.12) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0, 255, 102, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 102, 0.035) 1px, transparent 1px);
       pointer-events: none;
       z-index: 2;
     }
@@ -269,9 +282,10 @@
       z-index: 1;
     }
 
+    /* Telemetry Digital Numerical Readouts */
     .monitor-readout {
       position: absolute;
-      top: 12px;
+      top: 10px;
       right: 14px;
       z-index: 3;
       text-align: right;
@@ -280,38 +294,35 @@
     }
 
     .rate-number {
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: #00ff73;
-      text-shadow: 0 0 10px rgba(0, 255, 115, 0.6);
-      line-height: 1;
+      font-size: 3rem;
+      font-weight: 900;
+      color: #00ff66;
+      text-shadow: 0 0 12px rgba(0, 255, 102, 0.75);
+      line-height: 0.95;
     }
 
     .rate-label {
-      font-size: 0.75rem;
-      color: #00ff73;
-      letter-spacing: 1px;
+      font-size: 0.72rem;
+      color: #00ff66;
+      letter-spacing: 1.5px;
+      font-weight: 700;
     }
 
     .rhythm-alert {
       display: inline-block;
-      margin-top: 4px;
+      margin-top: 6px;
       background: rgba(255, 59, 48, 0.25);
       border: 1px solid var(--danger);
       color: #ff6b6b;
-      font-size: 0.8rem;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: bold;
-      animation: flash 0.8s infinite alternate;
+      font-size: 0.82rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      animation: alertPulse 1s infinite alternate;
+      letter-spacing: 1px;
     }
 
-    @keyframes flash {
-      from { opacity: 1; }
-      to { opacity: 0.3; }
-    }
-
-    /* Clinical Vitals Grid */
+    /* Patient Vitals Grid */
     .vitals-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -532,7 +543,7 @@
     .cpr-timer-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(3, 7, 18, 0.92);
+      background: rgba(3, 7, 18, 0.94);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -745,16 +756,18 @@
       <!-- Real Cardiac Monitor Bezel -->
       <div class="monitor-bezel">
         <div class="monitor-screen-header">
-          <div class="monitor-lead-info">LEAD II (MONITORING)</div>
-          <div>SWEEP SPEED: 25 mm/s</div>
-          <div>FILTER: DIAGNOSTIC (0.05-150Hz)</div>
+          <div class="monitor-lead-info">
+            <i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)
+          </div>
+          <div>SWEEP: 25.0 mm/s</div>
+          <div>BANDPASS: 0.05 - 150 Hz</div>
         </div>
         
         <div class="canvas-wrapper">
           <canvas id="ecgCanvas"></canvas>
           <div class="monitor-readout">
-            <div class="rate-number" id="monitorHR">210</div>
-            <div class="rate-label">BPM</div>
+            <div class="rate-number" id="monitorHR">214</div>
+            <div class="rate-label">HR (BPM)</div>
             <div class="rhythm-alert">VENTRICULAR TACHYCARDIA</div>
           </div>
         </div>
@@ -771,7 +784,7 @@
         </div>
         <div class="vital-tile">
           <div class="vital-title">Consciousness Level</div>
-          <div class="vital-value alert">Unresponsive (U)</div>
+          <div class="vital-value alert">Unresponsive</div>
         </div>
         <div class="vital-tile">
           <div class="vital-title">Respiratory Drive</div>
@@ -792,13 +805,13 @@
     <div class="panel">
       <div class="panel-header">
         <div class="panel-heading">
-          <i class="bi bi-clipboard2-pulse"></i> Decision Stage <span id="displayStageNumber">1</span> of 4
+          <i class="bi bi-clipboard2-pulse"></i> Stage <span id="displayStageNumber">1</span>: Decision Making
         </div>
         <span style="font-size: 0.8rem; color: var(--emerald); font-weight: 600;" id="stageTitle">Recognition & Action</span>
       </div>
 
       <div class="scenario-card" id="scenarioDescription">
-        A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The cardiac monitor displays a regular broad-complex tachycardia consistent with Ventricular Tachycardia. Central pulse is verified absent.
+        A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The ambulance team confirms no pulse, agonal breathing, and initiates CPR. The cardiac monitor displays a regular broad-complex tachycardia consistent with Ventricular Tachycardia.
       </div>
 
       <div class="question-banner">
@@ -810,7 +823,7 @@
       </div>
     </div>
 
-    <!-- RESULTS SUMMARY VIEW (Appears after completion) -->
+    <!-- RESULTS SUMMARY VIEW (Appears after Stage 4) -->
     <div class="panel results-view" id="resultsView">
       <div class="panel-header">
         <div class="panel-heading"><i class="bi bi-award-fill"></i> Performance Assessment Summary</div>
@@ -874,16 +887,17 @@
       <p class="footer-copyright">© 2026 <span>Yassin Razak</span> | All Rights Reserved</p>
       
       <p class="clinical-disclaimer">
-        DISCLAIMER: This interactive station is designed solely for clinical education and emergency training. Clinical resuscitation algorithms and drug dosages must strictly align with current Malaysian Ministry of Health guidelines and international Advanced Life Support (ALS) consensus.
+        DISCLAIMER: This interactive station is designed solely for clinical education and emergency training. Clinical resuscitation algorithms and drug dosages must strictly align with current Malaysian Ministry of Health guidelines and applicable Advanced Life Support (ALS) guidelines.
       </p>
     </div>
   </footer>
 
-  <!-- JAVASCRIPT: SIMULATION, REALISTIC ECG & WEB AUDIO SYNTHESIS -->
+  <!-- JAVASCRIPT: ADVANCED VT ECG ENGINE, WEB AUDIO SYNTHESIS & SCENARIO LOGIC -->
   <script>
     /* ==========================================================
        1. SYNTHETIC AUDIO ENGINE (Web Audio API)
-       Pure programmatic sound synthesis: No external MP3 downloads
+       Authentic patient monitor QRS beep, harmonic correct chime,
+       dissonant wrong alert, and defibrillator discharge sound.
        ========================================================== */
     class AudioEngine {
       constructor() {
@@ -901,7 +915,7 @@
         }
       }
 
-      // ECG Synchronized Beep (QRS sync)
+      // Authentic Hospital Monitor QRS Beep (~880 Hz sine chirp)
       playECGBeep() {
         if (!this.enabled) return;
         this.init();
@@ -910,22 +924,20 @@
           const gain = this.ctx.createGain();
 
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(800, this.ctx.currentTime); // Standard patient monitor high frequency chirp
-
-          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.055);
+          osc.frequency.setValueAtTime(880, this.ctx.currentTime); // Standard hospital monitor tone (A5)
+          
+          gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.05);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.06);
-        } catch (e) {
-          console.warn("Audio error:", e);
-        }
+          osc.stop(this.ctx.currentTime + 0.055);
+        } catch (e) {}
       }
 
-      // Correct Answer Harmonious Chime (Major triad C5 -> E5 -> G5)
+      // Correct Answer: Harmonious Major Ascending Chime
       playCorrectSound() {
         if (!this.enabled) return;
         this.init();
@@ -939,19 +951,19 @@
               osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
 
               gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.32);
 
               osc.connect(gain);
               gain.connect(this.ctx.destination);
 
               osc.start();
-              osc.stop(this.ctx.currentTime + 0.38);
+              osc.stop(this.ctx.currentTime + 0.35);
             } catch (err) {}
           }, idx * 75);
         });
       }
 
-      // Wrong Answer Dissonant Low Buzz
+      // Wrong Answer: Dissonant Low Buzzer
       playWrongSound() {
         if (!this.enabled) return;
         this.init();
@@ -964,9 +976,9 @@
           osc2.type = 'sawtooth';
 
           osc1.frequency.setValueAtTime(140, this.ctx.currentTime);
-          osc2.frequency.setValueAtTime(98, this.ctx.currentTime); // dissonant tritone interval
+          osc2.frequency.setValueAtTime(98, this.ctx.currentTime); // Tritone dissonance
 
-          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.16, this.ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.45);
 
           osc1.connect(gain);
@@ -980,22 +992,21 @@
         } catch (e) {}
       }
 
-      // Defibrillation Capacitor Charge & Discharge Sound
+      // Defibrillator Discharge Sound (Electrical capacitor boom)
       playShockSound() {
         if (!this.enabled) return;
         this.init();
         try {
-          // Rapid discharge boom
-          const bufferSize = this.ctx.sampleRate * 0.25;
+          const bufferSize = this.ctx.sampleRate * 0.3;
           const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
           const data = buffer.getChannelData(0);
           for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.05));
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.04));
           }
           const noise = this.ctx.createBufferSource();
           noise.buffer = buffer;
           const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+          noiseGain.gain.setValueAtTime(0.45, this.ctx.currentTime);
           noise.connect(noiseGain);
           noiseGain.connect(this.ctx.destination);
           noise.start();
@@ -1020,17 +1031,24 @@
     }
 
     /* ==========================================================
-       2. REALISTIC MONOMORPHIC VENTRICULAR TACHYCARDIA CANVAS
-       Simulates an authentic sweeping electron beam with phosphor
-       persistence, wide slurred notched QRS complexes, discordant
-       T-waves and realistic physiological wandering.
+       2. CLINICAL-GRADE MONOMORPHIC VENTRICULAR TACHYCARDIA ENGINE
+       Accurately simulates:
+       - Regular Broad-Complex QRS (>160ms) at 214 bpm
+       - Slurred ventricular onset with Josephson's notch on ascending limb
+       - Asymmetric wide peaked QRS with Brugada shoulder
+       - Rapid downstroke into deep discordant S-wave
+       - Inverted broad T-wave blending with absence of flat isoelectric baseline
+       - Subtle road vibration/transport tremor & respiration baseline wander
+       - Continuous sweeping electron beam with authentic phosphor decay
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
     let canvasW, canvasH;
     let sweepX = 0;
     let lastY = 0;
-    let animId = null;
+    let ecgBuffer = [];
+    let isBeatArmed = true;
+    let globalSample = 0;
 
     function resizeCanvas() {
       const parent = canvas.parentElement;
@@ -1038,115 +1056,127 @@
       canvas.height = parent.clientHeight;
       canvasW = canvas.width;
       canvasH = canvas.height;
-      lastY = canvasH / 2;
+      lastY = canvasH * 0.52;
       sweepX = 0;
-      
-      // Clear background
-      ctx.fillStyle = '#02060d';
+      ecgBuffer = new Array(Math.ceil(canvasW)).fill(canvasH * 0.52);
+
+      ctx.fillStyle = '#01080e';
       ctx.fillRect(0, 0, canvasW, canvasH);
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Realistic Monomorphic VT Waveform Calculation
-    // HR ~210 bpm: Wide QRS (>140ms), notched slurred peak, deep discordant S wave
-    function getVTY(time) {
-      const baseline = canvasH * 0.52;
-      const scale = canvasH * 0.38;
-      
-      // Period for ~210 bpm at sweep rate
-      const period = 75; 
-      const phase = (time % period) / period; // 0.0 to 1.0
+    // Advanced Mathematical Waveform Formulation for Monomorphic VT
+    function calculateVTSample(sampleIndex) {
+      const baseline = canvasH * 0.50;
+      const amplitude = canvasH * 0.36;
 
-      let yOffset = 0;
+      // Period at ~214 bpm with 2.2px/frame sweep
+      const cycleLength = 70; // pixels per cardiac cycle
+      const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
+      const phi = phase / cycleLength; // Normalized 0.0 to 1.0
 
-      if (phase < 0.12) {
-        // Slow slurred upstroke (loss of rapid septal activation)
-        const t = phase / 0.12;
-        yOffset = -scale * 0.35 * Math.sin(t * Math.PI * 0.5);
-      } else if (phase < 0.32) {
-        // Broad notched peak of wide QRS complex
-        const t = (phase - 0.12) / 0.20;
-        // Dual peak notch characteristic of ectopic ventricular origin
-        const notch = 0.08 * Math.sin(t * Math.PI * 3);
-        yOffset = -scale * (0.35 + 0.65 * Math.sin(t * Math.PI) + notch);
-      } else if (phase < 0.52) {
-        // Rapid steep plunge into discordant wide deep S-wave
-        const t = (phase - 0.32) / 0.20;
-        yOffset = -scale + scale * 1.85 * Math.sin(t * Math.PI * 0.5);
-      } else if (phase < 0.72) {
-        // Discordant secondary repolarization (broad inverted T-wave)
-        const t = (phase - 0.52) / 0.20;
-        yOffset = scale * 0.85 * (1 - Math.sin(t * Math.PI * 0.5));
+      let wave = 0;
+
+      // Broad QRS with delayed intrinsicoid deflection & Josephson's notch
+      if (phi < 0.28) {
+        // Slurred ascending limb with early notch (~0.12)
+        const t = phi / 0.28;
+        const mainR = Math.sin(t * Math.PI * 0.5);
+        const notch = (phi > 0.08 && phi < 0.16) ? -0.12 * Math.sin((phi - 0.08) / 0.08 * Math.PI) : 0;
+        wave = (mainR + notch) * 1.0;
+      } else if (phi < 0.48) {
+        // Steep descending limb down to deep wide S-wave nadir
+        const t = (phi - 0.28) / 0.20;
+        wave = 1.0 - (t * 1.85); // plunges from +1.0 to -0.85
+      } else if (phi < 0.76) {
+        // Discordant broad inverted T-wave repolarization
+        const t = (phi - 0.48) / 0.28;
+        wave = -0.85 + (Math.sin(t * Math.PI * 0.5) * 0.65); // recovers to -0.20
       } else {
-        // Pre-excitation isoelectric transition with minor baseline noise
-        yOffset = Math.sin(phase * 40) * 1.5;
+        // Late repolarization curving directly into the next wide QRS complex
+        const t = (phi - 0.76) / 0.24;
+        wave = -0.20 + (t * 0.20);
       }
 
-      // Trigger audio beep precisely at the R-wave peak
-      if (Math.abs(phase - 0.22) < 0.015 && isNewBeatTrigger) {
+      // Add high-frequency ambulance transit tremor (fine electrical + physical vibrations)
+      const roadTremor = (Math.sin(sampleIndex * 0.85) * 0.015) + ((Math.random() - 0.5) * 0.035);
+      
+      // Gentle respiratory baseline oscillation
+      const baselineWander = Math.sin(sampleIndex * 0.018) * 0.04;
+
+      const finalY = baseline - ((wave + roadTremor + baselineWander) * amplitude);
+
+      // Trigger synchronized monitor QRS beep at the peak of the R-wave
+      if (phi >= 0.26 && phi <= 0.30 && isBeatArmed) {
         audio.playECGBeep();
-        isNewBeatTrigger = false;
+        isBeatArmed = false;
       }
-      if (phase > 0.4) {
-        isNewBeatTrigger = true;
+      if (phi > 0.55) {
+        isBeatArmed = true;
       }
 
-      return baseline + yOffset;
+      return finalY;
     }
 
-    let isNewBeatTrigger = true;
-    let globalTime = 0;
+    // High-Fidelity Phosphor Sweeper Animation
+    function animateECG() {
+      const step = 2.2; // 25 mm/s sweep rate equivalent
+      const eraseWidth = 26; // Erase gap ahead of sweep head
 
-    function renderECGSweep() {
-      const speed = 2.4; // 25mm/s speed simulation
-      const eraseWidth = 24;
-
-      ctx.save();
-
-      // Clear the sweep head region ahead with phosphor trail effect
-      ctx.fillStyle = '#02060d';
+      // 1. Clear ahead of the sweep head
+      ctx.fillStyle = '#01080e';
       ctx.fillRect(sweepX, 0, eraseWidth, canvasH);
 
-      // Faint phosphor decay overlay
-      ctx.fillStyle = 'rgba(2, 6, 13, 0.02)';
+      // 2. Faint phosphor decay across canvas
+      ctx.fillStyle = 'rgba(1, 8, 14, 0.018)';
       ctx.fillRect(0, 0, canvasW, canvasH);
 
-      // Draw ECG vector
-      const newX = sweepX + speed;
-      const newY = getVTY(globalTime);
+      // 3. Compute new waveform segment
+      const nextX = sweepX + step;
+      const nextY = calculateVTSample(globalSample);
 
+      // 4. Draw outer emerald glow pass
+      ctx.save();
       ctx.beginPath();
       ctx.moveTo(sweepX, lastY);
-      ctx.lineTo(newX, newY);
-      
-      // Neon green glow
-      ctx.strokeStyle = '#00ff73';
-      ctx.lineWidth = 2.2;
-      ctx.shadowColor = '#00ff73';
-      ctx.shadowBlur = 6;
+      ctx.lineTo(nextX, nextY);
+      ctx.strokeStyle = 'rgba(0, 255, 102, 0.45)';
+      ctx.lineWidth = 5.0;
+      ctx.shadowColor = '#00ff66';
+      ctx.shadowBlur = 12;
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // Draw active bright beam tip
+      // 5. Draw inner bright high-intensity beam core
       ctx.beginPath();
-      ctx.arc(newX, newY, 2.5, 0, 2 * Math.PI);
-      ctx.fillStyle = '#b3ffcf';
-      ctx.shadowBlur = 10;
+      ctx.moveTo(sweepX, lastY);
+      ctx.lineTo(nextX, nextY);
+      ctx.strokeStyle = '#bbfce0';
+      ctx.lineWidth = 2.0;
       ctx.shadowColor = '#ffffff';
-      ctx.fill();
+      ctx.shadowBlur = 4;
+      ctx.stroke();
 
+      // 6. Draw active sweep cursor head dot
+      ctx.beginPath();
+      ctx.arc(nextX, nextY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#00ff66';
+      ctx.shadowBlur = 10;
+      ctx.fill();
       ctx.restore();
 
-      lastY = newY;
-      sweepX = newX;
-      globalTime += 1;
+      // Update pointers
+      lastY = nextY;
+      sweepX = nextX;
+      globalSample += 1;
 
       if (sweepX >= canvasW) {
         sweepX = 0;
-        lastY = canvasH / 2;
+        lastY = calculateVTSample(globalSample);
       }
 
-      animId = requestAnimationFrame(renderECGSweep);
+      requestAnimationFrame(animateECG);
     }
 
     /* ==========================================================
@@ -1157,7 +1187,7 @@
         stageNumber: 1,
         title: "Recognition of Pulseless VT",
         competency: "Recognition of pulseless VT and prompt defibrillation",
-        scenario: "A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive.<br><br>The ambulance team assesses the patient:<br>• Unresponsive<br>• Not breathing normally (absent/agonal)<br>• No palpable carotid pulse<br>• CPR has been initiated<br>• Cardiac monitor displays regular broad-complex tachycardia (VT).",
+        scenario: "A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive.<br><br>The ambulance team assesses the patient:<br>• Unresponsive<br>• Not breathing normally (absent/agonal)<br>• No palpable central pulse<br>• CPR has been initiated<br>• Cardiac monitor displays regular broad-complex tachycardia (VT).",
         interventionNote: "CPR ongoing during ambulance transport",
         question: "WHAT IS YOUR NEXT IMMEDIATE ACTION?",
         options: [
@@ -1201,7 +1231,7 @@
         stageNumber: 3,
         title: "Rhythm Reassessment & Repeat Shock",
         competency: "Rhythm reassessment and repeat defibrillation",
-        scenario: "<b>The 2-minute CPR cycle is completed.</b><br>The resuscitation team briefly pauses CPR to check the rhythm.<br>The monitor continues to display persistent Ventricular Tachycardia.<br>Carotid pulse check confirms NO pulse.",
+        scenario: "<b>The 2-minute CPR cycle is completed.</b><br>The resuscitation team briefly pauses CPR to check the rhythm.<br>The monitor continues to display persistent pulseless Ventricular Tachycardia.<br>Carotid pulse check confirms NO pulse.",
         interventionNote: "CPR completed for 2 minutes – Rhythm reassessed",
         question: "THE 2-MINUTE CPR CYCLE IS COMPLETED. THE MONITOR STILL SHOWS PULSELESS VT. WHAT IS YOUR NEXT ACTION?",
         options: [
@@ -1233,7 +1263,7 @@
         correctAnswer: 1, // Option B
         correctFeedback: {
           title: "CORRECT! – APPROPRIATE ALS MANAGEMENT",
-          html: "Following the third shock in refractory shockable cardiac arrest:<br><ol><li>Resume CPR immediately for 2 minutes.</li><li>Administer Adrenaline 1 mg IV/IO.</li><li>Administer Amiodarone 300 mg IV/IO bolus.</li><li>Continue CPR with minimal interruptions.</li><li>Identify and treat reversible causes (Hypoxia, Hypovolaemia, Hypo/hyperkalaemia, Hypothermia, Tension pneumothorax, Tamponade, Toxins, Thrombosis).</li><li>Give subsequent adrenaline every 3–5 minutes (alternate cycles).</li><li>Consider Amiodarone 150 mg IV/IO after the 5th shock.</li></ol>"
+          html: "Following the third shock in refractory shockable cardiac arrest:<br><ol><li>Resume CPR immediately for 2 minutes.</li><li>Administer Adrenaline 1 mg IV/IO.</li><li>Administer Amiodarone 300 mg IV/IO bolus.</li><li>Continue CPR with minimal interruptions.</li><li>Identify and treat reversible causes (4Hs and 4Ts).</li><li>Give subsequent adrenaline every 3–5 minutes (alternate cycles).</li><li>Consider Amiodarone 150 mg IV/IO after the 5th shock.</li></ol>"
         },
         incorrectFeedback: {
           title: "INCORRECT – DO NOT INTERRUPT CPR UNNECESSARILY",
@@ -1328,7 +1358,7 @@
       document.getElementById('currentScore').innerText = total;
     }
 
-    /* Actions: Shock & CPR Simulation */
+    /* Actions: Defibrillation & CPR Simulation */
     function executeDefibrillationSequence(fromStage) {
       audio.playShockSound();
       const flash = document.getElementById('shockFlash');
@@ -1423,10 +1453,10 @@
     // Initialize application on load
     window.addEventListener('DOMContentLoaded', () => {
       resizeCanvas();
-      renderECGSweep();
+      animateECG();
       loadStageUI(0);
 
-      // Auto-unlock Web Audio on first user interaction
+      // Auto-unlock Web Audio on first user interaction anywhere
       document.body.addEventListener('click', () => {
         audio.init();
       }, { once: true });
