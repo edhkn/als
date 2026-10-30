@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ED Simulation Station | Adult Pulseless Ventricular Tachycardia (ALS Advanced 6-Stage)</title>
+  <title>ED Simulation Station | Adult Tachyarrhythmia (ALS Advanced 6-Stage)</title>
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
@@ -42,6 +42,134 @@
       background-image: 
         radial-gradient(circle at 10% 15%, rgba(80, 200, 120, 0.08) 0%, transparent 40%),
         radial-gradient(circle at 90% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
+    }
+
+    /* INITIAL "READY TO GO" POP-UP OVERLAY */
+    .ready-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(13, 22, 42, 0.97) 0%, rgba(3, 6, 15, 0.99) 100%);
+      backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      padding: 1.5rem;
+    }
+
+    .ready-modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .ready-modal-box {
+      background: rgba(16, 26, 48, 0.94);
+      border: 2px solid var(--emerald);
+      border-radius: 20px;
+      max-width: 560px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(80, 200, 120, 0.35), inset 0 0 20px rgba(80, 200, 120, 0.1);
+      animation: readyPulse 3s infinite alternate;
+    }
+
+    @keyframes readyPulse {
+      0% { box-shadow: 0 0 30px rgba(80, 200, 120, 0.25); }
+      100% { box-shadow: 0 0 60px rgba(80, 200, 120, 0.55); }
+    }
+
+    .ready-dept-logo {
+      height: 68px;
+      width: auto;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 10px rgba(80, 200, 120, 0.5));
+    }
+
+    .ready-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(80, 200, 120, 0.15);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .ready-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    .ready-subtitle {
+      font-size: 0.95rem;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+    }
+
+    .ready-specs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .ready-spec-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ready-instruction {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .ready-btn {
+      background: linear-gradient(135deg, #50C878 0%, #3ca760 100%);
+      color: #050813;
+      border: none;
+      padding: 1rem 2.8rem;
+      border-radius: 35px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 0 25px var(--emerald-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+
+    .ready-btn:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 0 40px rgba(80, 200, 120, 0.8);
+      background: #40b366;
     }
 
     /* NAV BAR */
@@ -262,6 +390,7 @@
       border-radius: 0 0 6px 6px;
     }
 
+    /* Medical ECG Grid Overlay */
     .canvas-wrapper::before {
       content: "";
       position: absolute;
@@ -417,7 +546,7 @@
     .options-stack {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 1rem;
     }
 
@@ -425,15 +554,15 @@
       background: rgba(255, 255, 255, 0.035);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 10px;
-      padding: 0.85rem 1.15rem;
+      padding: 1rem 1.25rem;
       color: #fff;
-      font-size: 0.91rem;
+      font-size: 0.93rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
       display: flex;
       align-items: flex-start;
-      gap: 12px;
+      gap: 14px;
       line-height: 1.45;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -446,8 +575,8 @@
     }
 
     .opt-circle {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--gold);
       color: #070B19;
@@ -455,7 +584,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       flex-shrink: 0;
       margin-top: 2px;
     }
@@ -747,6 +876,32 @@
 </head>
 <body>
 
+  <!-- "READY TO GO" MODAL POP-UP OVERLAY -->
+  <div class="ready-modal-backdrop" id="readyModalBackdrop">
+    <div class="ready-modal-box">
+      <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="HKN Logo" class="ready-dept-logo">
+      <div>
+        <span class="ready-badge"><i class="bi bi-shield-fill-check"></i> Hospital Kuala Nerang</span>
+      </div>
+      <h1 class="ready-title">Emergency Department Simulation</h1>
+      <div class="ready-subtitle">Adult Tachyarrhythmia: Supraventricular Tachycardia (SVT)</div>
+      
+      <div class="ready-specs">
+        <div class="ready-spec-item"><i class="bi bi-person-fill"></i> 32 y/o Female</div>
+        <div class="ready-spec-item"><i class="bi bi-activity"></i> HR 204 BPM (Narrow QRS)</div>
+        <div class="ready-spec-item"><i class="bi bi-volume-up-fill"></i> Continuous Telemetry Audio</div>
+      </div>
+      
+      <p class="ready-instruction">
+        Check your device volume or headphones. Clicking below starts the high-speed cardiac telemetry audio and loads the clinical station.
+      </p>
+
+      <button class="ready-btn" id="readyBtn" onclick="startSimulationSession()">
+        <i class="bi bi-play-circle-fill"></i> READY TO GO
+      </button>
+    </div>
+  </div>
+
   <!-- NAV -->
   <nav>
     <a href="index.html" class="logo-group">
@@ -765,7 +920,7 @@
   <div class="station-bar">
     <div class="station-title-badge">
       <span class="live-tag" id="statusBadgeTag">CRITICAL ALS SIMULATION</span>
-      <span id="stationTitleHeading">Adult Tachyarrhythmia: Pulseless VT (Advanced 6-Stage)</span>
+      <span id="stationTitleHeading">Adult Tachyarrhythmia: SVT Assessment</span>
     </div>
     <div style="display: flex; gap: 1rem; align-items: center;">
       <button class="audio-toggle-btn active-sound" id="audioToggleBtn" onclick="toggleAudioState()">
@@ -805,7 +960,7 @@
           <div class="monitor-readout">
             <div class="rate-number" id="monitorHR">214</div>
             <div class="rate-label" id="rateLabelText">HR (BPM)</div>
-            <div class="rhythm-alert" id="rhythmAlertTag">VENTRICULAR TACHYCARDIA</div>
+            <div class="rhythm-alert" id="rhythmAlertTag">SUPRAVENTRICULAR TACHYCARDIA</div>
           </div>
         </div>
       </div>
@@ -858,7 +1013,7 @@
       <div class="stage-badge-level" id="difficultyTag">Core ALS Competency</div>
 
       <div class="scenario-card" id="scenarioDescription">
-        A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The ambulance team confirms no pulse, agonal breathing, and initiates CPR. The cardiac monitor displays a regular broad-complex tachycardia consistent with Ventricular Tachycardia.
+        A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive. The ambulance team confirms no pulse, agonal breathing, and initiates CPR. The cardiac monitor displays a regular broad-complex tachycardia.
       </div>
 
       <div class="question-banner">
@@ -1127,14 +1282,35 @@
       }
     }
 
+    /* Start Simulation Session from "READY TO GO" Button */
+    function startSimulationSession() {
+      // 1. Initialize and resume Web Audio immediately on direct user click
+      audio.init();
+      if (audio.ctx && audio.ctx.state === 'suspended') {
+        audio.ctx.resume();
+      }
+
+      // 2. Play initial chime sound to confirm active audio
+      audio.playCorrectSound();
+
+      // 3. Hide the pop-up overlay smoothly
+      const readyBackdrop = document.getElementById('readyModalBackdrop');
+      readyBackdrop.classList.add('hidden');
+
+      // 4. Ensure canvas animation and first stage are ready
+      if (!animRunning) {
+        animRunning = true;
+        animateECG();
+      }
+    }
+
     /* ==========================================================
-       2. RAPID MONOMORPHIC VENTRICULAR TACHYCARDIA ENGINE
-       Calibrated for genuine 214 BPM:
-       - Cycle period: ~280 ms (repeats 3.57 times/sec)
-       - Broad QRS (>160 ms), Josephson's notch on ascending limb
-       - Steep downslope to deep discordant S wave
-       - Discordant inverted broad T wave with NO isoelectric resting flatline
-       - Seamless deceleration to regular Sinus Rhythm (98 bpm) upon ROSC
+       2. REFINED ULTRA-NARROW & RAPID SVT ECG ENGINE
+       - Genuine high-frequency 204 BPM ($RR = 294\text{ ms}$)
+       - Narrow QRS (<0.075s, needle-thin vertical spike)
+       - Absent visible P wave (retrograde P buried in terminal QRS/ST)
+       - Rate-dependent J-point depression & conjoined asymmetric T-wave
+       - Decelerates seamlessly to Normal Sinus Rhythm (76 BPM) upon ROSC
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
@@ -1143,7 +1319,8 @@
     let lastY = 0;
     let isBeatArmed = true;
     let globalSample = 0;
-    let currentRhythmMode = 'VT'; // 'VT' or 'SINUS'
+    let currentRhythmMode = 'SVT'; // 'SVT', 'ASYSTOLE', 'ROSC_SINUS'
+    let animRunning = false;
 
     function resizeCanvas() {
       const parent = canvas.parentElement;
@@ -1151,137 +1328,121 @@
       canvas.height = parent.clientHeight;
       canvasW = canvas.width;
       canvasH = canvas.height;
-      lastY = canvasH * 0.52;
+      lastY = canvasH * 0.54;
       sweepX = 0;
-
       ctx.fillStyle = '#01080e';
       ctx.fillRect(0, 0, canvasW, canvasH);
     }
     window.addEventListener('resize', resizeCanvas);
 
-    function calculateECGSample(sampleIndex) {
-      const baseline = canvasH * 0.50;
-      let yOffset = 0;
+    function calculateLeadIISample(sampleIndex) {
+      const baseline = canvasH * 0.54;
+      const amp = canvasH * 0.40;
 
-      if (currentRhythmMode === 'VT') {
-        // High-velocity Monomorphic VT (214 bpm): cycleLength = 38 px
-        const cycleLength = 38;
-        const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
-        const phi = phase / cycleLength;
-        const amplitude = canvasH * 0.38;
-        let wave = 0;
+      if (currentRhythmMode === 'SVT') {
+        // Fast, authentic narrow SVT at 204 BPM: cycle length = 33 px
+        const cycle = 33;
+        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        if (phi < 0.28) {
-          // Broad, slurred upstroke with Josephson's notch
-          const t = phi / 0.28;
-          const mainR = Math.sin(t * Math.PI * 0.5);
-          const notch = (phi > 0.08 && phi < 0.16) ? -0.14 * Math.sin((phi - 0.08) / 0.08 * Math.PI) : 0;
-          wave = (mainR + notch) * 1.0;
-        } else if (phi < 0.50) {
-          // Steep downstroke plunging into deep discordant S-wave
-          const t = (phi - 0.28) / 0.22;
-          wave = 1.0 - (t * 1.88);
-        } else if (phi < 0.78) {
-          // Wide discordant secondary repolarization (inverted T-wave)
-          const t = (phi - 0.50) / 0.28;
-          wave = -0.88 + (Math.sin(t * Math.PI * 0.5) * 0.68);
-        } else {
-          // Rapid ascent straight into next ectopic wide complex
-          const t = (phi - 0.78) / 0.22;
-          wave = -0.20 + (t * 0.20);
-        }
+        // Mathematical formulation of Lead II AVNRT SVT:
+        // Razor-thin QRS complex (< 0.075s), sharp Q dip, needle R-spike, sharp S with buried retrograde P
+        const qWave = -0.11 * Math.exp(-Math.pow((phi - 0.13) / 0.008, 2));
+        const rWave =  1.32 * Math.exp(-Math.pow((phi - 0.165) / 0.009, 2)); // Needle-sharp vertical spike
+        const sWave = -0.34 * Math.exp(-Math.pow((phi - 0.198) / 0.009, 2)); // Rapid S nadir
+        const stDep = -0.07 * Math.exp(-Math.pow((phi - 0.28) / 0.05, 2));   // Classic rate-dependent ST depression
+        const tWave =  0.27 * Math.exp(-Math.pow((phi - 0.54) / 0.13, 2));   // Asymmetrical upright T-wave
 
-        const roadTremor = (Math.sin(sampleIndex * 0.85) * 0.015) + ((Math.random() - 0.5) * 0.035);
-        const baselineWander = Math.sin(sampleIndex * 0.02) * 0.03;
-        yOffset = -((wave + roadTremor + baselineWander) * amplitude);
+        const wave = qWave + rWave + sWave + stDep + tWave;
+        const noise = (Math.random() - 0.5) * 0.012; // Fine electrical noise
+        const y = baseline - (wave + noise) * amp;
 
-        // Sound trigger exactly at peak R-wave
-        if (phi >= 0.24 && phi <= 0.30 && isBeatArmed) {
-          audio.playECGBeep(880);
+        // Beep triggers directly on the razor-sharp R-wave peak
+        if (phi >= 0.155 && phi <= 0.185 && isBeatArmed) {
+          audio.playECGBeep(950);
           isBeatArmed = false;
         }
-        if (phi > 0.52) {
-          isBeatArmed = true;
-        }
+        if (phi > 0.45) isBeatArmed = true;
+        return y;
 
-      } else {
-        // Mode 'SINUS' (Post-ROSC Sinus Rhythm ~98 bpm)
-        const cycleLength = 84;
-        const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
-        const phi = phase / cycleLength;
-        const amplitude = canvasH * 0.42;
-        let wave = 0;
+      } else if (currentRhythmMode === 'ASYSTOLE') {
+        // Flatline with subtle biological wander
+        const wander = Math.sin(sampleIndex * 0.02) * 1.5;
+        const noise = (Math.random() - 0.5) * 1.0;
+        return baseline + wander + noise;
 
-        if (phi >= 0.10 && phi < 0.22) {
-          const t = (phi - 0.10) / 0.12;
-          wave = 0.18 * Math.sin(t * Math.PI);
-        } else if (phi >= 0.28 && phi < 0.31) {
-          const t = (phi - 0.28) / 0.03;
-          wave = -0.12 * Math.sin(t * Math.PI);
-        } else if (phi >= 0.31 && phi < 0.36) {
-          const t = (phi - 0.31) / 0.05;
-          wave = (t < 0.5) ? (t / 0.5) * 1.0 : (1.0 - (t - 0.5) / 0.5) * 1.0;
-        } else if (phi >= 0.36 && phi < 0.40) {
-          const t = (phi - 0.36) / 0.04;
-          wave = -0.25 * Math.sin(t * Math.PI);
-        } else if (phi >= 0.50 && phi < 0.68) {
-          const t = (phi - 0.50) / 0.18;
-          wave = 0.32 * Math.sin(t * Math.PI);
-        }
+      } else if (currentRhythmMode === 'ROSC_SINUS') {
+        // Normal Sinus Rhythm at 76 BPM: cycle length = 110 px
+        const cycle = 110;
+        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        const mildPhysioNoise = ((Math.random() - 0.5) * 0.015);
-        yOffset = -((wave + mildPhysioNoise) * amplitude);
+        const pWave =  0.15 * Math.exp(-Math.pow((phi - 0.14) / 0.035, 2));
+        const qWave = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.012, 2));
+        const rWave =  1.05 * Math.exp(-Math.pow((phi - 0.31) / 0.018, 2));
+        const sWave = -0.22 * Math.exp(-Math.pow((phi - 0.35) / 0.016, 2));
+        const tWave =  0.28 * Math.exp(-Math.pow((phi - 0.58) / 0.08, 2));
 
-        if (phi >= 0.32 && phi <= 0.35 && isBeatArmed) {
+        const wave = pWave + qWave + rWave + sWave + tWave;
+        const noise = (Math.random() - 0.5) * 0.012;
+        const y = baseline - (wave + noise) * amp;
+
+        if (phi >= 0.30 && phi <= 0.33 && isBeatArmed) {
           audio.playECGBeep(750);
           isBeatArmed = false;
         }
-        if (phi > 0.50) {
-          isBeatArmed = true;
-        }
+        if (phi > 0.50) isBeatArmed = true;
+        return y;
       }
-
-      return baseline + yOffset;
     }
 
     function animateECG() {
-      const step = 2.25;
+      const step = 2.4; // Calibrated fast sweep
       const eraseWidth = 26;
 
       ctx.fillStyle = '#01080e';
       ctx.fillRect(sweepX, 0, eraseWidth, canvasH);
-
       ctx.fillStyle = 'rgba(1, 8, 14, 0.02)';
       ctx.fillRect(0, 0, canvasW, canvasH);
 
       const nextX = sweepX + step;
-      const nextY = calculateECGSample(globalSample);
+      const nextY = calculateLeadIISample(globalSample);
 
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(sweepX, lastY);
       ctx.lineTo(nextX, nextY);
-      ctx.strokeStyle = currentRhythmMode === 'VT' ? 'rgba(0, 255, 102, 0.45)' : 'rgba(80, 200, 120, 0.5)';
-      ctx.lineWidth = 5.0;
-      ctx.shadowColor = '#00ff66';
-      ctx.shadowBlur = 12;
+
+      if (currentRhythmMode === 'ASYSTOLE') {
+        ctx.strokeStyle = 'rgba(255, 34, 34, 0.6)';
+        ctx.lineWidth = 4.0;
+        ctx.shadowColor = '#ff2222';
+      } else if (currentRhythmMode === 'ROSC_SINUS') {
+        ctx.strokeStyle = 'rgba(80, 200, 120, 0.55)';
+        ctx.lineWidth = 4.5;
+        ctx.shadowColor = '#00ff66';
+      } else {
+        ctx.strokeStyle = 'rgba(0, 255, 102, 0.45)';
+        ctx.lineWidth = 4.5;
+        ctx.shadowColor = '#00ff66';
+      }
+
+      ctx.shadowBlur = 10;
       ctx.lineCap = 'round';
       ctx.stroke();
 
       ctx.beginPath();
       ctx.moveTo(sweepX, lastY);
       ctx.lineTo(nextX, nextY);
-      ctx.strokeStyle = '#bbfce0';
-      ctx.lineWidth = 2.0;
+      ctx.strokeStyle = currentRhythmMode === 'ASYSTOLE' ? '#ff9999' : '#bbfce0';
+      ctx.lineWidth = 1.8;
       ctx.shadowColor = '#ffffff';
       ctx.shadowBlur = 4;
       ctx.stroke();
 
       ctx.beginPath();
-      ctx.arc(nextX, nextY, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = '#00ff66';
-      ctx.shadowBlur = 10;
+      ctx.arc(nextX, nextY, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = currentRhythmMode === 'ASYSTOLE' ? '#ff3333' : '#ffffff';
+      ctx.shadowColor = currentRhythmMode === 'ASYSTOLE' ? '#ff0000' : '#00ff66';
+      ctx.shadowBlur = 8;
       ctx.fill();
       ctx.restore();
 
@@ -1291,207 +1452,183 @@
 
       if (sweepX >= canvasW) {
         sweepX = 0;
-        lastY = calculateECGSample(globalSample);
+        lastY = calculateLeadIISample(globalSample);
       }
 
       requestAnimationFrame(animateECG);
     }
 
     /* ==========================================================
-       3. CLINICAL SIMULATION SCENARIO WORKFLOW (STAGES 1 - 6)
-       Each stage provides 4 concise options (A, B, C, D) with ONLY 1 correct answer.
+       3. 6-STAGE SVT WORKFLOW (4 Options, 1 Correct, Short & Precise)
        ========================================================== */
     const stagesData = [
       {
         stageNumber: 1,
-        title: "Recognition of Pulseless VT",
-        badge: "Core ALS Competency",
-        competency: "Recognition of pulseless VT and prompt defibrillation",
-        scenario: "A 40-year-old man suddenly develops severe chest pain and shortness of breath. During ambulance transfer to the hospital, the patient suddenly collapses and becomes unresponsive.<br><br>The ambulance team assesses the patient:<br>• Unresponsive<br>• Not breathing normally (absent/agonal)<br>• No palpable central pulse<br>• CPR has been initiated<br>• Cardiac monitor displays regular broad-complex tachycardia (VT).",
-        interventionNote: "CPR ongoing during ambulance transport",
-        vitals: {
-          conscious: "Unresponsive",
-          resp: "Absent / Agonal",
-          pulse: "No Palpable Pulse",
-          bp: "Non-recordable",
-          airway: "BVM 100% O2"
-        },
-        question: "WHAT IS YOUR NEXT IMMEDIATE ACTION?",
+        title: "Vagal Maneuver",
+        badge: "First-Line Assessment",
+        competency: "Execution of Modified Valsalva (REVERT)",
+        scenario: "A 32-year-old female presents with sudden palpitations. BP 118/75 mmHg, alert, no chest pain. Monitor: Regular narrow-complex tachycardia at 204 bpm.",
+        interventionNote: "Stable Tachycardia – Regular narrow-complex at 204 bpm",
+        vitals: { conscious: "Alert", resp: "24 /min", pulse: "204 bpm (Regular)", bp: "118/75 mmHg", spo2: "98% (Air)" },
+        question: "Patient is hemodynamically stable. What is the immediate first-line action?",
         options: [
-          { label: "A", text: "Continue chest compressions alone for 10 minutes without defibrillation." },
-          { label: "B", text: "Deliver an immediate unsynchronised defibrillation shock (150–200 J biphasic)." },
-          { label: "C", text: "Administer IV Atropine 1 mg bolus immediately." },
-          { label: "D", text: "Deliver synchronised cardioversion at 50 J." }
+          { label: "A", text: "Perform the Modified Valsalva (REVERT) maneuver." },
+          { label: "B", text: "Deliver an immediate unsynchronised shock of 200 J." },
+          { label: "C", text: "Administer IV Adrenaline 1 mg bolus immediately." },
+          { label: "D", text: "Initiate immediate chest compressions at 100–120 bpm." }
         ],
-        correctAnswer: 1, // Option B
+        correctAnswer: 0,
         correctFeedback: {
-          title: "CORRECT! – IMMEDIATE DEFIBRILLATION INDICATED",
-          html: "Pulseless ventricular tachycardia is a shockable cardiac arrest rhythm.<br><br><b>Immediate Management:</b><ol><li>Deliver an unsynchronised defibrillation shock (biphasic 150J–200J or monophasic 360J).</li><li>Resume CPR immediately for 2 minutes without checking the pulse immediately after the shock.</li><li>Reassess the rhythm after 2 minutes.</li><li>Continue the ALS cardiac arrest algorithm.</li></ol>"
+          title: "CORRECT – VAGAL STIMULATION",
+          html: "Modified Valsalva increases venous return and vagal tone, converting up to 43% of stable narrow-complex SVT without medications."
         },
         incorrectFeedback: {
-          title: "INCORRECT – REASSESS YOUR MANAGEMENT",
-          html: "The patient has pulseless ventricular tachycardia, which is a shockable cardiac arrest rhythm. Immediate defibrillation is required as soon as a defibrillator is available. Do not delay defibrillation by solely continuing CPR or administering atropine."
+          title: "INCORRECT MANAGEMENT",
+          html: "Defibrillation, adrenaline, and CPR are inappropriate and contraindicated in a conscious, stable patient with normal blood pressure."
         },
-        nextAction: () => executeDefibrillationSequence(1)
+        actionName: "PERFORMING MODIFIED VALSALVA",
+        actionSub: "Strain for 15s, then supine with 45° leg elevation...",
+        nextAction: () => advanceStage(2)
       },
       {
         stageNumber: 2,
-        title: "Immediate Post-Shock Action",
-        badge: "ALS Flow Management",
-        competency: "Immediate CPR resumption post-defibrillation",
-        scenario: "<b>Defibrillation shock delivered.</b><br>The patient remains unresponsive.<br>CPR has been temporarily paused for shock delivery.<br>The cardiac monitor displays the post-shock status.",
-        interventionNote: "Shock delivered – CPR paused for shock",
-        vitals: {
-          conscious: "Unresponsive",
-          resp: "Absent / Agonal",
-          pulse: "Not Checked (Mandatory)",
-          bp: "Non-recordable",
-          airway: "BVM 100% O2"
-        },
-        question: "WHAT SHOULD YOU DO IMMEDIATELY AFTER DELIVERING THE SHOCK?",
+        title: "First-Line Drug",
+        badge: "Pharmacotherapy",
+        competency: "Administration of Adenosine 6 mg rapid IV push",
+        scenario: "Valsalva caused brief rate slowing, but the tachycardia abruptly recurred at 204 bpm. BP is 116/74 mmHg. Large-bore IV access secured in right antecubital fossa.",
+        interventionNote: "Post-Valsalva – Persistent Tachycardia at 204 bpm",
+        vitals: { conscious: "Alert, Anxious", resp: "22 /min", pulse: "204 bpm", bp: "116/74 mmHg", spo2: "98%" },
+        question: "Vagal maneuver failed. What is the first-line drug therapy?",
         options: [
-          { label: "A", text: "Check the carotid pulse and pause 10 seconds to assess rhythm." },
-          { label: "B", text: "Resume CPR immediately for 2 minutes without checking pulse or rhythm." },
-          { label: "C", text: "Deliver stacked back-to-back shocks immediately." },
-          { label: "D", text: "Administer IV Adrenaline 1 mg bolus before touching the chest." }
+          { label: "A", text: "Administer IV Atropine 1 mg rapid bolus." },
+          { label: "B", text: "Administer Adenosine 6 mg rapid IV push + 20 mL saline flush." },
+          { label: "C", text: "Administer IV Amiodarone 300 mg over 10 minutes." },
+          { label: "D", text: "Administer IV Calcium Chloride 10% 10 mL bolus." }
         ],
-        correctAnswer: 1, // Option B
+        correctAnswer: 1,
         correctFeedback: {
-          title: "CORRECT! – EXCELLENT CLINICAL DECISION",
-          html: "Immediately resume CPR for 2 minutes following defibrillation.<br><br><b>Key actions:</b><ol><li>Resume chest compressions immediately without checking the pulse or rhythm.</li><li>Continue CPR for 2 minutes (30:2 or continuous compressions with advanced airway).</li><li>Establish IV/IO access if not already established.</li><li>Prepare adrenaline and amiodarone for subsequent cycles.</li><li>Reassess cardiac rhythm only after completing the 2-minute cycle.</li></ol>"
+          title: "CORRECT – ADENOSINE 6 MG",
+          html: "Adenosine transiently blocks AV nodal conduction. Give 6 mg as a rapid push followed immediately by a 20 mL saline flush."
         },
         incorrectFeedback: {
-          title: "INCORRECT – DO NOT DELAY CPR",
-          html: "After defibrillation, do not immediately check the pulse or reassess the rhythm. Immediate CPR is mandatory to maintain myocardial and cerebral perfusion while preparing for the next scheduled rhythm assessment."
+          title: "INCORRECT DRUG SELECTION",
+          html: "Atropine worsens tachycardia, while calcium and amiodarone are not first-line agents for stable narrow-complex tachycardia."
         },
-        nextAction: () => executeCPR2MinuteCycle(2)
+        actionName: "INJECTING ADENOSINE 6 MG + 20 mL FLUSH",
+        actionSub: "Rapid push via antecubital fossa with immediate limb elevation...",
+        nextAction: () => advanceStage(3)
       },
       {
         stageNumber: 3,
-        title: "Rhythm Reassessment & Repeat Shock",
-        badge: "Rhythm Check Protocol",
-        competency: "Rhythm reassessment and repeat defibrillation",
-        scenario: "<b>The 2-minute CPR cycle is completed.</b><br>The resuscitation team briefly pauses CPR to check the rhythm.<br>The monitor continues to display persistent pulseless Ventricular Tachycardia.<br>Carotid pulse check confirms NO pulse.",
-        interventionNote: "CPR completed for 2 minutes – Rhythm reassessed",
-        vitals: {
-          conscious: "Unresponsive",
-          resp: "Absent / Agonal",
-          pulse: "No Palpable Pulse",
-          bp: "Non-recordable",
-          airway: "Supraglottic / BVM 100% O2"
-        },
-        question: "THE 2-MINUTE CPR CYCLE IS COMPLETED. THE MONITOR STILL SHOWS PULSELESS VT. WHAT IS YOUR NEXT ACTION?",
+        title: "Dose Escalation",
+        badge: "Refractory Tachycardia",
+        competency: "Escalation to Adenosine 12 mg rapid IV push",
+        scenario: "Following Adenosine 6 mg, a 2-second sinus pause occurred, but tachycardia immediately resumed at 204 bpm. BP is 114/72 mmHg.",
+        interventionNote: "Post-Adenosine 6mg – Persistent Tachycardia at 204 bpm",
+        vitals: { conscious: "Alert, Flushed", resp: "24 /min", pulse: "204 bpm", bp: "114/72 mmHg", spo2: "97%" },
+        question: "The 6 mg dose was ineffective. What is the next pharmacological step?",
         options: [
-          { label: "A", text: "Deliver another unsynchronised defibrillation shock (150–200 J biphasic)." },
-          { label: "B", text: "Continue CPR for another 2 minutes without delivering a shock." },
-          { label: "C", text: "Discontinue resuscitation efforts and declare asystole." },
-          { label: "D", text: "Administer IV Sodium Bicarbonate 8.4% 100 mL bolus and observe." }
+          { label: "A", text: "Administer IV Digoxin 0.5 mg slow bolus." },
+          { label: "B", text: "Administer Sublingual Glyceryl Trinitrate (GTN) 0.5 mg." },
+          { label: "C", text: "Administer Adenosine 12 mg rapid IV push + 20 mL saline flush." },
+          { label: "D", text: "Administer a reduced dose of Adenosine 3 mg IV push." }
         ],
-        correctAnswer: 0, // Option A
+        correctAnswer: 2,
         correctFeedback: {
-          title: "CORRECT! – DELIVER ANOTHER DEFIBRILLATION SHOCK",
-          html: "Persistent pulseless VT is a shockable rhythm. Deliver a second unsynchronised shock without delay.<br><br><b>Actions:</b><ol><li>Deliver another unsynchronised shock.</li><li>Immediately resume CPR for 2 minutes.</li><li>Ensure high-quality chest compressions and minimal interruptions.</li><li>Establish secure IV/IO access.</li><li>Actively search for reversible causes (4Hs & 4Ts).</li></ol>"
+          title: "CORRECT – ADENOSINE 12 MG",
+          html: "If Adenosine 6 mg fails to terminate the rhythm within 1–2 minutes, escalate to a second dose of 12 mg rapid IV push with flush."
         },
         incorrectFeedback: {
-          title: "INCORRECT – PERSISTENT VT IS A SHOCKABLE RHYTHM",
-          html: "Defibrillation is indicated immediately. Continuing CPR without delivering the shock allows ventricular fibrillation or asystole to deteriorate further. Do not delay defibrillation."
+          title: "INCORRECT DRUG SELECTION",
+          html: "Digoxin has delayed onset, GTN causes vasodilation without rate control, and reducing the adenosine dose is ineffective."
         },
-        nextAction: () => executeDefibrillationSequence(3)
+        actionName: "INJECTING ADENOSINE 12 MG + 20 mL FLUSH",
+        actionSub: "Administering second-dose 12 mg rapid bolus...",
+        nextAction: () => advanceStage(4)
       },
       {
         stageNumber: 4,
-        title: "ALS Medication Administration",
-        badge: "Pharmacotherapy Cycle",
-        competency: "ALS medication management after 3rd shock",
-        scenario: "Subsequent CPR cycles and defibrillations have been conducted according to protocol.<br><b>The patient has now received THREE defibrillation shocks in total.</b><br>The cardiac monitor continues to show pulseless Ventricular Tachycardia.",
-        interventionNote: "Post-3rd Shock – CPR in progress",
-        vitals: {
-          conscious: "Unresponsive",
-          resp: "Absent / Agonal",
-          pulse: "No Palpable Pulse",
-          bp: "Non-recordable",
-          airway: "Advanced Airway secured"
-        },
-        question: "POST-THIRD SHOCK: WHAT ARE THE NEXT IMPORTANT MANAGEMENT ACTIONS?",
+        title: "Acute Instability",
+        badge: "Adverse Features",
+        competency: "Recognition of unstable tachycardia requiring electrical cardioversion",
+        scenario: "Tachycardia persists at 204 bpm. The patient suddenly turns pale and sweaty, reporting severe crushing chest pain. BP drops to 72/40 mmHg (shock). GCS 11 (confused).",
+        interventionNote: "ACUTE COLLAPSE – Shock (BP 72/40) & Chest Pain",
+        vitals: { conscious: "Confused (GCS 11)", resp: "28 /min (Labored)", pulse: "204 bpm (Weak)", bp: "72/40 mmHg", spo2: "90%" },
+        question: "The patient developed shock and myocardial ischemia. What is the immediate action?",
         options: [
-          { label: "A", text: "Stop CPR, check carotid pulse, and wait for spontaneous rhythm recovery." },
-          { label: "B", text: "Administer IV Calcium Chloride 10% 10 mL and Atropine 3 mg bolus." },
-          { label: "C", text: "Resume CPR immediately, administer Adrenaline 1 mg IV/IO and Amiodarone 300 mg IV/IO." },
-          { label: "D", text: "Switch to transcutaneous cardiac pacing at 80 bpm." }
+          { label: "A", text: "Prepare for immediate Synchronised DC Cardioversion." },
+          { label: "B", text: "Infuse 1,000 mL 5% Dextrose over 10 minutes." },
+          { label: "C", text: "Administer a third dose of Adenosine 18 mg IV." },
+          { label: "D", text: "Place the patient in Trendelenburg position and observe." }
         ],
-        correctAnswer: 2, // Option C
+        correctAnswer: 0,
         correctFeedback: {
-          title: "CORRECT! – APPROPRIATE ALS MANAGEMENT",
-          html: "Following the third shock in refractory shockable cardiac arrest:<br><ol><li>Resume CPR immediately for 2 minutes.</li><li>Administer Adrenaline 1 mg IV/IO.</li><li>Administer Amiodarone 300 mg IV/IO bolus.</li><li>Continue CPR with minimal interruptions.</li><li>Identify and treat reversible causes (4Hs and 4Ts).</li><li>Give subsequent adrenaline every 3–5 minutes (alternate cycles).</li><li>Consider Amiodarone 150 mg IV/IO after the 5th shock.</li></ol>"
+          title: "CORRECT – IMMEDIATE CARDIOVERSION",
+          html: "The presence of adverse features (hypotension/shock, chest pain, altered consciousness) mandates immediate electrical cardioversion."
         },
         incorrectFeedback: {
-          title: "INCORRECT – DO NOT INTERRUPT CPR UNNECESSARILY",
-          html: "The patient remains in pulseless VT. Stopping CPR to wait for spontaneous recovery will result in irreversible brain ischemia. Continue CPR immediately and administer ALS resuscitation drugs (Adrenaline 1mg + Amiodarone 300mg)."
+          title: "INCORRECT MANAGEMENT",
+          html: "Do not delay electrical therapy with IV fluids, observation, or further drugs when the patient is in decompensated cardiogenic shock."
         },
-        nextAction: () => advanceToStage(5)
+        actionName: "ATTACHING DEFIBRILLATOR PADS",
+        actionSub: "Applying pads, high-flow oxygen, preparing procedural sedation...",
+        nextAction: () => advanceStage(5)
       },
       {
         stageNumber: 5,
-        title: "Refractory VT & Advanced Pharmacotherapy",
-        badge: "Advanced ALS Dilemma (High Difficulty)",
-        competency: "Refractory pulseless VT management post-5th shock & antiarrhythmic dosing",
-        scenario: "The patient has now received a total of <b>FIVE defibrillation shocks</b> and over 10 minutes of advanced resuscitation.<br>The team pauses compressions for 5 seconds to reassess: the monitor continues to show <b>refractory broad-complex pulseless Ventricular Tachycardia</b>.<br>A junior team member suggests: <i>'The complexes look prominent and regular—should we switch the defibrillator to Synchronised Cardioversion mode, and repeat the 300 mg bolus of Amiodarone?'</i>",
-        interventionNote: "Post-5th Shock Reassessment – Refractory Pulseless VT",
-        vitals: {
-          conscious: "Unresponsive",
-          resp: "Mechanical Bagging (ET Tube)",
-          pulse: "No Palpable Pulse",
-          bp: "Non-recordable",
-          airway: "Endotracheal Tube (EtCO2: 18 mmHg)"
-        },
-        question: "ACCORDING TO ALS GUIDELINES, WHAT IS THE CORRECT SHOCK MODE AND PHARMACOTHERAPY AT THIS 5th-SHOCK STAGE?",
+        title: "Cardioversion Setup",
+        badge: "Critical Execution",
+        competency: "Activating SYNC mode to prevent lethal R-on-T Asystole",
+        scenario: "Defibrillator pads attached. Minimal IV sedation given. The team prepares to deliver the shock. Defibrillator is currently powered on.",
+        interventionNote: "Peri-Shock – Unstable Tachycardia (BP 70/38 mmHg)",
+        vitals: { conscious: "Sedated", resp: "BVM 100% O2", pulse: "204 bpm (Weak)", bp: "70/38 mmHg", spo2: "92%" },
+        question: "How must the defibrillator be configured for unstable narrow-complex tachycardia?",
         options: [
-          { label: "A", text: "Switch to Synchronised Cardioversion (100 J) and give Amiodarone 300 mg IV/IO bolus." },
-          { label: "B", text: "Maintain unsynchronised defibrillation (150–200 J biphasic), resume CPR immediately, administer second-dose Amiodarone 150 mg IV/IO, and continue Adrenaline 1 mg every 3–5 min." },
-          { label: "C", text: "Discontinue CPR and defibrillation, and administer IV Adenosine 12 mg rapid push." },
-          { label: "D", text: "Stop all antiarrhythmics and infuse IV Digoxin 0.5 mg bolus over 5 minutes." }
+          { label: "A", text: "Deliver an UNSYNCHRONISED shock of 200 J immediately." },
+          { label: "B", text: "Charge to 360 J monophasic with SYNC deactivated." },
+          { label: "C", text: "Administer IV Lignocaine 100 mg instead of electrical therapy." },
+          { label: "D", text: "Activate SYNC mode, verify R-wave markers, and deliver 70–100 J biphasic." }
         ],
-        correctAnswer: 1, // Option B
+        correctAnswer: 3,
+        isLethalStage: true,
         correctFeedback: {
-          title: "CORRECT! – ADVANCED ALS PROTOCOL EXECUTED",
-          html: "<b>Critical ALS Decision-Making:</b><ol><li><b>Never switch to Synchronised mode in Cardiac Arrest:</b> Synchronised cardioversion requires a perfusing rhythm with distinct R-wave sensing. In pulseless VT, the patient is in full cardiac arrest with no cardiac output. The defibrillator will fail to discharge or severely delay delivery in synchronised mode. Always deliver an <b>unsynchronised shock</b>.</li><li><b>Amiodarone Dosing:</b> The second dose of Amiodarone in refractory shockable rhythm is <b>150 mg IV/IO</b> (half the initial 300 mg dose), indicated after the 5th shock.</li><li><b>Adrenaline Cadence:</b> Continue Adrenaline 1 mg IV/IO every alternate CPR cycle (every 3–5 minutes).</li><li><b>Advanced troubleshooting:</b> Check pad placement (consider anterior-posterior position), verify high-quality compressions (EtCO2 > 20 mmHg), and aggressively search for 4Hs & 4Ts (especially myocardial ischemia/hypokalemia).</li></ol>"
+          title: "CORRECT – SYNCHRONISED SHOCK DELIVERED",
+          html: "Synchronisation delivers energy on the R-wave, completely preventing shock delivery during the vulnerable T-wave repolarization window."
         },
         incorrectFeedback: {
-          title: "INCORRECT – DANGEROUS PITFALL IN CARDIAC ARREST",
-          html: "<b>Do not switch to Synchronised Cardioversion:</b> Synchronisation requires a palpable pulse and regular hemodynamics. In pulseless cardiac arrest, synchronised mode may prevent the defibrillator from firing entirely, delaying life-saving shocks.<br><br>Furthermore, the repeat dose of Amiodarone after the 5th shock is <b>150 mg IV/IO</b>, NOT 300 mg. Always maintain unsynchronised defibrillation and administer Amiodarone 150 mg IV/IO."
+          title: "FATAL ERROR – UNSYNCHRONISED SHOCK",
+          html: "Unsynchronised delivery fired directly during the vulnerable T-wave (R-on-T phenomenon), triggering VF and total electrical standstill: <b>ASYSTOLE</b>."
         },
-        nextAction: () => advanceToStage(6)
+        actionName: "DELIVERING SYNCHRONISED CARDIOVERSION",
+        actionSub: "Sync verified -> Charging 100 J -> Stand clear -> Discharging...",
+        nextAction: () => advanceStage(6)
       },
       {
         stageNumber: 6,
-        title: "ROSC & Post-Resuscitation Care Bundle",
-        badge: "Post-Resuscitation Critical Care (High Difficulty)",
-        competency: "Comprehensive Post-Cardiac Arrest Care (ROSC bundle & hemodynamics)",
-        scenario: "Following the 5th shock, Amiodarone 150 mg, and aggressive resuscitation, the 2-minute cycle finishes.<br>At rhythm check, the monitor shows a <b>narrow-complex Sinus Rhythm at 98 bpm</b>.<br>The team leader immediately palpates the right carotid artery:<br><b>A STRONG, REGULAR CENTRAL PULSE IS DETECTED! ROSC IS ACHIEVED!</b><br>Initial post-ROSC vitals: BP 82/48 mmHg (MAP 59 mmHg), SpO2 91% on 100% FiO2, GCS 3 (E1V1M1, non-responsive), Pupils 3mm sluggish.",
-        interventionNote: "ROSC ACHIEVED – Transitioning to Post-Resuscitation Care",
-        vitals: {
-          conscious: "Comatose (GCS 3)",
-          resp: "Assisted (Rate 12/min)",
-          pulse: "Strong Palpable Carotid Pulse",
-          bp: "82/48 mmHg (Hypotensive)",
-          airway: "ETT in situ (EtCO2: 38 mmHg)"
-        },
-        question: "ROSC IS CONFIRMED. ACCORDING TO CURRENT ALS GUIDELINES, WHAT IS THE IMMEDIATE POST-RESUSCITATION CARE BUNDLE?",
+        title: "ROSC & Post-Care",
+        badge: "Stabilization",
+        competency: "Confirmation of ROSC and post-cardioversion bundle",
+        scenario: "Synchronised shock delivered. Racing tachycardia terminates. Monitor shows regular Normal Sinus Rhythm at 76 bpm. Strong radial pulse palpated. BP 122/78 mmHg. Patient alert.",
+        interventionNote: "ROSC ACHIEVED – Converted to Normal Sinus Rhythm (76 bpm)",
+        vitals: { conscious: "Alert (GCS 15)", resp: "16 /min", pulse: "76 bpm (Strong)", bp: "122/78 mmHg", spo2: "99%" },
+        question: "ROSC achieved. What is the essential post-conversion care bundle?",
         options: [
-          { label: "A", text: "Hyperventilate to target PaCO2 < 30 mmHg, infuse 2 litres of hypotonic dextrose, and extubate immediately." },
-          { label: "B", text: "Disconnect all monitoring, stop oxygen, and transfer directly to general medical ward." },
-          { label: "C", text: "Administer IV Adrenaline 1 mg bolus every 3 minutes to maintain a hypertensive state." },
-          { label: "D", text: "Titrate oxygen to SpO2 94–98%, maintain normocapnia (EtCO2 35–45 mmHg), restore MAP ≥ 65 mmHg with IV crystalloid / noradrenaline, acquire immediate 12-lead ECG, and initiate TTM." }
+          { label: "A", text: "Record an immediate 12-lead ECG, check electrolytes, and maintain monitoring." },
+          { label: "B", text: "Disconnect all monitoring and discharge the patient home immediately." },
+          { label: "C", text: "Start an IV Adrenaline infusion at 10 mcg/min maintenance." },
+          { label: "D", text: "Administer IV Adenosine 6 mg as prophylaxis to prevent recurrence." }
         ],
-        correctAnswer: 3, // Option D
+        correctAnswer: 0,
         correctFeedback: {
-          title: "CORRECT! – MASTER CLINICIAN POST-ROSC MANAGEMENT",
-          html: "<b>Evidence-Based Post-Cardiac Arrest Care (ABCDE Approach):</b><ol><li><b>Airway & Breathing:</b> Secure airway. Titrate FiO2 to maintain SpO2 94–98% (prevent hyperoxia-induced free radical damage and hypoxia). Maintain normocapnia (EtCO2 35–45 mmHg / PaCO2 4.5–6.0 kPa); <b>avoid hyperventilation</b> which causes cerebral vasoconstriction and worsens ischemia.</li><li><b>Hemodynamics:</b> Correct hypotension (BP 82/48 mmHg is critical). Administer IV crystalloid boluses and start <b>Noradrenaline infusion</b> targeting a Mean Arterial Pressure (MAP) ≥ 65 mmHg or Systolic BP > 100 mmHg.</li><li><b>Immediate 12-Lead ECG:</b> Vital to evaluate for ST-elevation Myocardial Infarction (STEMI) or acute coronary occlusion, directing immediate transfer to the Cath Lab for <b>Primary PCI</b>.</li><li><b>Targeted Temperature Management (TTM):</b> Maintain strict normothermia or targeted cooling (32–36°C) to prevent hyperthermia/pyrexia (> 37.7°C) and reduce secondary neurological damage.</li><li><b>Metabolic:</b> Maintain blood glucose 4.0–10.0 mmol/L; avoid hypoglycemia.</li></ol>"
+          title: "CORRECT – ROSC CARE BUNDLE",
+          html: "A post-conversion 12-lead ECG evaluates for underlying pre-excitation (WPW delta waves) or ischemia. Electrolyte evaluation prevents recurrence."
         },
         incorrectFeedback: {
-          title: "INCORRECT – SEVERE POST-ROSC PROTOCOL ERRORS",
-          html: "<b>Avoid Routine Hyperventilation & Hyperoxia:</b> Hyperventilation (PaCO2 < 30 mmHg) causes severe cerebral vasoconstriction and impairs cerebral blood flow. Prolonged 100% FiO2 creates toxic reactive oxygen species.<br><br><b>Immediate Priorities:</b> You must target SpO2 94–98%, maintain MAP ≥ 65 mmHg with fluids and vasopressors, obtain an immediate 12-lead ECG for emergency PCI, and maintain temperature control (TTM). Never extubate an unresponsive comatose patient."
+          title: "INCORRECT MANAGEMENT",
+          html: "Premature discharge is unsafe, adrenaline infusion is contraindicated in normotensive sinus rhythm, and prophylactic adenosine is inappropriate."
         },
+        actionName: "RECORDING 12-LEAD ECG & STABILIZING",
+        actionSub: "Assessing PR interval, delta waves, and hemodynamic stability...",
         nextAction: () => displayFinalAssessment()
       }
     ];
@@ -1499,6 +1636,7 @@
     let currentStage = 0;
     let scores = [0, 0, 0, 0, 0, 0];
     let attempts = [0, 0, 0, 0, 0, 0];
+    let simulationTerminatedInAsystole = false;
 
     function loadStageUI(stageIdx) {
       const data = stagesData[stageIdx];
@@ -1509,51 +1647,47 @@
       document.getElementById('questionHeading').innerText = data.question;
       document.getElementById('activeInterventionText').innerText = data.interventionNote;
 
-      // Update Vitals Grid
       if (data.vitals) {
         document.getElementById('consciousVal').innerText = data.vitals.conscious;
         document.getElementById('respVal').innerText = data.vitals.resp;
         document.getElementById('pulseVal').innerText = data.vitals.pulse;
         document.getElementById('bpVal').innerText = data.vitals.bp;
-        document.getElementById('airwayVal').innerText = data.vitals.airway;
+        document.getElementById('spo2Val').innerText = data.vitals.spo2;
 
         if (stageIdx === 5) {
-          // Stage 6 (ROSC)
-          document.getElementById('consciousVal').className = "vital-value alert";
+          document.getElementById('consciousVal').style.color = "var(--emerald)";
           document.getElementById('pulseVal').className = "vital-value good";
+          document.getElementById('bpVal').className = "vital-value good";
+        } else if (stageIdx === 3 || stageIdx === 4) {
+          document.getElementById('pulseVal').className = "vital-value alert";
           document.getElementById('bpVal').className = "vital-value alert";
         }
       }
 
-      // Dynamic Rhythm Adjustment
       if (stageIdx === 5) {
-        // Transition to ROSC (Sinus Rhythm)
-        currentRhythmMode = 'SINUS';
-        document.getElementById('monitorHR').innerText = "98";
+        currentRhythmMode = 'ROSC_SINUS';
+        document.getElementById('monitorHR').innerText = "76";
         document.getElementById('monitorHR').style.color = "var(--emerald)";
         document.getElementById('rateLabelText').style.color = "var(--emerald)";
         const alertTag = document.getElementById('rhythmAlertTag');
-        alertTag.innerText = "SINUS TACHYCARDIA (ROSC)";
+        alertTag.innerText = "NORMAL SINUS RHYTHM (ROSC)";
         alertTag.className = "rhythm-alert rosc-state";
-        document.getElementById('statusBadgeTag').innerText = "POST-ROSC CRITICAL CARE";
+        document.getElementById('statusBadgeTag').innerText = "ROSC ACHIEVED – STABLE";
         document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse-fill" style="color: var(--emerald);"></i> LEAD II (PERFUSING)';
       } else {
-        // Pulseless VT
-        currentRhythmMode = 'VT';
-        document.getElementById('monitorHR').innerText = "214";
+        currentRhythmMode = 'SVT';
+        document.getElementById('monitorHR').innerText = "204";
         document.getElementById('monitorHR').style.color = "#00ff66";
         document.getElementById('rateLabelText').style.color = "#00ff66";
         const alertTag = document.getElementById('rhythmAlertTag');
-        alertTag.innerText = "VENTRICULAR TACHYCARDIA";
+        alertTag.innerText = "SUPRAVENTRICULAR TACHYCARDIA";
         alertTag.className = "rhythm-alert";
         document.getElementById('statusBadgeTag').innerText = "CRITICAL ALS SIMULATION";
         document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)';
       }
 
-      // Populate Decision Buttons
       const optsBox = document.getElementById('optionsContainer');
       optsBox.innerHTML = '';
-
       data.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'btn-decision';
@@ -1566,7 +1700,6 @@
     function handleAnswer(selectedIdx) {
       const data = stagesData[currentStage];
       attempts[currentStage]++;
-
       const isCorrect = (selectedIdx === data.correctAnswer);
       
       const backdrop = document.getElementById('feedbackBackdrop');
@@ -1581,25 +1714,30 @@
 
       if (isCorrect) {
         audio.playCorrectSound();
-        if (attempts[currentStage] === 1) {
-          scores[currentStage] = 1;
-        }
+        if (attempts[currentStage] === 1) scores[currentStage] = 1;
         updateScoreHUD();
 
-        box.classList.remove('incorrect');
+        box.classList.remove('incorrect', 'asystole-fatal');
         icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color: var(--emerald);"></i>';
         title.style.color = 'var(--emerald)';
         title.innerText = data.correctFeedback.title;
         body.innerHTML = data.correctFeedback.html;
 
         actionBtn.className = 'modal-action-btn btn-emerald';
-        actionBtn.innerText = currentStage === 5 ? 'VIEW FINAL PERFORMANCE SUMMARY' : 'PROCEED TO NEXT ACTION';
+        actionBtn.innerText = currentStage === 5 ? 'VIEW FINAL PERFORMANCE' : 'CONTINUE';
         actionBtn.onclick = () => {
           closeModal();
-          data.nextAction();
+          triggerActionSimulation(data.actionName, data.actionSub, data.nextAction);
         };
       } else {
+        // Lethal pitfall in Stage 5: Unsynchronised shock (Options A or B)
+        if (data.isLethalStage && (selectedIdx === 0 || selectedIdx === 1)) {
+          triggerFatalAsystole();
+          return;
+        }
+
         audio.playWrongSound();
+        box.classList.remove('asystole-fatal');
         box.classList.add('incorrect');
         icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>';
         title.style.color = 'var(--danger)';
@@ -1607,9 +1745,58 @@
         body.innerHTML = data.incorrectFeedback.html;
 
         actionBtn.className = 'modal-action-btn btn-rose';
-        actionBtn.innerText = 'RETRY CLINICAL DECISION';
+        actionBtn.innerText = 'RETRY';
         actionBtn.onclick = closeModal;
       }
+    }
+
+    function triggerFatalAsystole() {
+      simulationTerminatedInAsystole = true;
+      currentRhythmMode = 'ASYSTOLE';
+      audio.startAsystoleTone();
+
+      document.getElementById('monitorHR').innerText = "0";
+      document.getElementById('monitorHR').style.color = "var(--asystole-red)";
+      document.getElementById('rateLabelText').style.color = "var(--asystole-red)";
+      const alertTag = document.getElementById('rhythmAlertTag');
+      alertTag.innerText = "ASYSTOLE / CARDIAC ARREST";
+      alertTag.className = "rhythm-alert asystole-state";
+      document.getElementById('statusBadgeTag').innerText = "CARDIAC ARREST (ASYSTOLE)";
+      document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--asystole-red);"></i> LEAD II (ASYSTOLE)';
+
+      document.getElementById('consciousVal').innerText = "Unresponsive";
+      document.getElementById('consciousVal').className = "vital-value fatal";
+      document.getElementById('respVal').innerText = "Apneic (0 /min)";
+      document.getElementById('respVal').className = "vital-value fatal";
+      document.getElementById('pulseVal').innerText = "NO CENTRAL PULSE";
+      document.getElementById('pulseVal').className = "vital-value fatal";
+      document.getElementById('bpVal').innerText = "0 / 0 mmHg";
+      document.getElementById('bpVal').className = "vital-value fatal";
+
+      const box = document.getElementById('feedbackBox');
+      const icon = document.getElementById('feedbackIcon');
+      const title = document.getElementById('feedbackTitle');
+      const body = document.getElementById('feedbackContent');
+      const actionBtn = document.getElementById('feedbackButton');
+
+      box.classList.remove('incorrect');
+      box.classList.add('asystole-fatal');
+      icon.innerHTML = '<i class="bi bi-heartbreak-fill" style="color: var(--asystole-red);"></i>';
+      title.style.color = 'var(--asystole-red)';
+      title.innerText = "PATIENT COLLAPSED INTO ASYSTOLE";
+      body.innerHTML = `
+        <b>CRITICAL PITFALL: R-on-T PHENOMENON</b><br>
+        An unsynchronised shock struck during the vulnerable T-wave repolarization phase, causing Ventricular Fibrillation and rapid decay into <b>FLATLINE ASYSTOLE</b>.<br>
+        Patient is pulseless. Immediate CPR is required.
+      `;
+
+      actionBtn.className = 'modal-action-btn btn-fatal-restart';
+      actionBtn.innerText = 'VIEW FATAL SUMMARY';
+      actionBtn.onclick = () => {
+        closeModal();
+        audio.stopAsystoleTone();
+        displayFinalAssessment();
+      };
     }
 
     function closeModal() {
@@ -1624,51 +1811,50 @@
       document.getElementById('currentScore').innerText = total;
     }
 
-    function advanceToStage(nextStageNumber) {
+    function advanceStage(nextStageNumber) {
       currentStage = nextStageNumber - 1;
       loadStageUI(currentStage);
     }
 
-    /* Actions: Defibrillation & CPR Simulation */
-    function executeDefibrillationSequence(fromStage) {
-      audio.playShockSound();
-      const flash = document.getElementById('shockFlash');
-      flash.style.animation = 'defibrillate 0.35s ease-out forwards';
+    function triggerActionSimulation(name, sub, callback) {
+      const overlay = document.getElementById('actionOverlay');
+      const fill = document.getElementById('actionFill');
+      const hText = document.getElementById('actionHeadlineText');
+      const sText = document.getElementById('actionSublineText');
 
-      setTimeout(() => {
-        flash.style.animation = 'none';
-        currentStage++;
-        loadStageUI(currentStage);
-      }, 400);
-    }
+      hText.innerHTML = `<i class="bi bi-activity"></i> ${name}`;
+      sText.innerText = sub;
 
-    function executeCPR2MinuteCycle(fromStage) {
-      const overlay = document.getElementById('cprOverlay');
-      const fill = document.getElementById('cprFill');
+      if (name.includes("CARDIOVERSION")) {
+        audio.playCardioversionSound();
+        const flash = document.getElementById('shockFlash');
+        flash.style.animation = 'cardioversionFlash 0.35s ease-out forwards';
+        setTimeout(() => { flash.style.animation = 'none'; }, 400);
+      }
+
       overlay.style.display = 'flex';
       fill.style.width = '0%';
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 2;
+        progress += 4;
         fill.style.width = progress + '%';
         if (progress >= 100) {
           clearInterval(interval);
           setTimeout(() => {
             overlay.style.display = 'none';
-            currentStage++;
-            loadStageUI(currentStage);
-          }, 300);
+            if (callback) callback();
+          }, 250);
         }
-      }, 25);
+      }, 20);
     }
 
-    /* Final 6-Stage Assessment Results */
     function displayFinalAssessment() {
+      audio.stopAsystoleTone();
       document.getElementById('mainGrid').style.display = 'none';
       const resultsView = document.getElementById('resultsView');
       resultsView.style.display = 'flex';
-      resultsView.style.maxWidth = '950px';
+      resultsView.style.maxWidth = '900px';
       resultsView.style.margin = '2rem auto';
       document.querySelector('main').parentNode.insertBefore(resultsView, document.querySelector('footer'));
 
@@ -1677,18 +1863,18 @@
       document.getElementById('finalScoreSummary').innerText = `TOTAL SCORE: ${totalScore} / 6 (${percentage}%)`;
 
       const verdictEl = document.getElementById('verdictText');
-      if (totalScore === 6) {
+      if (simulationTerminatedInAsystole) {
+        verdictEl.style.color = 'var(--asystole-red)';
+        verdictEl.innerText = "UNSUCCESSFUL: PATIENT DETERIORATED INTO ASYSTOLE";
+      } else if (totalScore === 6) {
         verdictEl.style.color = 'var(--emerald)';
-        verdictEl.innerText = "6/6: EXCELLENT – MASTER CLINICIAN LEVEL (COMPETENT ALS DECISION-MAKING)";
+        verdictEl.innerText = "EXCELLENT (6/6): SUCCESSFUL ROSC & CLINICAL COMPETENCE";
       } else if (totalScore === 5) {
         verdictEl.style.color = 'var(--gold)';
-        verdictEl.innerText = "5/6: SATISFACTORY – STRONG PERFORMANCE (MINOR ALS PROTOCOL REVIEW)";
-      } else if (totalScore >= 3) {
-        verdictEl.style.color = '#FFA500';
-        verdictEl.innerText = `${totalScore}/6: NEEDS IMPROVEMENT – REVIEW ADVANCED LIFE SUPPORT & ROSC GUIDELINES`;
+        verdictEl.innerText = "SATISFACTORY (5/6): ROSC ACHIEVED WITH MINOR IMPROVEMENT NEEDED";
       } else {
         verdictEl.style.color = 'var(--danger)';
-        verdictEl.innerText = `${totalScore}/6: UNSUCCESSFUL – REPEAT SIMULATION STATION`;
+        verdictEl.innerText = `${totalScore}/6: NEEDS IMPROVEMENT – REPEAT SIMULATION`;
       }
 
       const tbody = document.getElementById('resultsTableContent');
@@ -1700,7 +1886,7 @@
           <td><strong>Stage ${stg.stageNumber}</strong></td>
           <td>${stg.competency}</td>
           <td style="color: ${pass ? 'var(--emerald)' : 'var(--danger)'}; font-weight: 600;">
-            ${pass ? '<i class="bi bi-check-lg"></i> Correct (1st Attempt)' : '<i class="bi bi-x-lg"></i> Remediation Required'}
+            ${pass ? '<i class="bi bi-check-lg"></i> Correct' : '<i class="bi bi-x-lg"></i> Incorrect'}
           </td>
           <td style="font-weight: 700; color: ${pass ? 'var(--emerald)' : 'var(--danger)'};">${scores[i]} / 1</td>
         `;
@@ -1709,10 +1895,12 @@
     }
 
     function restartSimulation() {
+      audio.stopAsystoleTone();
       currentStage = 0;
       scores = [0, 0, 0, 0, 0, 0];
       attempts = [0, 0, 0, 0, 0, 0];
-      currentRhythmMode = 'VT';
+      simulationTerminatedInAsystole = false;
+      currentRhythmMode = 'SVT';
       updateScoreHUD();
 
       const resultsView = document.getElementById('resultsView');
@@ -1722,16 +1910,10 @@
       loadStageUI(0);
     }
 
-    // Auto-start initialization when DOM loads
+    // Initialize application structure on load
     window.addEventListener('DOMContentLoaded', () => {
-      audio.init();
       resizeCanvas();
-      animateECG();
       loadStageUI(0);
-    });
-
-    window.addEventListener('load', () => {
-      audio.init();
     });
   </script>
 </body>
