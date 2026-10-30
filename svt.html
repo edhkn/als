@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ED Simulation Station | Supraventricular Tachycardia (SVT) ALS 6-Stage</title>
+  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   
   <style>
@@ -42,7 +43,7 @@
         radial-gradient(circle at 90% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
     }
 
-    /* NAV */
+    /* NAV BAR */
     nav {
       background: rgba(8, 14, 28, 0.94);
       backdrop-filter: blur(14px);
@@ -151,7 +152,7 @@
     }
 
     .audio-toggle-btn {
-      background: rgba(80, 200, 120, 0.12);
+      background: rgba(80, 200, 120, 0.15);
       border: 1px solid var(--emerald);
       color: var(--emerald);
       padding: 0.45rem 1rem;
@@ -167,6 +168,10 @@
     .audio-toggle-btn:hover {
       background: var(--emerald);
       color: #050813;
+    }
+
+    .audio-toggle-btn.active-sound {
+      box-shadow: 0 0 12px var(--emerald-glow);
     }
 
     /* MAIN GRID */
@@ -254,6 +259,7 @@
       border-radius: 0 0 6px 6px;
     }
 
+    /* Calibrated ECG Grid (25mm/s, 10mm/mV: 5mm large boxes, 1mm small boxes) */
     .canvas-wrapper::before {
       content: "";
       position: absolute;
@@ -422,7 +428,7 @@
       border-radius: 10px;
       padding: 0.85rem 1.1rem;
       color: #fff;
-      font-size: 0.92rem;
+      font-size: 0.91rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
@@ -534,6 +540,11 @@
       color: #cbd5e1;
       margin-bottom: 1.25rem;
       text-align: left;
+    }
+
+    .modal-body-text ul {
+      margin-left: 1.25rem;
+      margin-top: 0.35rem;
     }
 
     .modal-action-btn {
@@ -744,9 +755,9 @@
       <span id="stationTitleHeading">Adult Tachyarrhythmia: Supraventricular Tachycardia (SVT)</span>
     </div>
     <div style="display: flex; gap: 1rem; align-items: center;">
-      <button class="audio-toggle-btn" id="audioToggleBtn" onclick="toggleAudioState()">
+      <button class="audio-toggle-btn active-sound" id="audioToggleBtn" onclick="toggleAudioState()">
         <i class="bi bi-volume-up-fill" id="audioIcon"></i>
-        <span id="audioText">Monitor Audio: Active</span>
+        <span id="audioText">Monitor Audio: Live</span>
       </button>
       <div style="font-weight: bold; color: var(--gold); font-size: 0.95rem;">
         Score: <span id="currentScore">0</span> / 6
@@ -911,7 +922,10 @@
 
   <script>
     /* ==========================================================
-       1. SYNTHETIC AUDIO ENGINE
+       1. SYNTHETIC AUDIO ENGINE WITH ROBUST AUTO-START
+       - Automatically resumes Web Audio on page load
+       - Immediate multi-event unlock listeners across user interaction
+       - Clear, audible monitor QRS beep, chime, and warning buzzer
        ========================================================== */
     class AudioEngine {
       constructor() {
@@ -922,29 +936,46 @@
       }
 
       init() {
-        if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          this.ctx = new AudioContext();
-        }
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume();
+        if (!this.enabled) return;
+        try {
+          if (!this.ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              this.ctx = new AudioContextClass();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        } catch (e) {
+          console.warn("AudioContext auto-start notice:", e);
         }
       }
 
       playECGBeep(pitch = 950) {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+
         try {
+          const now = this.ctx.currentTime;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
+
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(pitch, this.ctx.currentTime);
-          gain.gain.setValueAtTime(0.06, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.04);
+          osc.frequency.setValueAtTime(pitch, now);
+          
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+
           osc.connect(gain);
           gain.connect(this.ctx.destination);
-          osc.start();
-          osc.stop(this.ctx.currentTime + 0.045);
+
+          osc.start(now);
+          osc.stop(now + 0.05);
         } catch (e) {}
       }
 
@@ -952,15 +983,25 @@
         if (!this.enabled) return;
         this.init();
         this.stopAsystoleTone();
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+
         try {
+          const now = this.ctx.currentTime;
           this.asystoleOsc = this.ctx.createOscillator();
           this.asystoleGain = this.ctx.createGain();
+
           this.asystoleOsc.type = 'sawtooth';
-          this.asystoleOsc.frequency.setValueAtTime(780, this.ctx.currentTime);
-          this.asystoleGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          this.asystoleOsc.frequency.setValueAtTime(780, now);
+
+          this.asystoleGain.gain.setValueAtTime(0.12, now);
+
           this.asystoleOsc.connect(this.asystoleGain);
           this.asystoleGain.connect(this.ctx.destination);
-          this.asystoleOsc.start();
+
+          this.asystoleOsc.start(now);
         } catch (e) {}
       }
 
@@ -977,52 +1018,78 @@
       playCorrectSound() {
         if (!this.enabled) return;
         this.init();
-        const notes = [523.25, 659.25, 783.99, 1046.50];
-        notes.forEach((freq, idx) => {
-          setTimeout(() => {
-            try {
-              const osc = this.ctx.createOscillator();
-              const gain = this.ctx.createGain();
-              osc.type = 'triangle';
-              osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-              gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.28);
-              osc.connect(gain);
-              gain.connect(this.ctx.destination);
-              osc.start();
-              osc.stop(this.ctx.currentTime + 0.3);
-            } catch (err) {}
-          }, idx * 60);
-        });
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+
+        try {
+          const now = this.ctx.currentTime;
+          const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const startT = now + (idx * 0.07);
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, startT);
+
+            gain.gain.setValueAtTime(0.22, startT);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startT + 0.28);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(startT);
+            osc.stop(startT + 0.3);
+          });
+        } catch (err) {}
       }
 
       playWrongSound() {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+
         try {
+          const now = this.ctx.currentTime;
           const osc1 = this.ctx.createOscillator();
           const osc2 = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
+
           osc1.type = 'sawtooth';
           osc2.type = 'sawtooth';
-          osc1.frequency.setValueAtTime(140, this.ctx.currentTime);
-          osc2.frequency.setValueAtTime(98, this.ctx.currentTime);
-          gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.38);
+
+          osc1.frequency.setValueAtTime(146.83, now); // D3
+          osc2.frequency.setValueAtTime(103.83, now); // G#2 (dissonant tritone)
+
+          gain.gain.setValueAtTime(0.24, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+
           osc1.connect(gain);
           osc2.connect(gain);
           gain.connect(this.ctx.destination);
-          osc1.start();
-          osc2.start();
-          osc1.stop(this.ctx.currentTime + 0.4);
-          osc2.stop(this.ctx.currentTime + 0.4);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.45);
+          osc2.stop(now + 0.45);
         } catch (e) {}
       }
 
       playCardioversionSound() {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+
         try {
+          const now = this.ctx.currentTime;
           const bufferSize = this.ctx.sampleRate * 0.25;
           const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
           const data = buffer.getChannelData(0);
@@ -1032,33 +1099,54 @@
           const noise = this.ctx.createBufferSource();
           noise.buffer = buffer;
           const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+          noiseGain.gain.setValueAtTime(0.42, now);
           noise.connect(noiseGain);
           noiseGain.connect(this.ctx.destination);
-          noise.start();
+          noise.start(now);
         } catch (e) {}
       }
     }
 
     const audio = new AudioEngine();
 
+    // Auto-start Audio on Load & Instant Unmute Multi-Listener
+    audio.init();
+
+    function autoResumeAudio() {
+      if (audio.ctx && audio.ctx.state === 'suspended') {
+        audio.ctx.resume().catch(() => {});
+      } else if (!audio.ctx) {
+        audio.init();
+      }
+    }
+    ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown', 'mousemove', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, autoResumeAudio, { passive: true });
+    });
+
     function toggleAudioState() {
       audio.enabled = !audio.enabled;
       const icon = document.getElementById('audioIcon');
       const text = document.getElementById('audioText');
+      const btn = document.getElementById('audioToggleBtn');
       if (audio.enabled) {
         audio.init();
         icon.className = 'bi bi-volume-up-fill';
-        text.innerText = 'Monitor Audio: Active';
+        text.innerText = 'Monitor Audio: Live';
+        btn.classList.add('active-sound');
       } else {
         audio.stopAsystoleTone();
         icon.className = 'bi bi-volume-mute-fill';
         text.innerText = 'Monitor Audio: Muted';
+        btn.classList.remove('active-sound');
       }
     }
 
     /* ==========================================================
-       2. REALISTIC SVT ECG ENGINE (Continuous Gaussian Model)
+       2. FAST CALIBRATED SVT ECG ENGINE (Continuous Gaussian Model)
+       - SVT: Calibrated high-velocity 200 BPM (cycleLength = 41 px at 2.3 px/frame)
+       - Lead II narrow QRS (<80ms, sharp spike) with pseudo ST depression
+       - ROSC: Decelerates to regular Normal Sinus Rhythm (76 BPM, cycleLength = 110 px)
+       - Asystole: Flatline with continuous alarm tone
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
@@ -1075,35 +1163,34 @@
       canvas.height = parent.clientHeight;
       canvasW = canvas.width;
       canvasH = canvas.height;
-      lastY = canvasH * 0.52;
+      lastY = canvasH * 0.54;
       sweepX = 0;
       ctx.fillStyle = '#01080e';
       ctx.fillRect(0, 0, canvasW, canvasH);
     }
     window.addEventListener('resize', resizeCanvas);
 
-    // Realistic Lead II SVT Waveform:
-    // HR: 200 bpm (RR = 300ms). QRS narrow (<80ms, sharp spike).
-    // P wave absent/buried. Rate-dependent J-point depression transitioning into T wave.
     function calculateLeadIISample(sampleIndex) {
       const baseline = canvasH * 0.54;
       const amp = canvasH * 0.38;
 
       if (currentRhythmMode === 'SVT') {
-        const cycle = 66; // ~200 bpm at 2.2 px/frame
+        // Fast SVT at 200 BPM: cycle length = 41 px
+        const cycle = 41;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        const qWave = -0.08 * Math.exp(-Math.pow((phi - 0.12) / 0.012, 2));
-        const rWave =  1.08 * Math.exp(-Math.pow((phi - 0.155) / 0.018, 2));
-        const sWave = -0.28 * Math.exp(-Math.pow((phi - 0.195) / 0.016, 2));
-        const stDep = -0.07 * Math.exp(-Math.pow((phi - 0.28) / 0.07, 2));
-        const tWave =  0.26 * Math.exp(-Math.pow((phi - 0.50) / 0.13, 2));
+        const qWave = -0.09 * Math.exp(-Math.pow((phi - 0.12) / 0.012, 2));
+        const rWave =  1.10 * Math.exp(-Math.pow((phi - 0.155) / 0.016, 2)); // Razor-sharp spike
+        const sWave = -0.28 * Math.exp(-Math.pow((phi - 0.19) / 0.014, 2));
+        const stDep = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.06, 2));  // J-point depression
+        const tWave =  0.26 * Math.exp(-Math.pow((phi - 0.52) / 0.12, 2));  // T wave
 
         const wave = qWave + rWave + sWave + stDep + tWave;
         const noise = (Math.random() - 0.5) * 0.015;
         const y = baseline - (wave + noise) * amp;
 
-        if (phi >= 0.145 && phi <= 0.175 && isBeatArmed) {
+        // Beep synchronized with peak R-wave
+        if (phi >= 0.145 && phi <= 0.185 && isBeatArmed) {
           audio.playECGBeep(950);
           isBeatArmed = false;
         }
@@ -1111,12 +1198,14 @@
         return y;
 
       } else if (currentRhythmMode === 'ASYSTOLE') {
+        // Flatline with subtle biological wander
         const wander = Math.sin(sampleIndex * 0.02) * 1.5;
         const noise = (Math.random() - 0.5) * 1.0;
         return baseline + wander + noise;
 
       } else if (currentRhythmMode === 'ROSC_SINUS') {
-        const cycle = 160; // ~75 bpm
+        // Normal Sinus Rhythm at 76 BPM: cycle length = 110 px
+        const cycle = 110;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
         const pWave =  0.15 * Math.exp(-Math.pow((phi - 0.14) / 0.035, 2));
@@ -1139,7 +1228,7 @@
     }
 
     function animateECG() {
-      const step = 2.2;
+      const step = 2.3;
       const eraseWidth = 26;
 
       ctx.fillStyle = '#01080e';
@@ -1300,12 +1389,12 @@
         vitals: { conscious: "Confused (GCS 11)", resp: "28 /min (Labored)", pulse: "200 bpm (Weak)", bp: "72/40 mmHg", spo2: "90%" },
         question: "The patient developed shock and myocardial ischemia. What is the immediate action?",
         options: [
-          { label: "A", text: "Infuse 1,000 mL 5% Dextrose over 10 minutes." },
-          { label: "B", text: "Prepare for immediate Synchronised DC Cardioversion." },
+          { label: "A", text: "Prepare for immediate Synchronised DC Cardioversion." },
+          { label: "B", text: "Infuse 1,000 mL 5% Dextrose over 10 minutes." },
           { label: "C", text: "Administer a third dose of Adenosine 18 mg IV." },
           { label: "D", text: "Place the patient in Trendelenburg position and observe." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 0,
         correctFeedback: {
           title: "CORRECT – IMMEDIATE CARDIOVERSION",
           html: "The presence of adverse features (hypotension/shock, chest pain, altered consciousness) mandates immediate electrical cardioversion."
@@ -1474,7 +1563,7 @@
           triggerActionSimulation(data.actionName, data.actionSub, data.nextAction);
         };
       } else {
-        // Lethal pitfall check in Stage 5: Unsynchronised shocks (Options A or B)
+        // Lethal pitfall in Stage 5: Unsynchronised shock (Options A or B)
         if (data.isLethalStage && (selectedIdx === 0 || selectedIdx === 1)) {
           triggerFatalAsystole();
           return;
@@ -1654,11 +1743,16 @@
       loadStageUI(0);
     }
 
+    // Auto-start initialization when DOM loads
     window.addEventListener('DOMContentLoaded', () => {
+      audio.init();
       resizeCanvas();
       animateECG();
       loadStageUI(0);
-      document.body.addEventListener('click', () => { audio.init(); }, { once: true });
+    });
+
+    window.addEventListener('load', () => {
+      audio.init();
     });
   </script>
 </body>
