@@ -414,7 +414,7 @@
     .options-stack {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 1rem;
     }
 
@@ -422,15 +422,15 @@
       background: rgba(255, 255, 255, 0.035);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 10px;
-      padding: 1rem 1.25rem;
+      padding: 0.85rem 1.15rem;
       color: #fff;
-      font-size: 0.93rem;
+      font-size: 0.91rem;
       font-weight: 600;
       text-align: left;
       cursor: pointer;
       display: flex;
       align-items: flex-start;
-      gap: 14px;
+      gap: 12px;
       line-height: 1.45;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -443,8 +443,8 @@
     }
 
     .opt-circle {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: var(--gold);
       color: #070B19;
@@ -452,7 +452,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       flex-shrink: 0;
       margin-top: 2px;
     }
@@ -1107,7 +1107,6 @@
       let yOffset = 0;
 
       if (currentRhythmMode === 'VT') {
-        // High-fidelity Monomorphic VT (~214 bpm, cycle ~70 px)
         const cycleLength = 70;
         const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
         const phi = phase / cycleLength;
@@ -1143,7 +1142,6 @@
         }
 
       } else {
-        // Mode 'SINUS' (Post-ROSC Sinus Rhythm ~98 bpm, cycle ~150 px)
         const cycleLength = 152;
         const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
         const phi = phase / cycleLength;
@@ -1151,23 +1149,18 @@
         let wave = 0;
 
         if (phi >= 0.10 && phi < 0.22) {
-          // P wave (rounded, upright)
           const t = (phi - 0.10) / 0.12;
           wave = 0.18 * Math.sin(t * Math.PI);
         } else if (phi >= 0.28 && phi < 0.31) {
-          // Q wave (small negative)
           const t = (phi - 0.28) / 0.03;
           wave = -0.12 * Math.sin(t * Math.PI);
         } else if (phi >= 0.31 && phi < 0.36) {
-          // R wave (crisp, narrow, tall spike)
           const t = (phi - 0.31) / 0.05;
           wave = (t < 0.5) ? (t / 0.5) * 1.0 : (1.0 - (t - 0.5) / 0.5) * 1.0;
         } else if (phi >= 0.36 && phi < 0.40) {
-          // S wave (negative dip)
           const t = (phi - 0.36) / 0.04;
           wave = -0.25 * Math.sin(t * Math.PI);
         } else if (phi >= 0.50 && phi < 0.68) {
-          // T wave (broad, upright normal repolarization)
           const t = (phi - 0.50) / 0.18;
           wave = 0.32 * Math.sin(t * Math.PI);
         }
@@ -1176,7 +1169,7 @@
         yOffset = -((wave + mildPhysioNoise) * amplitude);
 
         if (phi >= 0.32 && phi <= 0.35 && isBeatArmed) {
-          audio.playECGBeep(750); // Lower physiological pitch on return of spontaneous circulation
+          audio.playECGBeep(750);
           isBeatArmed = false;
         }
         if (phi > 0.50) {
@@ -1242,7 +1235,7 @@
 
     /* ==========================================================
        3. CLINICAL SIMULATION SCENARIO WORKFLOW (STAGES 1 - 6)
-       Expanded with Advanced ALS Stages 5 & 6
+       Each stage provides 4 concise options (A, B, C, D) with ONLY 1 correct answer.
        ========================================================== */
     const stagesData = [
       {
@@ -1261,17 +1254,19 @@
         },
         question: "WHAT IS YOUR NEXT IMMEDIATE ACTION?",
         options: [
-          { label: "A", text: "CONTINUE CPR" },
-          { label: "B", text: "DEFIBRILLATE THE PATIENT" }
+          { label: "A", text: "Continue chest compressions alone for 10 minutes without defibrillation." },
+          { label: "B", text: "Deliver an immediate unsynchronised defibrillation shock (150–200 J biphasic)." },
+          { label: "C", text: "Administer IV Atropine 1 mg bolus immediately." },
+          { label: "D", text: "Deliver synchronised cardioversion at 50 J." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 1, // Option B
         correctFeedback: {
           title: "CORRECT! – IMMEDIATE DEFIBRILLATION INDICATED",
           html: "Pulseless ventricular tachycardia is a shockable cardiac arrest rhythm.<br><br><b>Immediate Management:</b><ol><li>Deliver an unsynchronised defibrillation shock (biphasic 150J–200J or monophasic 360J).</li><li>Resume CPR immediately for 2 minutes without checking the pulse immediately after the shock.</li><li>Reassess the rhythm after 2 minutes.</li><li>Continue the ALS cardiac arrest algorithm.</li></ol>"
         },
         incorrectFeedback: {
           title: "INCORRECT – REASSESS YOUR MANAGEMENT",
-          html: "The patient has pulseless ventricular tachycardia, which is a shockable cardiac arrest rhythm. Immediate defibrillation is required as soon as a defibrillator is available. Do not delay defibrillation by solely continuing CPR."
+          html: "The patient has pulseless ventricular tachycardia, which is a shockable cardiac arrest rhythm. Immediate defibrillation is required as soon as a defibrillator is available. Do not delay defibrillation by solely continuing CPR or administering atropine."
         },
         nextAction: () => executeDefibrillationSequence(1)
       },
@@ -1291,10 +1286,12 @@
         },
         question: "WHAT SHOULD YOU DO IMMEDIATELY AFTER DELIVERING THE SHOCK?",
         options: [
-          { label: "A", text: "CHECK THE PATIENT'S PULSE AND RHYTHM IMMEDIATELY" },
-          { label: "B", text: "RESUME CPR IMMEDIATELY FOR 2 MINUTES" }
+          { label: "A", text: "Check the carotid pulse and pause 10 seconds to assess rhythm." },
+          { label: "B", text: "Resume CPR immediately for 2 minutes without checking pulse or rhythm." },
+          { label: "C", text: "Deliver stacked back-to-back shocks immediately." },
+          { label: "D", text: "Administer IV Adrenaline 1 mg bolus before touching the chest." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 1, // Option B
         correctFeedback: {
           title: "CORRECT! – EXCELLENT CLINICAL DECISION",
           html: "Immediately resume CPR for 2 minutes following defibrillation.<br><br><b>Key actions:</b><ol><li>Resume chest compressions immediately without checking the pulse or rhythm.</li><li>Continue CPR for 2 minutes (30:2 or continuous compressions with advanced airway).</li><li>Establish IV/IO access if not already established.</li><li>Prepare adrenaline and amiodarone for subsequent cycles.</li><li>Reassess cardiac rhythm only after completing the 2-minute cycle.</li></ol>"
@@ -1321,10 +1318,12 @@
         },
         question: "THE 2-MINUTE CPR CYCLE IS COMPLETED. THE MONITOR STILL SHOWS PULSELESS VT. WHAT IS YOUR NEXT ACTION?",
         options: [
-          { label: "A", text: "CONTINUE CPR FOR ANOTHER 2 MINUTES" },
-          { label: "B", text: "DELIVER ANOTHER UNSYNCHRONISED DEFIBRILLATION SHOCK" }
+          { label: "A", text: "Deliver another unsynchronised defibrillation shock (150–200 J biphasic)." },
+          { label: "B", text: "Continue CPR for another 2 minutes without delivering a shock." },
+          { label: "C", text: "Discontinue resuscitation efforts and declare asystole." },
+          { label: "D", text: "Administer IV Sodium Bicarbonate 8.4% 100 mL bolus and observe." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 0, // Option A
         correctFeedback: {
           title: "CORRECT! – DELIVER ANOTHER DEFIBRILLATION SHOCK",
           html: "Persistent pulseless VT is a shockable rhythm. Deliver a second unsynchronised shock without delay.<br><br><b>Actions:</b><ol><li>Deliver another unsynchronised shock.</li><li>Immediately resume CPR for 2 minutes.</li><li>Ensure high-quality chest compressions and minimal interruptions.</li><li>Establish secure IV/IO access.</li><li>Actively search for reversible causes (4Hs & 4Ts).</li></ol>"
@@ -1351,10 +1350,12 @@
         },
         question: "POST-THIRD SHOCK: WHAT ARE THE NEXT IMPORTANT MANAGEMENT ACTIONS?",
         options: [
-          { label: "A", text: "STOP CPR, CHECK THE PULSE AND WAIT FOR SPONTANEOUS RECOVERY" },
-          { label: "B", text: "RESUME CPR IMMEDIATELY, ADMINISTER ADRENALINE 1 MG IV/IO AND AMIODARONE 300 MG IV/IO ACCORDING TO THE ALS ALGORITHM" }
+          { label: "A", text: "Stop CPR, check carotid pulse, and wait for spontaneous rhythm recovery." },
+          { label: "B", text: "Administer IV Calcium Chloride 10% 10 mL and Atropine 3 mg bolus." },
+          { label: "C", text: "Resume CPR immediately, administer Adrenaline 1 mg IV/IO and Amiodarone 300 mg IV/IO." },
+          { label: "D", text: "Switch to transcutaneous cardiac pacing at 80 bpm." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 2, // Option C
         correctFeedback: {
           title: "CORRECT! – APPROPRIATE ALS MANAGEMENT",
           html: "Following the third shock in refractory shockable cardiac arrest:<br><ol><li>Resume CPR immediately for 2 minutes.</li><li>Administer Adrenaline 1 mg IV/IO.</li><li>Administer Amiodarone 300 mg IV/IO bolus.</li><li>Continue CPR with minimal interruptions.</li><li>Identify and treat reversible causes (4Hs and 4Ts).</li><li>Give subsequent adrenaline every 3–5 minutes (alternate cycles).</li><li>Consider Amiodarone 150 mg IV/IO after the 5th shock.</li></ol>"
@@ -1381,16 +1382,12 @@
         },
         question: "ACCORDING TO ALS GUIDELINES, WHAT IS THE CORRECT SHOCK MODE AND PHARMACOTHERAPY AT THIS 5th-SHOCK STAGE?",
         options: [
-          { 
-            label: "A", 
-            text: "SWITCH TO SYNCHRONISED CARDIOVERSION (100 J) TO AVOID R-ON-T PHENOMENON, AND ADMINISTER A SECOND FULL DOSE OF AMIODARONE 300 MG IV/IO." 
-          },
-          { 
-            label: "B", 
-            text: "MAINTAIN UNSYNCHRONISED DEFIBRILLATION (150–200 J BIPHASIC), RESUME CPR IMMEDIATELY, ADMINISTER SECOND-DOSE AMIODARONE 150 MG IV/IO, AND CONTINUE ADRENALINE 1 MG EVERY 3–5 MINUTES." 
-          }
+          { label: "A", text: "Switch to Synchronised Cardioversion (100 J) and give Amiodarone 300 mg IV/IO bolus." },
+          { label: "B", text: "Maintain unsynchronised defibrillation (150–200 J biphasic), resume CPR immediately, administer second-dose Amiodarone 150 mg IV/IO, and continue Adrenaline 1 mg every 3–5 min." },
+          { label: "C", text: "Discontinue CPR and defibrillation, and administer IV Adenosine 12 mg rapid push." },
+          { label: "D", text: "Stop all antiarrhythmics and infuse IV Digoxin 0.5 mg bolus over 5 minutes." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 1, // Option B
         correctFeedback: {
           title: "CORRECT! – ADVANCED ALS PROTOCOL EXECUTED",
           html: "<b>Critical ALS Decision-Making:</b><ol><li><b>Never switch to Synchronised mode in Cardiac Arrest:</b> Synchronised cardioversion requires a perfusing rhythm with distinct R-wave sensing. In pulseless VT, the patient is in full cardiac arrest with no cardiac output. The defibrillator will fail to discharge or severely delay delivery in synchronised mode. Always deliver an <b>unsynchronised shock</b>.</li><li><b>Amiodarone Dosing:</b> The second dose of Amiodarone in refractory shockable rhythm is <b>150 mg IV/IO</b> (half the initial 300 mg dose), indicated after the 5th shock.</li><li><b>Adrenaline Cadence:</b> Continue Adrenaline 1 mg IV/IO every alternate CPR cycle (every 3–5 minutes).</li><li><b>Advanced troubleshooting:</b> Check pad placement (consider anterior-posterior position), verify high-quality compressions (EtCO2 > 20 mmHg), and aggressively search for 4Hs & 4Ts (especially myocardial ischemia/hypokalemia).</li></ol>"
@@ -1417,16 +1414,12 @@
         },
         question: "ROSC IS CONFIRMED. ACCORDING TO CURRENT ALS GUIDELINES, WHAT IS THE IMMEDIATE POST-RESUSCITATION CARE BUNDLE?",
         options: [
-          { 
-            label: "A", 
-            text: "HYPERVENTILATE TO TARGET PaCO2 < 30 mmHg TO PREVENT CEREBRAL EDEMA, INFUSE 2 LITRES OF HYPOTONIC DEXTROSE, EXTUBATE PROMPTLY TO ASSESS GCS, AND DELAY ECG UNTIL ARRIVAL AT ICU." 
-          },
-          { 
-            label: "B", 
-            text: "TITRATE OXYGEN TO SpO2 94–98% (AVOID HYPEROXIA), MAINTAIN NORMOCAPNIA (EtCO2 35–45 mmHg), RESTORE MAP ≥ 65 mmHg WITH IV CRYSTALLOID CHALLENGE / NORADRENALINE, ACQUIRE AN IMMEDIATE 12-LEAD ECG (ASSESS FOR PRIMARY PCI), AND INITIATE TARGETED TEMPERATURE MANAGEMENT (TTM)." 
-          }
+          { label: "A", text: "Hyperventilate to target PaCO2 < 30 mmHg, infuse 2 litres of hypotonic dextrose, and extubate immediately." },
+          { label: "B", text: "Disconnect all monitoring, stop oxygen, and transfer directly to general medical ward." },
+          { label: "C", text: "Administer IV Adrenaline 1 mg bolus every 3 minutes to maintain a hypertensive state." },
+          { label: "D", text: "Titrate oxygen to SpO2 94–98%, maintain normocapnia (EtCO2 35–45 mmHg), restore MAP ≥ 65 mmHg with IV crystalloid / noradrenaline, acquire immediate 12-lead ECG, and initiate TTM." }
         ],
-        correctAnswer: 1,
+        correctAnswer: 3, // Option D
         correctFeedback: {
           title: "CORRECT! – MASTER CLINICIAN POST-ROSC MANAGEMENT",
           html: "<b>Evidence-Based Post-Cardiac Arrest Care (ABCDE Approach):</b><ol><li><b>Airway & Breathing:</b> Secure airway. Titrate FiO2 to maintain SpO2 94–98% (prevent hyperoxia-induced free radical damage and hypoxia). Maintain normocapnia (EtCO2 35–45 mmHg / PaCO2 4.5–6.0 kPa); <b>avoid hyperventilation</b> which causes cerebral vasoconstriction and worsens ischemia.</li><li><b>Hemodynamics:</b> Correct hypotension (BP 82/48 mmHg is critical). Administer IV crystalloid boluses and start <b>Noradrenaline infusion</b> targeting a Mean Arterial Pressure (MAP) ≥ 65 mmHg or Systolic BP > 100 mmHg.</li><li><b>Immediate 12-Lead ECG:</b> Vital to evaluate for ST-elevation Myocardial Infarction (STEMI) or acute coronary occlusion, directing immediate transfer to the Cath Lab for <b>Primary PCI</b>.</li><li><b>Targeted Temperature Management (TTM):</b> Maintain strict normothermia or targeted cooling (32–36°C) to prevent hyperthermia/pyrexia (> 37.7°C) and reduce secondary neurological damage.</li><li><b>Metabolic:</b> Maintain blood glucose 4.0–10.0 mmol/L; avoid hypoglycemia.</li></ol>"
