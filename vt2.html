@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ED Simulation Station | Adult Tachyarrhythmia Assessment (10-Stage)</title>
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    :root {
+      --bg-dark: #050813;
+      --bg-panel: rgba(13, 21, 38, 0.85);
+      --bg-panel-border: rgba(80, 200, 120, 0.25);
+      --emerald: #50C878;
+      --emerald-glow: rgba(80, 200, 120, 0.55);
+      --gold: #FFD700;
+      --gold-glow: rgba(255, 215, 0, 0.4);
+      --danger: #FF3B30;
+      --danger-glow: rgba(255, 59, 48, 0.45);
+      --asystole-red: #ff2222;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --monitor-screen: #01080e;
+      --ecg-glow: #00ff66;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(80, 200, 120, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
+    }
+
+    /* INITIAL "READY TO GO" POP-UP OVERLAY */
+    .ready-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(13, 22, 42, 0.97) 0%, rgba(3, 6, 15, 0.99) 100%);
+      backdrop-filter: blur(18px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      padding: 1.5rem;
+    }
+
+    .ready-modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .ready-modal-box {
+      background: rgba(16, 26, 48, 0.94);
+      border: 2px solid var(--emerald);
+      border-radius: 20px;
+      max-width: 560px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(80, 200, 120, 0.35), inset 0 0 20px rgba(80, 200, 120, 0.1);
+      animation: readyPulse 3s infinite alternate;
+    }
+
+    @keyframes readyPulse {
+      0% { box-shadow: 0 0 30px rgba(80, 200, 120, 0.25); }
+      100% { box-shadow: 0 0 60px rgba(80, 200, 120, 0.55); }
+    }
+
+    .ready-dept-logo {
+      height: 68px;
+      width: auto;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 10px rgba(80, 200, 120, 0.5));
+    }
+
+    .ready-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(80, 200, 120, 0.15);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .ready-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    .ready-subtitle {
+      font-size: 0.95rem;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+    }
+
+    .ready-specs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .ready-spec-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ready-instruction {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .ready-btn {
+      background: linear-gradient(135deg, #50C878 0%, #3ca760 100%);
+      color: #050813;
+      border: none;
+      padding: 1rem 2.8rem;
+      border-radius: 35px;
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 0 25px var(--emerald-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+
+    .ready-btn:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 0 40px rgba(80, 200, 120, 0.8);
+      background: #40b366;
+    }
+
+    /* NAV BAR */
+    nav {
+      background: rgba(8, 14, 28, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(80, 200, 120, 0.22);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .dept-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(80, 200, 120, 0.4));
+    }
+
+    .logo-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25;
+    }
+
+    .logo-text span {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--emerald);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .back-portal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 215, 0, 0.08);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      color: var(--gold);
+      padding: 0.55rem 1.15rem;
+      border-radius: 24px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .back-portal-btn:hover {
+      background: var(--gold);
+      color: #070B19;
+      box-shadow: 0 0 16px var(--gold-glow);
+      transform: translateX(-3px);
+    }
+
+    /* TELEMETRY BAR */
+    .station-bar {
+      background: rgba(13, 22, 40, 0.75);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .station-title-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--emerald);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .live-tag {
+      background: rgba(255, 59, 48, 0.25);
+      border: 1px solid var(--danger);
+      color: #ff6b6b;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      animation: alertPulse 1.2s infinite;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    @keyframes alertPulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.97); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .audio-toggle-btn {
+      background: rgba(80, 200, 120, 0.15);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .audio-toggle-btn:hover {
+      background: var(--emerald);
+      color: #050813;
+    }
+
+    .audio-toggle-btn.active-sound {
+      box-shadow: 0 0 12px var(--emerald-glow);
+    }
+
+    /* MAIN GRID */
+    main {
+      flex: 1;
+      padding: 1.75rem 2rem;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.75rem;
+    }
+
+    /* PANELS */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--bg-panel-border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(80, 200, 120, 0.2);
+    }
+
+    .panel-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* CARDIAC MONITOR BEZEL */
+    .monitor-bezel {
+      background: #080d17;
+      border-radius: 12px;
+      padding: 10px;
+      border: 2px solid #1a2638;
+      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.95), 0 8px 24px rgba(0, 0, 0, 0.6);
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .monitor-screen-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.78rem;
+      color: #64748b;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: #01080e;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .monitor-lead-info {
+      color: #00ff66;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 235px;
+      background-color: var(--monitor-screen);
+      overflow: hidden;
+      border-radius: 0 0 6px 6px;
+    }
+
+    /* Calibrated Medical ECG Grid */
+    .canvas-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-size: 25px 25px, 5px 5px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 255, 102, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 102, 0.12) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0, 255, 102, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 255, 102, 0.035) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .monitor-readout {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      z-index: 3;
+      text-align: right;
+      font-family: 'Courier New', Courier, monospace;
+      pointer-events: none;
+    }
+
+    .rate-number {
+      font-size: 3rem;
+      font-weight: 900;
+      color: #00ff66;
+      text-shadow: 0 0 12px rgba(0, 255, 102, 0.75);
+      line-height: 0.95;
+    }
+
+    .rate-label {
+      font-size: 0.72rem;
+      color: #00ff66;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+
+    .rhythm-alert {
+      display: inline-block;
+      margin-top: 6px;
+      background: rgba(255, 59, 48, 0.25);
+      border: 1px solid var(--danger);
+      color: #ff6b6b;
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+    }
+
+    .rhythm-alert.rosc-state {
+      background: rgba(80, 200, 120, 0.25);
+      border-color: var(--emerald);
+      color: #a8f5c8;
+      animation: roscPulse 1.5s infinite;
+    }
+
+    .rhythm-alert.asystole-state {
+      background: rgba(255, 34, 34, 0.35);
+      border-color: var(--asystole-red);
+      color: #ff9999;
+      animation: alertPulse 0.8s infinite;
+    }
+
+    @keyframes roscPulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; box-shadow: 0 0 12px var(--emerald-glow); }
+      100% { opacity: 0.8; }
+    }
+
+    /* VITALS TILES */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .vital-tile {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--emerald);
+      padding: 10px 14px;
+      border-radius: 8px;
+    }
+
+    .vital-title {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 2px;
+    }
+
+    .vital-value {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .vital-value.alert { color: #ff6b6b; }
+    .vital-value.good { color: var(--emerald); }
+    .vital-value.fatal { color: #ff2222; font-weight: 800; }
+
+    /* DECISION CARD */
+    .scenario-card {
+      background: rgba(255, 255, 255, 0.025);
+      border-radius: 8px;
+      padding: 1rem 1.15rem;
+      font-size: 0.94rem;
+      line-height: 1.55;
+      border-left: 4px solid var(--gold);
+      margin-bottom: 1.1rem;
+      color: #cbd5e1;
+    }
+
+    .stage-badge-level {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      margin-bottom: 8px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .question-banner {
+      background: rgba(80, 200, 120, 0.08);
+      border: 1px solid rgba(80, 200, 120, 0.35);
+      padding: 0.9rem;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 1.1rem;
+    }
+
+    .question-banner h3 {
+      font-size: 1rem;
+      color: var(--emerald);
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .options-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .btn-decision {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      line-height: 1.45;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-decision:hover {
+      background: rgba(80, 200, 120, 0.1);
+      border-color: var(--emerald);
+      box-shadow: 0 4px 16px rgba(80, 200, 120, 0.2);
+      transform: translateX(4px);
+    }
+
+    .opt-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #070B19;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* FLASH SCREEN */
+    .shock-flash-screen {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes cardioversionFlash {
+      0% { opacity: 0; }
+      20% { opacity: 0.95; }
+      100% { opacity: 0; }
+    }
+    
+    @keyframes defibrillate {
+      0% { opacity: 0; }
+      15% { opacity: 0.95; }
+      100% { opacity: 0; }
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 17, 0.88);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.25rem;
+    }
+
+    .modal-box {
+      background: #0c1424;
+      border: 2px solid var(--emerald);
+      border-radius: 14px;
+      max-width: 580px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+      box-shadow: 0 0 35px var(--emerald-glow);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.2s ease-out;
+    }
+
+    .modal-box.incorrect {
+      border-color: var(--danger);
+      box-shadow: 0 0 35px var(--danger-glow);
+    }
+
+    .modal-box.asystole-fatal {
+      border-color: var(--asystole-red);
+      box-shadow: 0 0 35px rgba(255, 34, 34, 0.6);
+      background: #140507;
+    }
+
+    .modal-box.active {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal-status-icon {
+      font-size: 2.4rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .modal-headline {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.6rem;
+      text-align: center;
+    }
+
+    .modal-body-text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      margin-bottom: 1.25rem;
+      text-align: left;
+    }
+
+    .modal-body-text ul, .modal-body-text ol {
+      margin-left: 1.25rem;
+      margin-top: 0.35rem;
+    }
+
+    .modal-action-btn {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 25px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-emerald {
+      background: var(--emerald);
+      color: #030712;
+      box-shadow: 0 0 14px var(--emerald-glow);
+    }
+    .btn-emerald:hover { background: #40b366; }
+
+    .btn-rose {
+      background: var(--danger);
+      color: #fff;
+      box-shadow: 0 0 14px var(--danger-glow);
+    }
+    .btn-rose:hover { background: #e02f25; }
+
+    .btn-fatal-restart {
+      background: #ff2222;
+      color: #fff;
+      box-shadow: 0 0 18px rgba(255, 34, 34, 0.6);
+    }
+
+    /* ACTION OVERLAY */
+    .action-progress-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.94);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 900;
+    }
+
+    .action-headline {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--emerald);
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      text-shadow: 0 0 12px var(--emerald-glow);
+      text-align: center;
+    }
+
+    .action-subline {
+      font-size: 0.9rem;
+      color: var(--gold);
+      margin-bottom: 1.75rem;
+    }
+
+    .action-bar-frame {
+      width: 45%;
+      min-width: 280px;
+      height: 16px;
+      background: #111b2d;
+      border-radius: 20px;
+      border: 1px solid var(--emerald);
+      overflow: hidden;
+    }
+
+    .action-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #50C878, #FFD700);
+      box-shadow: 0 0 10px var(--emerald);
+    }
+
+    /* RESULTS */
+    .results-view {
+      display: none;
+      grid-column: span 2;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    .results-table th, .results-table td {
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .results-table th {
+      background: rgba(80, 200, 120, 0.12);
+      color: var(--emerald);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #040711;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 2rem 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+    }
+
+    .footer-logos {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-logos img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.15));
+    }
+
+    .logo-divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: dotPulse 1.5s infinite;
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .footer-copyright {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .footer-copyright span {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    @media (max-width: 992px) {
+      main { grid-template-columns: 1fr; }
+      .results-view { grid-column: span 1; }
+      nav { padding: 0.75rem 1rem; }
+      .logo-text { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- "READY TO GO" MODAL POP-UP OVERLAY -->
+  <div class="ready-modal-backdrop" id="readyModalBackdrop">
+    <div class="ready-modal-box">
+      <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="HKN Logo" class="ready-dept-logo">
+      <div>
+        <span class="ready-badge"><i class="bi bi-shield-fill-check"></i> Hospital Kuala Nerang</span>
+      </div>
+      <h1 class="ready-title">Emergency Department Simulation</h1>
+      <div class="ready-subtitle">Adult Tachyarrhythmia Assessment Station</div>
+      
+      <div class="ready-specs">
+        <div class="ready-spec-item"><i class="bi bi-person-fill"></i> 55 y/o Male</div>
+        <div class="ready-spec-item"><i class="bi bi-activity"></i> Unknown Rhythm (Interpret)</div>
+        <div class="ready-spec-item"><i class="bi bi-list-ol"></i> 10-Stage Comprehensive</div>
+      </div>
+      
+      <p class="ready-instruction">
+        Check your device volume or headphones. You will need to interpret the rhythm and act accordingly over 10 clinical stages. Clicking below starts the high-speed cardiac telemetry audio and loads the clinical station.
+      </p>
+
+      <button class="ready-btn" id="readyBtn" onclick="startSimulationSession()">
+        <i class="bi bi-play-circle-fill"></i> READY TO GO
+      </button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo-group">
+      <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="Logo Jabatan" class="dept-logo">
+      <div class="logo-text">
+        Hospital Kuala Nerang
+        <span>Jabatan Kecemasan & Trauma</span>
+      </div>
+    </a>
+    <a href="index.html" class="back-portal-btn">
+      <i class="bi bi-arrow-left"></i> Hub Portal
+    </a>
+  </nav>
+
+  <!-- TELEMETRY / STATUS BAR -->
+  <div class="station-bar">
+    <div class="station-title-badge">
+      <span class="live-tag" id="statusBadgeTag">CRITICAL ALS SIMULATION</span>
+      <span id="stationTitleHeading">Adult Tachyarrhythmia Assessment</span>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <button class="audio-toggle-btn active-sound" id="audioToggleBtn" onclick="toggleAudioState()">
+        <i class="bi bi-volume-up-fill" id="audioIcon"></i>
+        <span id="audioText">Monitor Audio: Live</span>
+      </button>
+      <div style="font-weight: bold; color: var(--gold); font-size: 0.95rem;">
+        Score: <span id="currentScore">0</span> / 10
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SIMULATION AREA -->
+  <main id="mainGrid">
+    
+    <!-- LEFT PANEL: CARDIAC TELEMETRY -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-heading">
+          <i class="bi bi-activity"></i> Clinical Telemetry Monitor
+        </div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); font-family: monospace;">SPEED: 25mm/s | GAIN: 10mm/mV</span>
+      </div>
+
+      <div class="monitor-bezel">
+        <div class="monitor-screen-header">
+          <div class="monitor-lead-info" id="leadDisplay">
+            <i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)
+          </div>
+          <div>SWEEP: 25.0 mm/s</div>
+          <div>DIAGNOSTIC (0.05-150Hz)</div>
+        </div>
+        
+        <div class="canvas-wrapper">
+          <canvas id="ecgCanvas"></canvas>
+          <div class="monitor-readout">
+            <div class="rate-number" id="monitorHR">185</div>
+            <div class="rate-label" id="rateLabelText">HR (BPM)</div>
+            <div class="rhythm-alert" id="rhythmAlertTag" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-heading" style="margin-bottom: 0.65rem; font-size: 0.85rem;">
+        <i class="bi bi-person-fill-exclamation"></i> Patient Status & Vitals
+      </div>
+      <div class="vitals-grid">
+        <div class="vital-tile">
+          <div class="vital-title">Patient Profile</div>
+          <div class="vital-value">55 y/o Male</div>
+        </div>
+        <div class="vital-tile">
+          <div class="vital-title">Consciousness</div>
+          <div class="vital-value alert" id="consciousVal">Alert, Dizzy</div>
+        </div>
+        <div class="vital-tile">
+          <div class="vital-title">Respiration</div>
+          <div class="vital-value" id="respVal">22 /min</div>
+        </div>
+        <div class="vital-tile">
+          <div class="vital-title">Radial Pulse</div>
+          <div class="vital-value alert" id="pulseVal">Weak, Regular (185 bpm)</div>
+        </div>
+        <div class="vital-tile">
+          <div class="vital-title">Blood Pressure</div>
+          <div class="vital-value alert" id="bpVal">88/50 mmHg (Shock)</div>
+        </div>
+        <div class="vital-tile">
+          <div class="vital-title">SpO2</div>
+          <div class="vital-value" id="spo2Val" style="color: var(--emerald);">95% on Room Air</div>
+        </div>
+        <div class="vital-tile" style="grid-column: span 2;">
+          <div class="vital-title">Current Presentation</div>
+          <div class="vital-value" id="activeInterventionText" style="color: var(--gold);">Severe palpitations, dizziness, chest tightness</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: DECISION MAKING -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-heading">
+          <i class="bi bi-clipboard2-pulse"></i> Decision Stage <span id="displayStageNumber">1</span> of 10
+        </div>
+        <span style="font-size: 0.8rem; color: var(--emerald); font-weight: 600;" id="stageTitle">Clinical Assessment</span>
+      </div>
+
+      <div class="stage-badge-level" id="difficultyTag">First-Line Assessment</div>
+
+      <div class="scenario-card" id="scenarioDescription">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="question-banner">
+        <h3 id="questionHeading"><!-- Injected via JS --></h3>
+      </div>
+
+      <div class="options-stack" id="optionsContainer">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- RESULTS SUMMARY SCREEN -->
+    <div class="panel results-view" id="resultsView">
+      <div class="panel-header">
+        <div class="panel-heading"><i class="bi bi-award-fill"></i> Performance Assessment Summary (10 Stages)</div>
+        <div style="font-size: 1.1rem; font-weight: bold; color: var(--gold);" id="finalScoreSummary"></div>
+      </div>
+
+      <div id="verdictText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;"></div>
+
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Stage</th>
+            <th>Clinical ALS Competency</th>
+            <th>Result Status</th>
+            <th>Marks</th>
+          </tr>
+        </thead>
+        <tbody id="resultsTableContent"></tbody>
+      </table>
+
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+        <button class="modal-action-btn btn-emerald" style="max-width: 260px;" onclick="restartSimulation()">
+          <i class="bi bi-arrow-counterclockwise"></i> Repeat Simulation
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ACTION OVERLAY -->
+  <div class="action-progress-overlay" id="actionOverlay">
+    <div class="action-headline" id="actionHeadlineText"><i class="bi bi-activity"></i> PERFORMING PROCEDURE</div>
+    <div class="action-subline" id="actionSublineText">Executing intervention...</div>
+    <div class="action-bar-frame">
+      <div class="action-bar-fill" id="actionFill"></div>
+    </div>
+  </div>
+
+  <!-- CARDIOVERSION / DEFIB FLASH EFFECT -->
+  <div class="shock-flash-screen" id="shockFlash"></div>
+
+  <!-- FEEDBACK MODAL -->
+  <div class="modal-backdrop" id="feedbackBackdrop">
+    <div class="modal-box" id="feedbackBox">
+      <div class="modal-status-icon" id="feedbackIcon"></div>
+      <div class="modal-headline" id="feedbackTitle"></div>
+      <div class="modal-body-text" id="feedbackContent"></div>
+      <button class="modal-action-btn" id="feedbackButton">PROCEED</button>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-logos">
+        <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="HKN Logo">
+        <div class="logo-divider"></div>
+        <img src="https://lh3.googleusercontent.com/d/1LdMRx-PF49CWOcrjthClGLJg-yQoJ2mt" alt="MOH Logo">
+      </div>
+      <div class="footer-status"><span class="pulse-dot"></span><span>EDHKN PORTAL Ver 2.0</span></div>
+      <p class="footer-copyright">© 2026 <span>Yassin Razak</span> | All Rights Reserved</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================
+       1. SYNTHETIC AUDIO ENGINE
+       ========================================================== */
+    class AudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+        this.asystoleOsc = null;
+        this.asystoleGain = null;
+      }
+
+      init() {
+        if (!this.enabled) return;
+        try {
+          if (!this.ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              this.ctx = new AudioContextClass();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        } catch (e) {
+          console.warn("AudioContext auto-start notice:", e);
+        }
+      }
+
+      playECGBeep(pitch = 920) {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx || this.ctx.state !== 'running') return;
+
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(pitch, now);
+          
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } catch (e) {}
+      }
+
+      startAsystoleTone() {
+        if (!this.enabled) return;
+        this.init();
+        this.stopAsystoleTone();
+        if (!this.ctx || this.ctx.state !== 'running') return;
+
+        try {
+          const now = this.ctx.currentTime;
+          this.asystoleOsc = this.ctx.createOscillator();
+          this.asystoleGain = this.ctx.createGain();
+
+          this.asystoleOsc.type = 'sawtooth';
+          this.asystoleOsc.frequency.setValueAtTime(780, now);
+
+          this.asystoleGain.gain.setValueAtTime(0.12, now);
+
+          this.asystoleOsc.connect(this.asystoleGain);
+          this.asystoleGain.connect(this.ctx.destination);
+
+          this.asystoleOsc.start(now);
+        } catch (e) {}
+      }
+
+      stopAsystoleTone() {
+        if (this.asystoleOsc) {
+          try {
+            this.asystoleOsc.stop();
+            this.asystoleOsc.disconnect();
+          } catch(e) {}
+          this.asystoleOsc = null;
+        }
+      }
+
+      playCorrectSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx || this.ctx.state !== 'running') return;
+
+        try {
+          const now = this.ctx.currentTime;
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const startT = now + (idx * 0.07);
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, startT);
+
+            gain.gain.setValueAtTime(0.22, startT);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startT + 0.28);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(startT);
+            osc.stop(startT + 0.3);
+          });
+        } catch (err) {}
+      }
+
+      playWrongSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx || this.ctx.state !== 'running') return;
+
+        try {
+          const now = this.ctx.currentTime;
+          const osc1 = this.ctx.createOscillator();
+          const osc2 = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc1.type = 'sawtooth';
+          osc2.type = 'sawtooth';
+
+          osc1.frequency.setValueAtTime(146.83, now);
+          osc2.frequency.setValueAtTime(103.83, now);
+
+          gain.gain.setValueAtTime(0.24, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.45);
+          osc2.stop(now + 0.45);
+        } catch (e) {}
+      }
+
+      playShockSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx || this.ctx.state !== 'running') return;
+
+        try {
+          const now = this.ctx.currentTime;
+          const bufferSize = this.ctx.sampleRate * 0.25;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.04));
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const noiseGain = this.ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.42, now);
+          noise.connect(noiseGain);
+          noiseGain.connect(this.ctx.destination);
+          noise.start(now);
+        } catch (e) {}
+      }
+    }
+
+    const audio = new AudioEngine();
+
+    function autoResumeAudio() {
+      if (audio.ctx && audio.ctx.state === 'suspended') {
+        audio.ctx.resume().catch(() => {});
+      } else if (!audio.ctx) {
+        audio.init();
+      }
+    }
+    ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown'].forEach(evt => {
+      window.addEventListener(evt, autoResumeAudio, { passive: true });
+    });
+
+    function toggleAudioState() {
+      audio.enabled = !audio.enabled;
+      const icon = document.getElementById('audioIcon');
+      const text = document.getElementById('audioText');
+      const btn = document.getElementById('audioToggleBtn');
+      if (audio.enabled) {
+        audio.init();
+        icon.className = 'bi bi-volume-up-fill';
+        text.innerText = 'Monitor Audio: Live';
+        btn.classList.add('active-sound');
+      } else {
+        audio.stopAsystoleTone();
+        icon.className = 'bi bi-volume-mute-fill';
+        text.innerText = 'Monitor Audio: Muted';
+        btn.classList.remove('active-sound');
+      }
+    }
+
+    function startSimulationSession() {
+      audio.init();
+      if (audio.ctx && audio.ctx.state === 'suspended') {
+        audio.ctx.resume();
+      }
+
+      audio.playCorrectSound();
+
+      const readyBackdrop = document.getElementById('readyModalBackdrop');
+      if (readyBackdrop) readyBackdrop.classList.add('hidden');
+
+      resizeCanvas();
+      loadStageUI(currentStage);
+
+      if (!animRunning) {
+        animRunning = true;
+        animateECG();
+      }
+    }
+
+    /* ==========================================================
+       2. ECG ENGINE (VT_PERFUSING, VT_PULSELESS, ROSC_SINUS, ASYSTOLE)
+       ========================================================== */
+    const canvas = document.getElementById('ecgCanvas');
+    const ctx = canvas.getContext('2d');
+    let canvasW, canvasH;
+    let sweepX = 0;
+    let lastY = 0;
+    let isBeatArmed = true;
+    let globalSample = 0;
+    let currentRhythmMode = 'VT_PERFUSING'; 
+    let animRunning = false;
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+      canvasW = canvas.width;
+      canvasH = canvas.height;
+      lastY = canvasH * 0.54;
+      sweepX = 0;
+      ctx.fillStyle = '#01080e';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function calculateLeadIISample(sampleIndex) {
+      const baseline = canvasH * 0.54;
+      const amp = canvasH * 0.40;
+
+      if (currentRhythmMode === 'VT_PERFUSING' || currentRhythmMode === 'VT_PULSELESS') {
+        // Broad complex regular tachycardia at 185 BPM
+        // 25mm/s speed -> approx 125 px/sec -> 185 bpm is ~3.08 beats/sec -> cycle ~40 px
+        const cycle = 40;
+        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
+
+        let wave = 0;
+        if (phi < 0.28) {
+          const t = phi / 0.28;
+          const mainR = Math.sin(t * Math.PI * 0.5);
+          const notch = (phi > 0.08 && phi < 0.16) ? -0.14 * Math.sin((phi - 0.08) / 0.08 * Math.PI) : 0;
+          wave = (mainR + notch) * 1.0;
+        } else if (phi < 0.50) {
+          const t = (phi - 0.28) / 0.22;
+          wave = 1.0 - (t * 1.88);
+        } else if (phi < 0.78) {
+          const t = (phi - 0.50) / 0.28;
+          wave = -0.88 + (Math.sin(t * Math.PI * 0.5) * 0.68);
+        } else {
+          const t = (phi - 0.78) / 0.22;
+          wave = -0.20 + (t * 0.20);
+        }
+
+        const roadTremor = (Math.sin(sampleIndex * 0.85) * 0.015) + ((Math.random() - 0.5) * 0.035);
+        const y = baseline - ((wave + roadTremor) * amp);
+
+        if (phi >= 0.24 && phi <= 0.30 && isBeatArmed) {
+          audio.playECGBeep(920);
+          isBeatArmed = false;
+        }
+        if (phi > 0.50) isBeatArmed = true;
+        return y;
+
+      } else if (currentRhythmMode === 'ASYSTOLE') {
+        const wander = Math.sin(sampleIndex * 0.02) * 1.5;
+        const noise = (Math.random() - 0.5) * 1.0;
+        return baseline + wander + noise;
+
+      } else if (currentRhythmMode === 'ROSC_SINUS') {
+        // Normal Sinus Rhythm at 92 BPM: cycle length = 81 px
+        const cycle = 81;
+        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
+
+        const pWave =  0.15 * Math.exp(-Math.pow((phi - 0.15) / 0.04, 2));
+        const qWave = -0.08 * Math.exp(-Math.pow((phi - 0.28) / 0.015, 2));
+        const rWave =  1.10 * Math.exp(-Math.pow((phi - 0.31) / 0.02, 2));
+        const sWave = -0.25 * Math.exp(-Math.pow((phi - 0.35) / 0.02, 2));
+        const tWave =  0.30 * Math.exp(-Math.pow((phi - 0.60) / 0.08, 2));
+
+        const wave = pWave + qWave + rWave + sWave + tWave;
+        const noise = (Math.random() - 0.5) * 0.012;
+        const y = baseline - (wave + noise) * amp;
+
+        if (phi >= 0.30 && phi <= 0.33 && isBeatArmed) {
+          audio.playECGBeep(750);
+          isBeatArmed = false;
+        }
+        if (phi > 0.50) isBeatArmed = true;
+        return y;
+      }
+    }
+
+    function animateECG() {
+      const step = 2.1;
+      const eraseWidth = 26;
+
+      ctx.fillStyle = '#01080e';
+      ctx.fillRect(sweepX, 0, eraseWidth, canvasH);
+      ctx.fillStyle = 'rgba(1, 8, 14, 0.02)';
+      ctx.fillRect(0, 0, canvasW, canvasH);
+
+      const nextX = sweepX + step;
+      const nextY = calculateLeadIISample(globalSample);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(sweepX, lastY);
+      ctx.lineTo(nextX, nextY);
+
+      if (currentRhythmMode === 'ASYSTOLE') {
+        ctx.strokeStyle = 'rgba(255, 34, 34, 0.6)';
+        ctx.lineWidth = 4.0;
+        ctx.shadowColor = '#ff2222';
+      } else if (currentRhythmMode === 'ROSC_SINUS') {
+        ctx.strokeStyle = 'rgba(80, 200, 120, 0.55)';
+        ctx.lineWidth = 4.5;
+        ctx.shadowColor = '#00ff66';
+      } else {
+        ctx.strokeStyle = 'rgba(0, 255, 102, 0.45)';
+        ctx.lineWidth = 4.5;
+        ctx.shadowColor = '#00ff66';
+      }
+
+      ctx.shadowBlur = 10;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(sweepX, lastY);
+      ctx.lineTo(nextX, nextY);
+      ctx.strokeStyle = currentRhythmMode === 'ASYSTOLE' ? '#ff9999' : '#bbfce0';
+      ctx.lineWidth = 1.8;
+      ctx.shadowColor = '#ffffff';
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(nextX, nextY, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = currentRhythmMode === 'ASYSTOLE' ? '#ff3333' : '#ffffff';
+      ctx.shadowColor = currentRhythmMode === 'ASYSTOLE' ? '#ff0000' : '#00ff66';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.restore();
+
+      lastY = nextY;
+      sweepX = nextX;
+      globalSample += 1;
+
+      if (sweepX >= canvasW) {
+        sweepX = 0;
+        lastY = calculateLeadIISample(globalSample);
+      }
+
+      requestAnimationFrame(animateECG);
+    }
+
+    /* ==========================================================
+       3. 10-STAGE WORKFLOW (Unstable VT -> Arrest -> ROSC)
+       ========================================================== */
+    const stagesData = [
+      {
+        stageNumber: 1,
+        title: "Clinical Recognition",
+        badge: "Initial Assessment",
+        competency: "Recognition of unstable tachyarrhythmia",
+        scenario: "A 55-year-old male presents with severe palpitations, dizziness, and mild chest tightness. The monitor displays a regular broad-complex rhythm at 185 bpm. Radial pulse is weak but palpable.",
+        interventionNote: "Tachycardia at 185 bpm. Assessing stability.",
+        vitals: { conscious: "Alert, Anxious", resp: "22 /min", pulse: "Weak, Regular (185 bpm)", bp: "88/50 mmHg (Hypotensive)", spo2: "95% (Room Air)" },
+        question: "Based on the clinical parameters and monitor trace, what is the most appropriate initial classification and priority action?",
+        options: [
+          { label: "A", text: "Stable narrow-complex tachycardia requiring vagal maneuvers." },
+          { label: "B", text: "Pulseless arrest requiring immediate unsynchronised defibrillation." },
+          { label: "C", text: "Unstable broad-complex tachycardia requiring emergent synchronised cardioversion." },
+          { label: "D", text: "Rate-controlled atrial fibrillation requiring Amiodarone infusion." }
+        ],
+        correctAnswer: 2,
+        correctFeedback: {
+          title: "CORRECT – UNSTABLE TACHYCARDIA",
+          html: "<b>Classification:</b> The patient has a pulse but exhibits adverse features (hypotension, BP 88/50, chest tightness, dizziness) indicating hemodynamic instability. Immediate synchronised electrical cardioversion is required."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT CLASSIFICATION",
+          html: "The QRS is broad, not narrow. The patient has a pulse, so it is not pulseless arrest. Hypotension makes this an unstable rhythm, mandating electrical therapy, not rate control."
+        },
+        actionName: "PREPARING FOR CARDIOVERSION",
+        actionSub: "Attaching pads, securing IV access, preparing airway equipment...",
+        nextAction: () => advanceStage(2)
+      },
+      {
+        stageNumber: 2,
+        title: "Pre-Procedural Preparation",
+        badge: "Sedation Management",
+        competency: "Safe procedural sedation in a hypotensive patient",
+        scenario: "You have decided to proceed with emergent synchronised cardioversion. The patient is conscious, highly anxious, and remains hypotensive (BP 88/50 mmHg).",
+        interventionNote: "Preparation for electrical therapy in an awake, unstable patient.",
+        vitals: { conscious: "Alert, Anxious", resp: "22 /min", pulse: "185 bpm", bp: "88/50 mmHg", spo2: "95%" },
+        question: "Prior to delivering the electrical shock, what is the appropriate airway and sedation management?",
+        options: [
+          { label: "A", text: "Withhold all sedation to prevent further blood pressure drop and shock immediately." },
+          { label: "B", text: "Administer cautious, titrated IV sedation (e.g., Fentanyl/Midazolam) with airway rescue equipment ready." },
+          { label: "C", text: "Perform rapid sequence intubation (RSI) using high-dose Propofol (150 mg)." },
+          { label: "D", text: "Administer Sublingual GTN for the chest tightness before shocking." }
+        ],
+        correctAnswer: 1,
+        correctFeedback: {
+          title: "CORRECT – CAUTIOUS SEDATION",
+          html: "<b>Sedation Protocol:</b> Cardioversion is painful. Unless the patient rapidly deteriorates to profound unconsciousness, conscious sedation must be provided. In a hypotensive patient, agents like Midazolam/Fentanyl or low-dose Ketamine must be titrated very carefully to avoid catastrophic circulatory collapse."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT MANAGEMENT",
+          html: "Shocking an awake patient without sedation is inhumane. High-dose propofol or GTN will cause profound vasodilation and precipitate cardiac arrest."
+        },
+        actionName: "ADMINISTERING TITRATED SEDATION",
+        actionSub: "Providing low-dose IV Midazolam/Fentanyl, maintaining airway...",
+        nextAction: () => advanceStage(3)
+      },
+      {
+        stageNumber: 3,
+        title: "Cardioversion Setup",
+        badge: "Electrical Safety",
+        competency: "Correct application of SYNC mode",
+        scenario: "The patient is now lightly sedated and airway is maintained. Defibrillator pads are firmly attached in the anterior-posterior position. The monitor displays the same broad-complex rhythm.",
+        interventionNote: "Sedated – Ready for cardioversion.",
+        vitals: { conscious: "Sedated", resp: "Supported via BVM", pulse: "185 bpm", bp: "86/48 mmHg", spo2: "97% (High-Flow O2)" },
+        question: "How must the defibrillator be configured before delivering the shock?",
+        options: [
+          { label: "A", text: "Deliver an unsynchronised shock of 200 J immediately." },
+          { label: "B", text: "Activate 'SYNC' mode, verify R-wave markers, select 120-150 J biphasic, and press/hold shock." },
+          { label: "C", text: "Deactivate 'SYNC' mode and select 50 J biphasic." },
+          { label: "D", text: "Initiate transcutaneous pacing mode at 100 bpm." }
+        ],
+        correctAnswer: 1,
+        isLethalStage: true,
+        correctFeedback: {
+          title: "CORRECT – SYNCHRONISED CARDIOVERSION",
+          html: "<b>Sync Mode Confirmed:</b> For any tachyarrhythmia with a pulse, the shock must be synchronized to the R-wave to avoid striking the vulnerable T-wave. Initial energy for broad-complex tachycardia is typically 120–150 J biphasic."
+        },
+        incorrectFeedback: {
+          title: "FATAL ERROR – UNSYNCHRONISED SHOCK DELIVERED",
+          html: "Delivering an unsynchronised shock caused an R-on-T discharge, throwing the patient into Ventricular Fibrillation and immediate <b>ASYSTOLE</b>."
+        },
+        actionName: "DELIVERING SYNCHRONISED SHOCK (120 J)",
+        actionSub: "Sync active -> Charging 120 J -> Stand clear -> Discharging...",
+        nextAction: () => advanceStage(4)
+      },
+      {
+        stageNumber: 4,
+        title: "Energy Escalation",
+        badge: "Refractory Cardioversion",
+        competency: "Recognition of non-conversion and energy step-up",
+        scenario: "The 120 J synchronised shock was delivered. The monitor shows a brief pause, but the broad-complex rhythm immediately resumes at 185 bpm. Blood pressure drops further to 76/40 mmHg.",
+        interventionNote: "Post-Shock 1 – Persistent Unstable Tachycardia",
+        vitals: { conscious: "Sedated", resp: "Supported via BVM", pulse: "185 bpm", bp: "76/40 mmHg", spo2: "96%" },
+        question: "The first synchronised shock failed. What is the immediate next step?",
+        options: [
+          { label: "A", text: "Administer IV Amiodarone 300 mg over 20 minutes before attempting another shock." },
+          { label: "B", text: "Re-activate SYNC mode, escalate energy (e.g., 150-200 J biphasic), and deliver a second synchronised shock." },
+          { label: "C", text: "Begin chest compressions immediately." },
+          { label: "D", text: "Administer IV Lignocaine 100 mg rapid push." }
+        ],
+        correctAnswer: 1,
+        correctFeedback: {
+          title: "CORRECT – ENERGY ESCALATION",
+          html: "<b>Escalation Protocol:</b> When the first synchronised shock fails to convert an unstable tachycardia, the immediate action is to re-synchronize, escalate the energy setting, and deliver a second shock."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT MANAGEMENT",
+          html: "Do not delay electrical therapy in an unstable patient for a 20-minute drug infusion. Escalate energy and re-shock first."
+        },
+        actionName: "DELIVERING 2nd SYNCHRONISED SHOCK (200 J)",
+        actionSub: "Sync active -> Escalate to 200 J -> Stand clear -> Discharging...",
+        nextAction: () => advanceStage(5)
+      },
+      {
+        stageNumber: 5,
+        title: "Pharmacotherapy Integration",
+        badge: "Refractory Management",
+        competency: "Appropriate antiarrhythmic use after failed shocks",
+        scenario: "The 2nd shock (200 J) has been delivered. The rhythm remains unchanged at 185 bpm. Blood pressure is now 70/40 mmHg. The patient is deeply sedated.",
+        interventionNote: "Post-Shock 2 – Persistent Unstable Tachycardia",
+        vitals: { conscious: "Deeply Sedated", resp: "Supported via BVM", pulse: "Weak, 185 bpm", bp: "70/40 mmHg", spo2: "96%" },
+        question: "You are preparing the defibrillator for a 3rd synchronised shock (maximum energy). What pharmacological adjunct should be administered now according to ALS guidelines for unstable tachycardia?",
+        options: [
+          { label: "A", text: "Administer IV Amiodarone 300 mg over 10–20 minutes." },
+          { label: "B", text: "Administer IV Adrenaline 1 mg rapid push." },
+          { label: "C", text: "Administer IV Adenosine 6 mg rapid push." },
+          { label: "D", text: "Administer IV Atropine 1 mg rapid bolus." }
+        ],
+        correctAnswer: 0,
+        correctFeedback: {
+          title: "CORRECT – AMIODARONE ADDITION",
+          html: "<b>Adjunctive Therapy:</b> In unstable tachycardia resistant to electrical cardioversion (after 2–3 shocks), adding an antiarrhythmic like Amiodarone 300 mg IV over 10–20 minutes is recommended to facilitate subsequent electrical conversions."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT DRUG",
+          html: "Adrenaline is for cardiac arrest. Adenosine is for narrow-complex or regular SVT (though some broad complex are SVT with aberrancy, amiodarone is the safer choice for unstable broad-complex resistant to shocks). Atropine is for bradycardia."
+        },
+        actionName: "INITIATING AMIODARONE INFUSION",
+        actionSub: "Starting IV Amiodarone 300 mg -> Preparing 3rd synchronised shock...",
+        nextAction: () => advanceStage(6)
+      },
+      {
+        stageNumber: 6,
+        title: "Deterioration to Pulseless Arrest",
+        badge: "Arrest Recognition",
+        competency: "Transition from unstable tachycardia to pulseless arrest",
+        scenario: "Before the Amiodarone infusion can finish, the patient's eyes roll back. He stops breathing entirely. A rapid check reveals the <b>carotid pulse is now ABSENT</b>. The monitor still displays the same broad-complex rhythm at 185 bpm.",
+        interventionNote: "PULSE LOST – Cardiac Arrest (Pulseless VT)",
+        vitals: { conscious: "Unresponsive", resp: "Apnoeic", pulse: "NO PALPABLE PULSE", bp: "Non-recordable", spo2: "Falling" },
+        question: "The patient has lost his pulse, transitioning into cardiac arrest. What is your immediate priority?",
+        options: [
+          { label: "A", text: "Continue the Amiodarone infusion, perform a 12-lead ECG, and wait." },
+          { label: "B", text: "Deactivate SYNC mode, deliver an UNSYNCHRONISED shock immediately, and start CPR." },
+          { label: "C", text: "Check for a radial pulse for 10 more seconds." },
+          { label: "D", text: "Deliver a synchronised shock at 360 J." }
+        ],
+        correctAnswer: 1,
+        isLethalStage: true,
+        correctFeedback: {
+          title: "CORRECT – SHOCKABLE ARREST PROTOCOL",
+          html: "<b>Arrest Paradigm Shift:</b> The patient has deteriorated from unstable tachycardia (with a pulse) to <b>pulseless Ventricular Tachycardia (pVT)</b>. This is a cardiac arrest. You must immediately deliver an UNSYNCHRONISED defibrillation shock and commence CPR."
+        },
+        incorrectFeedback: {
+          title: "FATAL ERROR – INCORRECT ARREST MANAGEMENT",
+          html: "Attempting to sync a shock in cardiac arrest delays life-saving defibrillation. Waiting or checking distal pulses guarantees ischemic brain death. Patient deteriorated to Asystole."
+        },
+        actionName: "DELIVERING UNSYNCHRONISED DEFIBRILLATION",
+        actionSub: "SYNC OFF -> Charging -> Stand clear -> Discharging -> Starting CPR...",
+        nextAction: () => advanceStage(7)
+      },
+      {
+        stageNumber: 7,
+        title: "Post-Defibrillation Management",
+        badge: "CPR Flow",
+        competency: "Immediate resumption of CPR post-shock",
+        scenario: "An unsynchronised defibrillation shock has been delivered. The patient remains completely unresponsive and apnoeic.",
+        interventionNote: "Post-Defibrillation Phase",
+        vitals: { conscious: "Unresponsive", resp: "Apnoeic", pulse: "Not Checked", bp: "Non-recordable", spo2: "N/A" },
+        question: "What is the mandatory immediate action after defibrillation in cardiac arrest?",
+        options: [
+          { label: "A", text: "Pause to check the rhythm on the monitor." },
+          { label: "B", text: "Palpate the carotid pulse to see if the shock was successful." },
+          { label: "C", text: "Immediately resume high-quality chest compressions for 2 minutes." },
+          { label: "D", text: "Administer IV Adrenaline 1 mg immediately." }
+        ],
+        correctAnswer: 2,
+        correctFeedback: {
+          title: "CORRECT – MINIMIZING INTERRUPTIONS",
+          html: "<b>CPR Resumption:</b> Post-shock myocardial stunning requires immediate chest compressions to provide artificial perfusion. Never delay CPR to check the rhythm or pulse immediately after a shock."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT – FATAL DELAY",
+          html: "Interrupting CPR to check a pulse or rhythm post-shock severely reduces coronary perfusion pressure and survival chances."
+        },
+        actionName: "COMPLETING 2-MINUTE CPR CYCLE",
+        actionSub: "High-quality chest compressions, BVM ventilations (30:2)...",
+        nextAction: () => executeCPR2MinuteCycle(7)
+      },
+      {
+        stageNumber: 8,
+        title: "Rhythm Reassessment",
+        badge: "Rhythm Check",
+        competency: "Identifying ROSC potential during rhythm check",
+        scenario: "Two minutes of high-quality CPR conclude. A brief rhythm check reveals a narrow-complex, organized rhythm at 92 bpm on the monitor.",
+        interventionNote: "2-Minute Rhythm Check – Organized rhythm present",
+        vitals: { conscious: "Unresponsive", resp: "Ventilated", pulse: "Checking...", bp: "Re-measuring...", spo2: "N/A" },
+        question: "The monitor shows an organized narrow-complex rhythm at 92 bpm. What is your next step?",
+        options: [
+          { label: "A", text: "Check for a central carotid pulse for up to 10 seconds." },
+          { label: "B", text: "Deliver another unsynchronised shock of 200 J." },
+          { label: "C", text: "Resume CPR immediately without checking a pulse." },
+          { label: "D", text: "Administer IV Adenosine 6 mg." }
+        ],
+        correctAnswer: 0,
+        correctFeedback: {
+          title: "CORRECT – PULSE CHECK INDICATED",
+          html: "<b>Organized Rhythm:</b> When an organized rhythm (not VF or pVT) appears during a rhythm check, you must check for a central pulse to differentiate between Return of Spontaneous Circulation (ROSC) and Pulseless Electrical Activity (PEA)."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT MANAGEMENT",
+          html: "Shocking an organized rhythm is contraindicated. You must check a pulse to determine if ROSC has occurred."
+        },
+        actionName: "PERFORMING CENTRAL PULSE CHECK",
+        actionSub: "Palpating carotid artery for up to 10 seconds...",
+        nextAction: () => advanceStage(9)
+      },
+      {
+        stageNumber: 9,
+        title: "Post-Resuscitation Hemodynamics",
+        badge: "Post-ROSC Stabilization",
+        competency: "Management of post-arrest hypotension and oxygenation",
+        scenario: "A strong carotid pulse is palpated! ROSC is achieved. The patient remains unconscious (GCS 3). Initial post-ROSC vitals reveal a blood pressure of 82/48 mmHg and SpO2 of 88%.",
+        interventionNote: "ROSC ACHIEVED – Severe Post-Arrest Hypotension",
+        vitals: { conscious: "Comatose (GCS 3)", resp: "Ventilated", pulse: "Strong (92 bpm)", bp: "82/48 mmHg", spo2: "88%" },
+        question: "ROSC is confirmed, but the patient is hypotensive and hypoxic. How do you manage this phase?",
+        options: [
+          { label: "A", text: "Hyperventilate the patient and give 2,000 mL 5% Dextrose." },
+          { label: "B", text: "Titrate O2 to target 94-98% SpO2 and administer IV fluid bolus/vasopressors to target a MAP > 65 mmHg." },
+          { label: "C", text: "Administer IV Adrenaline 1 mg bolus push." },
+          { label: "D", text: "Extubate immediately to assess airway reflexes." }
+        ],
+        correctAnswer: 1,
+        correctFeedback: {
+          title: "CORRECT – ABCDE OPTIMIZATION",
+          html: "<b>Post-ROSC Care:</b> Prevent hypoxia but avoid hyperoxia (target SpO2 94-98%). Support blood pressure with crystalloids and vasopressors (e.g., Noradrenaline) to maintain adequate cerebral perfusion (MAP > 65 mmHg)."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT POST-ROSC CARE",
+          html: "Hyperventilation worsens brain ischemia. Adrenaline boluses are for arrest, not ROSC maintenance. Extubating a comatose patient risks airway loss."
+        },
+        actionName: "OPTIMIZING HEMODYNAMICS & OXYGENATION",
+        actionSub: "Titrating FiO2 -> Starting Noradrenaline infusion -> Fluid challenge...",
+        nextAction: () => advanceStage(10)
+      },
+      {
+        stageNumber: 10,
+        title: "Definitive Diagnostic & Disposition",
+        badge: "Final Disposition",
+        competency: "Identifying cause and destination via 12-lead ECG",
+        scenario: "Blood pressure has stabilized to 108/65 mmHg with a low-dose Noradrenaline infusion. The patient is intubated, sedated, and oxygenating well.",
+        interventionNote: "Post-ROSC Stabilized – Preparing for transfer",
+        vitals: { conscious: "Intubated/Sedated", resp: "Ventilated", pulse: "Regular (92 bpm)", bp: "108/65 mmHg", spo2: "96%" },
+        question: "What is the most important immediate diagnostic test to determine the definitive care destination (e.g., Cath Lab)?",
+        options: [
+          { label: "A", text: "Chest X-Ray to check tube placement." },
+          { label: "B", text: "CT Brain to assess for ischemic stroke." },
+          { label: "C", text: "12-Lead ECG to assess for ST-Elevation Myocardial Infarction (STEMI)." },
+          { label: "D", text: "Arterial Blood Gas to check exact pO2." }
+        ],
+        correctAnswer: 2,
+        correctFeedback: {
+          title: "CORRECT – 12-LEAD ECG ACQUIRED",
+          html: "<b>Definitive Care:</b> Acute coronary occlusion is the leading cause of VT/VF arrest. A 12-Lead ECG must be performed immediately post-ROSC to identify a STEMI, which mandates emergency transfer to the Cardiac Catheterisation Laboratory for PCI."
+        },
+        incorrectFeedback: {
+          title: "INCORRECT PRIORITY",
+          html: "While CXR and ABG are useful, identifying a STEMI via a 12-Lead ECG is the most time-critical diagnostic test to dictate the definitive life-saving destination (Cath Lab)."
+        },
+        actionName: "ACQUIRING 12-LEAD ECG & PREPARING TRANSFER",
+        actionSub: "Recording 12-Lead ECG -> Contacting Cardiology / ICU...",
+        nextAction: () => displayFinalAssessment()
+      }
+    ];
+
+    let currentStage = 0;
+    let scores = Array(10).fill(0);
+    let attempts = Array(10).fill(0);
+    let simulationTerminatedInAsystole = false;
+
+    function loadStageUI(stageIdx) {
+      const data = stagesData[stageIdx];
+      
+      if (document.getElementById('displayStageNumber')) document.getElementById('displayStageNumber').innerText = data.stageNumber;
+      if (document.getElementById('stageTitle')) document.getElementById('stageTitle').innerText = data.title;
+      if (document.getElementById('difficultyTag')) document.getElementById('difficultyTag').innerText = data.badge;
+      if (document.getElementById('scenarioDescription')) document.getElementById('scenarioDescription').innerHTML = data.scenario;
+      if (document.getElementById('questionHeading')) document.getElementById('questionHeading').innerText = data.question;
+      if (document.getElementById('activeInterventionText')) document.getElementById('activeInterventionText').innerText = data.interventionNote;
+
+      if (data.vitals) {
+        if (document.getElementById('consciousVal')) document.getElementById('consciousVal').innerText = data.vitals.conscious;
+        if (document.getElementById('respVal')) document.getElementById('respVal').innerText = data.vitals.resp;
+        if (document.getElementById('pulseVal')) document.getElementById('pulseVal').innerText = data.vitals.pulse;
+        if (document.getElementById('bpVal')) document.getElementById('bpVal').innerText = data.vitals.bp;
+        if (document.getElementById('spo2Val')) document.getElementById('spo2Val').innerText = data.vitals.spo2;
+
+        // Color coding for vitals based on stage logic
+        if (stageIdx >= 8) { // ROSC stabilized
+          if (document.getElementById('pulseVal')) document.getElementById('pulseVal').className = "vital-value good";
+          if (document.getElementById('bpVal')) {
+            document.getElementById('bpVal').className = (stageIdx === 9) ? "vital-value good" : "vital-value alert";
+          }
+        } else if (stageIdx >= 5) { // Arrest
+          if (document.getElementById('pulseVal')) document.getElementById('pulseVal').className = "vital-value alert";
+          if (document.getElementById('bpVal')) document.getElementById('bpVal').className = "vital-value alert";
+        } else { // Unstable
+          if (document.getElementById('pulseVal')) document.getElementById('pulseVal').className = "vital-value alert";
+          if (document.getElementById('bpVal')) document.getElementById('bpVal').className = "vital-value alert";
+        }
+      }
+
+      // Dynamic Rhythm Adjustment
+      if (stageIdx <= 4) {
+        // Unstable VT (Perfusing)
+        currentRhythmMode = 'VT_PERFUSING';
+        if (document.getElementById('monitorHR')) { document.getElementById('monitorHR').innerText = "185"; document.getElementById('monitorHR').style.color = "#00ff66"; }
+        if (document.getElementById('rateLabelText')) document.getElementById('rateLabelText').style.color = "#00ff66";
+        if (document.getElementById('rhythmAlertTag')) document.getElementById('rhythmAlertTag').style.display = "none";
+        if (document.getElementById('statusBadgeTag')) document.getElementById('statusBadgeTag').innerText = "CRITICAL ALS SIMULATION";
+        if (document.getElementById('leadDisplay')) document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)';
+      } else if (stageIdx === 5 || stageIdx === 6) {
+        // Pulseless VT
+        currentRhythmMode = 'VT_PULSELESS';
+        if (document.getElementById('monitorHR')) { document.getElementById('monitorHR').innerText = "185"; document.getElementById('monitorHR').style.color = "#ff6b6b"; }
+        if (document.getElementById('rateLabelText')) document.getElementById('rateLabelText').style.color = "#ff6b6b";
+        if (document.getElementById('rhythmAlertTag')) {
+          document.getElementById('rhythmAlertTag').style.display = "inline-block";
+          document.getElementById('rhythmAlertTag').innerText = "CARDIAC ARREST";
+          document.getElementById('rhythmAlertTag').className = "rhythm-alert";
+        }
+        if (document.getElementById('statusBadgeTag')) document.getElementById('statusBadgeTag').innerText = "RESUSCITATION IN PROGRESS";
+        if (document.getElementById('leadDisplay')) document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse"></i> LEAD II (ARREST)';
+      } else {
+        // ROSC Sinus
+        currentRhythmMode = 'ROSC_SINUS';
+        if (document.getElementById('monitorHR')) { document.getElementById('monitorHR').innerText = "92"; document.getElementById('monitorHR').style.color = "var(--emerald)"; }
+        if (document.getElementById('rateLabelText')) document.getElementById('rateLabelText').style.color = "var(--emerald)";
+        if (document.getElementById('rhythmAlertTag')) {
+          document.getElementById('rhythmAlertTag').style.display = "inline-block";
+          document.getElementById('rhythmAlertTag').innerText = "ROSC CONFIRMED";
+          document.getElementById('rhythmAlertTag').className = "rhythm-alert rosc-state";
+        }
+        if (document.getElementById('statusBadgeTag')) document.getElementById('statusBadgeTag').innerText = "POST-ROSC CRITICAL CARE";
+        if (document.getElementById('leadDisplay')) document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse-fill" style="color: var(--emerald);"></i> LEAD II (PERFUSING)';
+      }
+
+      const optsBox = document.getElementById('optionsContainer');
+      if (optsBox) {
+        optsBox.innerHTML = '';
+        data.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'btn-decision';
+          btn.innerHTML = `<span class="opt-circle">${opt.label}</span> <span>${opt.text}</span>`;
+          btn.onclick = () => handleAnswer(idx);
+          optsBox.appendChild(btn);
+        });
+      }
+    }
+
+    function handleAnswer(selectedIdx) {
+      const data = stagesData[currentStage];
+      attempts[currentStage]++;
+      const isCorrect = (selectedIdx === data.correctAnswer);
+      
+      const backdrop = document.getElementById('feedbackBackdrop');
+      const box = document.getElementById('feedbackBox');
+      const icon = document.getElementById('feedbackIcon');
+      const title = document.getElementById('feedbackTitle');
+      const body = document.getElementById('feedbackContent');
+      const actionBtn = document.getElementById('feedbackButton');
+
+      backdrop.style.display = 'flex';
+      setTimeout(() => box.classList.add('active'), 20);
+
+      if (isCorrect) {
+        audio.playCorrectSound();
+        if (attempts[currentStage] === 1) scores[currentStage] = 1;
+        updateScoreHUD();
+
+        box.classList.remove('incorrect', 'asystole-fatal');
+        icon.innerHTML = '<i class="bi bi-check-circle-fill" style="color: var(--emerald);"></i>';
+        title.style.color = 'var(--emerald)';
+        title.innerText = data.correctFeedback.title;
+        body.innerHTML = data.correctFeedback.html;
+
+        actionBtn.className = 'modal-action-btn btn-emerald';
+        actionBtn.innerText = currentStage === 9 ? 'VIEW FINAL PERFORMANCE' : 'CONTINUE';
+        actionBtn.onclick = () => {
+          closeModal();
+          triggerActionSimulation(data.actionName, data.actionSub, data.nextAction);
+        };
+      } else {
+        // Lethal pitfall in Stage 3 (Unsync shock) or Stage 6 (Sync shock on pulseless/delay)
+        if (data.isLethalStage && (selectedIdx === 0 || selectedIdx === 0 || selectedIdx === 2 || selectedIdx === 3)) {
+          // Careful logic: For stage 3, option 0 is A. For stage 6, Option B is correct, so A, C, D are lethal.
+          if ((currentStage === 2 && selectedIdx === 0) || (currentStage === 5 && selectedIdx !== 1)) {
+            triggerFatalAsystole();
+            return;
+          }
+        }
+
+        audio.playWrongSound();
+        box.classList.remove('asystole-fatal');
+        box.classList.add('incorrect');
+        icon.innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>';
+        title.style.color = 'var(--danger)';
+        title.innerText = data.incorrectFeedback.title;
+        body.innerHTML = data.incorrectFeedback.html;
+
+        actionBtn.className = 'modal-action-btn btn-rose';
+        actionBtn.innerText = 'RETRY';
+        actionBtn.onclick = closeModal;
+      }
+    }
+
+    function triggerFatalAsystole() {
+      simulationTerminatedInAsystole = true;
+      audio.playShockSound();
+      const flash = document.getElementById('shockFlash');
+      flash.style.animation = 'cardioversionFlash 0.35s ease-out forwards';
+      setTimeout(() => { flash.style.animation = 'none'; }, 400);
+
+      currentRhythmMode = 'ASYSTOLE';
+      audio.startAsystoleTone();
+
+      document.getElementById('monitorHR').innerText = "0";
+      document.getElementById('monitorHR').style.color = "var(--asystole-red)";
+      document.getElementById('rateLabelText').style.color = "var(--asystole-red)";
+      const alertTag = document.getElementById('rhythmAlertTag');
+      alertTag.style.display = "inline-block";
+      alertTag.innerText = "ASYSTOLE / CARDIAC ARREST";
+      alertTag.className = "rhythm-alert asystole-state";
+      document.getElementById('statusBadgeTag').innerText = "CARDIAC ARREST (ASYSTOLE)";
+      document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-x-circle-fill" style="color: var(--asystole-red);"></i> LEAD II (ASYSTOLE)';
+
+      document.getElementById('consciousVal').innerText = "Unresponsive";
+      document.getElementById('consciousVal').className = "vital-value fatal";
+      document.getElementById('respVal').innerText = "Apnoeic (0/min)";
+      document.getElementById('respVal').className = "vital-value fatal";
+      document.getElementById('pulseVal').innerText = "NO CENTRAL PULSE";
+      document.getElementById('pulseVal').className = "vital-value fatal";
+      document.getElementById('bpVal').innerText = "0 / 0 mmHg";
+      document.getElementById('bpVal').className = "vital-value fatal";
+
+      const box = document.getElementById('feedbackBox');
+      const icon = document.getElementById('feedbackIcon');
+      const title = document.getElementById('feedbackTitle');
+      const body = document.getElementById('feedbackContent');
+      const actionBtn = document.getElementById('feedbackButton');
+
+      box.classList.remove('incorrect');
+      box.classList.add('asystole-fatal');
+      icon.innerHTML = '<i class="bi bi-heartbreak-fill" style="color: var(--asystole-red);"></i>';
+      title.style.color = 'var(--asystole-red)';
+      title.innerText = "PATIENT COLLAPSED INTO ASYSTOLE";
+      body.innerHTML = `
+        <b>CRITICAL PITFALL OCCURRED:</b><br>
+        A major electrical or protocol deviation was committed (e.g. delivering an unsynchronised shock to a perfusing rhythm, or failing to deliver a prompt defibrillation in pulseless arrest). The patient has deteriorated into <b>FLATLINE ASYSTOLE</b>.
+      `;
+
+      actionBtn.className = 'modal-action-btn btn-fatal-restart';
+      actionBtn.innerText = 'VIEW FATAL SUMMARY';
+      actionBtn.onclick = () => {
+        closeModal();
+        audio.stopAsystoleTone();
+        displayFinalAssessment();
+      };
+    }
+
+    function closeModal() {
+      const box = document.getElementById('feedbackBox');
+      const backdrop = document.getElementById('feedbackBackdrop');
+      box.classList.remove('active');
+      setTimeout(() => { backdrop.style.display = 'none'; }, 200);
+    }
+
+    function updateScoreHUD() {
+      const total = scores.reduce((a, b) => a + b, 0);
+      document.getElementById('currentScore').innerText = total;
+    }
+
+    function advanceStage(nextStageNumber) {
+      currentStage = nextStageNumber - 1;
+      loadStageUI(currentStage);
+    }
+
+    function triggerActionSimulation(name, sub, callback) {
+      const overlay = document.getElementById('actionOverlay');
+      const fill = document.getElementById('actionFill');
+      const hText = document.getElementById('actionHeadlineText');
+      const sText = document.getElementById('actionSublineText');
+
+      hText.innerHTML = `<i class="bi bi-activity"></i> ${name}`;
+      sText.innerText = sub;
+
+      if (name.includes("SHOCK") || name.includes("DEFIBRILLATION")) {
+        audio.playShockSound();
+        const flash = document.getElementById('shockFlash');
+        flash.style.animation = 'cardioversionFlash 0.35s ease-out forwards';
+        setTimeout(() => { flash.style.animation = 'none'; }, 400);
+      }
+
+      overlay.style.display = 'flex';
+      fill.style.width = '0%';
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 4;
+        fill.style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            if (callback) callback();
+          }, 250);
+        }
+      }, 20);
+    }
+
+    function executeCPR2MinuteCycle(fromStage) {
+      triggerActionSimulation("CPR CYCLE IN PROGRESS", "High-quality chest compressions (100–120 bpm) for 2 minutes...", () => advanceStage(8));
+    }
+
+    function displayFinalAssessment() {
+      audio.stopAsystoleTone();
+      document.getElementById('mainGrid').style.display = 'none';
+      const resultsView = document.getElementById('resultsView');
+      resultsView.style.display = 'flex';
+      resultsView.style.maxWidth = '900px';
+      resultsView.style.margin = '2rem auto';
+      document.querySelector('main').parentNode.insertBefore(resultsView, document.querySelector('footer'));
+
+      const totalScore = scores.reduce((a, b) => a + b, 0);
+      const percentage = Math.round((totalScore / 10) * 100);
+      document.getElementById('finalScoreSummary').innerText = `TOTAL SCORE: ${totalScore} / 10 (${percentage}%)`;
+
+      const verdictEl = document.getElementById('verdictText');
+      if (simulationTerminatedInAsystole) {
+        verdictEl.style.color = 'var(--asystole-red)';
+        verdictEl.innerText = "UNSUCCESSFUL: PATIENT DETERIORATED INTO ASYSTOLE";
+      } else if (totalScore === 10) {
+        verdictEl.style.color = 'var(--emerald)';
+        verdictEl.innerText = "EXCELLENT (10/10): MASTER CLINICIAN LEVEL & SUCCESSFUL ROSC";
+      } else if (totalScore >= 8) {
+        verdictEl.style.color = 'var(--gold)';
+        verdictEl.innerText = `SATISFACTORY (${totalScore}/10): ROSC ACHIEVED WITH MINOR PROTOCOL ERRORS`;
+      } else {
+        verdictEl.style.color = 'var(--danger)';
+        verdictEl.innerText = `${totalScore}/10: NEEDS IMPROVEMENT – REVIEW RESUSCITATION PROTOCOLS`;
+      }
+
+      const tbody = document.getElementById('resultsTableContent');
+      tbody.innerHTML = '';
+      stagesData.forEach((stg, i) => {
+        const tr = document.createElement('tr');
+        const pass = scores[i] === 1;
+        tr.innerHTML = `
+          <td><strong>Stage ${stg.stageNumber}</strong></td>
+          <td>${stg.competency}</td>
+          <td style="color: ${pass ? 'var(--emerald)' : 'var(--danger)'}; font-weight: 600;">
+            ${pass ? '<i class="bi bi-check-lg"></i> Correct' : '<i class="bi bi-x-lg"></i> Incorrect'}
+          </td>
+          <td style="font-weight: 700; color: ${pass ? 'var(--emerald)' : 'var(--danger)'};">${scores[i]} / 1</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function restartSimulation() {
+      audio.stopAsystoleTone();
+      currentStage = 0;
+      scores = Array(10).fill(0);
+      attempts = Array(10).fill(0);
+      simulationTerminatedInAsystole = false;
+      currentRhythmMode = 'VT_PERFUSING';
+      updateScoreHUD();
+
+      const resultsView = document.getElementById('resultsView');
+      resultsView.style.display = 'none';
+      document.getElementById('mainGrid').style.display = 'grid';
+
+      const readyBackdrop = document.getElementById('readyModalBackdrop');
+      if (readyBackdrop) readyBackdrop.classList.remove('hidden');
+
+      loadStageUI(0);
+    }
+
+    function initApp() {
+      resizeCanvas();
+      loadStageUI(0);
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
