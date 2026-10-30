@@ -856,15 +856,6 @@
       font-weight: 600;
     }
 
-    .clinical-disclaimer {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.35);
-      max-width: 850px;
-      line-height: 1.4;
-      border-top: 1px dashed rgba(255, 255, 255, 0.1);
-      padding-top: 12px;
-    }
-
     @media (max-width: 992px) {
       main { grid-template-columns: 1fr; }
       .results-view { grid-column: span 1; }
@@ -988,7 +979,7 @@
           <div class="vital-value alert" id="bpVal">82/50 mmHg (Shock)</div>
         </div>
         <div class="vital-tile">
-          <div class="vital-title">SpO2</div>
+          <div class="vital-title">Oxygen Saturation</div>
           <div class="vital-value alert" id="spo2Val">86% (Room Air) / 92% (High-Flow Mask)</div>
         </div>
         <div class="vital-tile" style="grid-column: span 2;">
@@ -1123,7 +1114,11 @@
       playECGBeep(pitch = 840) {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx || this.ctx.state !== 'running') return;
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+          return;
+        }
 
         try {
           const now = this.ctx.currentTime;
@@ -1148,7 +1143,10 @@
         if (!this.enabled) return;
         this.init();
         this.stopAsystoleTone();
-        if (!this.ctx || this.ctx.state !== 'running') return;
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
 
         try {
           const now = this.ctx.currentTime;
@@ -1180,7 +1178,10 @@
       playCorrectSound() {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx || this.ctx.state !== 'running') return;
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
 
         try {
           const now = this.ctx.currentTime;
@@ -1208,7 +1209,10 @@
       playWrongSound() {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx || this.ctx.state !== 'running') return;
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
 
         try {
           const now = this.ctx.currentTime;
@@ -1239,7 +1243,10 @@
       playCardioversionSound() {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx || this.ctx.state !== 'running') return;
+        if (!this.ctx) return;
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
 
         try {
           const now = this.ctx.currentTime;
@@ -1301,7 +1308,10 @@
       audio.playCorrectSound();
 
       const readyBackdrop = document.getElementById('readyModalBackdrop');
-      readyBackdrop.classList.add('hidden');
+      if (readyBackdrop) readyBackdrop.classList.add('hidden');
+
+      resizeCanvas();
+      loadStageUI(currentStage);
 
       if (!animRunning) {
         animRunning = true;
@@ -1325,6 +1335,7 @@
     let globalSample = 0;
     let currentRhythmMode = 'AF_RVR'; // 'AF_RVR', 'ROSC_SINUS', 'ASYSTOLE'
     let animRunning = false;
+    let isBeatArmed = true;
 
     // Irregularly irregular beat intervals (in samples at 2.15 px/step) simulating ~164 bpm
     const afIntervals = [34, 46, 28, 40, 52, 30, 42, 26, 48, 36, 30, 56, 32, 44, 28, 38];
@@ -1415,8 +1426,6 @@
       }
     }
 
-    let isBeatArmed = true;
-
     function animateECG() {
       const step = 2.15;
       const eraseWidth = 26;
@@ -1493,7 +1502,7 @@
         competency: "Recognition of unstable tachyarrhythmia with acute heart failure",
         scenario: "A 68-year-old male with ischaemic heart disease presents with sudden severe breathlessness, orthopnoea, and cold, clammy extremities. Clinical exam reveals pink frothy sputum, bilateral extensive lung crackles, and a blood pressure of 82/50 mmHg (cardiogenic shock). The cardiac monitor displays the rapid rhythm shown at ~164 bpm. Radial pulse is weak and irregularly irregular.",
         interventionNote: "Decompensated Cardiogenic Shock with Acute Pulmonary Edema (BP 82/50 mmHg)",
-        vitals: { conscious: "Lethargic, Confused", resp: "28 /min (Crackles/Orthopnoea)", pulse: "Weak, Irregularly Irregular (~164 bpm)", bp: "82/50 mmHg (Shock)", airway: "86% (Room Air) / 92% (High-Flow Mask)" },
+        vitals: { conscious: "Lethargic, Confused", resp: "28 /min (Crackles/Orthopnoea)", pulse: "Weak, Irregularly Irregular (~164 bpm)", bp: "82/50 mmHg (Shock)", spo2: "86% (Room Air) / 92% (High-Flow Mask)" },
         question: "The patient presents with an acute tachyarrhythmia complicated by cardiogenic shock and acute pulmonary edema. What is the immediate priority intervention?",
         options: [
           { label: "A", text: "Administer IV Verapamil 5 mg slow bolus over 2 minutes." },
@@ -1664,64 +1673,83 @@
 
     function loadStageUI(stageIdx) {
       const data = stagesData[stageIdx];
-      document.getElementById('displayStageNumber').innerText = data.stageNumber;
-      document.getElementById('stageTitle').innerText = data.title;
-      document.getElementById('difficultyTag').innerText = data.badge;
-      document.getElementById('scenarioDescription').innerHTML = data.scenario;
-      document.getElementById('questionHeading').innerText = data.question;
-      document.getElementById('activeInterventionText').innerText = data.interventionNote;
+      
+      const stageNumEl = document.getElementById('displayStageNumber');
+      if (stageNumEl) stageNumEl.innerText = data.stageNumber;
+      
+      const titleEl = document.getElementById('stageTitle');
+      if (titleEl) titleEl.innerText = data.title;
+      
+      const diffEl = document.getElementById('difficultyTag');
+      if (diffEl) diffEl.innerText = data.badge;
+      
+      const scenEl = document.getElementById('scenarioDescription');
+      if (scenEl) scenEl.innerHTML = data.scenario;
+      
+      const qEl = document.getElementById('questionHeading');
+      if (qEl) qEl.innerText = data.question;
+      
+      const actTextEl = document.getElementById('activeInterventionText');
+      if (actTextEl) actTextEl.innerText = data.interventionNote;
 
       if (data.vitals) {
-        document.getElementById('consciousVal').innerText = data.vitals.conscious;
-        document.getElementById('respVal').innerText = data.vitals.resp;
-        document.getElementById('pulseVal').innerText = data.vitals.pulse;
-        document.getElementById('bpVal').innerText = data.vitals.bp;
-        document.getElementById('airwayVal').innerText = data.vitals.airway;
+        if (document.getElementById('consciousVal')) document.getElementById('consciousVal').innerText = data.vitals.conscious;
+        if (document.getElementById('respVal')) document.getElementById('respVal').innerText = data.vitals.resp;
+        if (document.getElementById('pulseVal')) document.getElementById('pulseVal').innerText = data.vitals.pulse;
+        if (document.getElementById('bpVal')) document.getElementById('bpVal').innerText = data.vitals.bp;
+        if (document.getElementById('spo2Val')) document.getElementById('spo2Val').innerText = data.vitals.spo2;
 
         if (stageIdx >= 4) {
-          document.getElementById('consciousVal').style.color = "var(--emerald)";
-          document.getElementById('pulseVal').className = "vital-value good";
-          document.getElementById('bpVal').className = "vital-value good";
+          if (document.getElementById('consciousVal')) document.getElementById('consciousVal').style.color = "var(--emerald)";
+          if (document.getElementById('pulseVal')) document.getElementById('pulseVal').className = "vital-value good";
+          if (document.getElementById('bpVal')) document.getElementById('bpVal').className = "vital-value good";
         } else {
-          document.getElementById('pulseVal').className = "vital-value alert";
-          document.getElementById('bpVal').className = "vital-value alert";
+          if (document.getElementById('consciousVal')) document.getElementById('consciousVal').style.color = "";
+          if (document.getElementById('pulseVal')) document.getElementById('pulseVal').className = "vital-value alert";
+          if (document.getElementById('bpVal')) document.getElementById('bpVal').className = "vital-value alert";
         }
       }
 
       // Dynamic Rhythm Adjustment without revealing names
       if (stageIdx <= 3) {
-        // Fast irregular rhythm (AF with RVR)
         currentRhythmMode = 'AF_RVR';
-        document.getElementById('monitorHR').innerText = "164";
-        document.getElementById('monitorHR').style.color = "#00ff66";
-        document.getElementById('rateLabelText').style.color = "#00ff66";
+        if (document.getElementById('monitorHR')) {
+          document.getElementById('monitorHR').innerText = "164";
+          document.getElementById('monitorHR').style.color = "#00ff66";
+        }
+        if (document.getElementById('rateLabelText')) document.getElementById('rateLabelText').style.color = "#00ff66";
         const alertTag = document.getElementById('rhythmAlertTag');
-        alertTag.style.display = "none";
-        document.getElementById('statusBadgeTag').innerText = "CRITICAL ALS SIMULATION";
-        document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)';
+        if (alertTag) alertTag.style.display = "none";
+        if (document.getElementById('statusBadgeTag')) document.getElementById('statusBadgeTag').innerText = "CRITICAL ALS SIMULATION";
+        if (document.getElementById('leadDisplay')) document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse"></i> LEAD II (CONTINUOUS)';
       } else {
-        // Converted Sinus Rhythm (ROSC)
         currentRhythmMode = 'ROSC_SINUS';
-        document.getElementById('monitorHR').innerText = "78";
-        document.getElementById('monitorHR').style.color = "var(--emerald)";
-        document.getElementById('rateLabelText').style.color = "var(--emerald)";
+        if (document.getElementById('monitorHR')) {
+          document.getElementById('monitorHR').innerText = "78";
+          document.getElementById('monitorHR').style.color = "var(--emerald)";
+        }
+        if (document.getElementById('rateLabelText')) document.getElementById('rateLabelText').style.color = "var(--emerald)";
         const alertTag = document.getElementById('rhythmAlertTag');
-        alertTag.style.display = "inline-block";
-        alertTag.innerText = "SINUS CONVERSION CONFIRMED";
-        alertTag.className = "rhythm-alert rosc-state";
-        document.getElementById('statusBadgeTag').innerText = "POST-CONVERSION STABLE";
-        document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse-fill" style="color: var(--emerald);"></i> LEAD II (PERFUSING)';
+        if (alertTag) {
+          alertTag.style.display = "inline-block";
+          alertTag.innerText = "SINUS CONVERSION CONFIRMED";
+          alertTag.className = "rhythm-alert rosc-state";
+        }
+        if (document.getElementById('statusBadgeTag')) document.getElementById('statusBadgeTag').innerText = "POST-CONVERSION STABLE";
+        if (document.getElementById('leadDisplay')) document.getElementById('leadDisplay').innerHTML = '<i class="bi bi-heart-pulse-fill" style="color: var(--emerald);"></i> LEAD II (PERFUSING)';
       }
 
       const optsBox = document.getElementById('optionsContainer');
-      optsBox.innerHTML = '';
-      data.options.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'btn-decision';
-        btn.innerHTML = `<span class="opt-circle">${opt.label}</span> <span>${opt.text}</span>`;
-        btn.onclick = () => handleAnswer(idx);
-        optsBox.appendChild(btn);
-      });
+      if (optsBox) {
+        optsBox.innerHTML = '';
+        data.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'btn-decision';
+          btn.innerHTML = `<span class="opt-circle">${opt.label}</span> <span>${opt.text}</span>`;
+          btn.onclick = () => handleAnswer(idx);
+          optsBox.appendChild(btn);
+        });
+      }
     }
 
     function handleAnswer(selectedIdx) {
@@ -1941,16 +1969,21 @@
       document.getElementById('mainGrid').style.display = 'grid';
 
       const readyBackdrop = document.getElementById('readyModalBackdrop');
-      readyBackdrop.classList.remove('hidden');
+      if (readyBackdrop) readyBackdrop.classList.remove('hidden');
 
       loadStageUI(0);
     }
 
-    // Initialize application structure on load
-    window.addEventListener('DOMContentLoaded', () => {
+    function initApp() {
       resizeCanvas();
       loadStageUI(0);
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
   </script>
 </body>
 </html>
