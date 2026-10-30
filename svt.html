@@ -43,6 +43,134 @@
         radial-gradient(circle at 90% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 40%);
     }
 
+    /* INITIAL "READY TO GO" POP-UP OVERLAY */
+    .ready-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(13, 22, 42, 0.96) 0%, rgba(3, 6, 15, 0.99) 100%);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      padding: 1.5rem;
+    }
+
+    .ready-modal-backdrop.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .ready-modal-box {
+      background: rgba(16, 26, 48, 0.92);
+      border: 2px solid var(--emerald);
+      border-radius: 20px;
+      max-width: 580px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(80, 200, 120, 0.35), inset 0 0 20px rgba(80, 200, 120, 0.1);
+      animation: readyPulse 3s infinite alternate;
+    }
+
+    @keyframes readyPulse {
+      0% { box-shadow: 0 0 35px rgba(80, 200, 120, 0.25); }
+      100% { box-shadow: 0 0 60px rgba(80, 200, 120, 0.5); }
+    }
+
+    .ready-dept-logo {
+      height: 68px;
+      width: auto;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 10px rgba(80, 200, 120, 0.5));
+    }
+
+    .ready-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(80, 200, 120, 0.15);
+      border: 1px solid var(--emerald);
+      color: var(--emerald);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .ready-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    .ready-subtitle {
+      font-size: 0.95rem;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+    }
+
+    .ready-specs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .ready-spec-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ready-instruction {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .ready-btn {
+      background: linear-gradient(135deg, #50C878 0%, #3ca760 100%);
+      color: #050813;
+      border: none;
+      padding: 1rem 2.8rem;
+      border-radius: 35px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 0 25px var(--emerald-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+
+    .ready-btn:hover {
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 0 0 40px rgba(80, 200, 120, 0.8);
+      background: #40b366;
+    }
+
     /* NAV BAR */
     nav {
       background: rgba(8, 14, 28, 0.94);
@@ -734,6 +862,32 @@
 </head>
 <body>
 
+  <!-- "READY TO GO" MODAL POP-UP OVERLAY -->
+  <div class="ready-modal-backdrop" id="readyModalBackdrop">
+    <div class="ready-modal-box">
+      <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="HKN Logo" class="ready-dept-logo">
+      <div>
+        <span class="ready-badge"><i class="bi bi-shield-fill-check"></i> Hospital Kuala Nerang</span>
+      </div>
+      <h1 class="ready-title">Emergency Department Simulation</h1>
+      <div class="ready-subtitle">Adult Tachyarrhythmia: Supraventricular Tachycardia (SVT)</div>
+      
+      <div class="ready-specs">
+        <div class="ready-spec-item"><i class="bi bi-person-fill"></i> 32 y/o Female</div>
+        <div class="ready-spec-item"><i class="bi bi-activity"></i> HR 200–210 BPM</div>
+        <div class="ready-spec-item"><i class="bi bi-volume-up-fill"></i> Live Sound Telemetry</div>
+      </div>
+      
+      <p class="ready-instruction">
+        Put on headphones or ensure device volume is active. Clicking below activates the live cardiac telemetry audio and begins the simulation.
+      </p>
+
+      <button class="ready-btn" id="readyBtn" onclick="startSimulationSession()">
+        <i class="bi bi-play-circle-fill"></i> READY TO GO
+      </button>
+    </div>
+  </div>
+
   <!-- NAV -->
   <nav>
     <a href="index.html" class="logo-group">
@@ -922,10 +1076,7 @@
 
   <script>
     /* ==========================================================
-       1. SYNTHETIC AUDIO ENGINE WITH ROBUST AUTO-START
-       - Automatically resumes Web Audio on page load
-       - Immediate multi-event unlock listeners across user interaction
-       - Clear, audible monitor QRS beep, chime, and warning buzzer
+       1. SYNTHETIC AUDIO ENGINE WITH AUTO-PLAY ON "READY TO GO"
        ========================================================== */
     class AudioEngine {
       constructor() {
@@ -955,10 +1106,7 @@
       playECGBeep(pitch = 950) {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume().catch(() => {});
-        }
+        if (!this.ctx || this.ctx.state !== 'running') return;
 
         try {
           const now = this.ctx.currentTime;
@@ -983,10 +1131,7 @@
         if (!this.enabled) return;
         this.init();
         this.stopAsystoleTone();
-        if (!this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume().catch(() => {});
-        }
+        if (!this.ctx || this.ctx.state !== 'running') return;
 
         try {
           const now = this.ctx.currentTime;
@@ -1018,10 +1163,7 @@
       playCorrectSound() {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume().catch(() => {});
-        }
+        if (!this.ctx || this.ctx.state !== 'running') return;
 
         try {
           const now = this.ctx.currentTime;
@@ -1049,10 +1191,7 @@
       playWrongSound() {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume().catch(() => {});
-        }
+        if (!this.ctx || this.ctx.state !== 'running') return;
 
         try {
           const now = this.ctx.currentTime;
@@ -1083,10 +1222,7 @@
       playCardioversionSound() {
         if (!this.enabled) return;
         this.init();
-        if (!this.ctx) return;
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume().catch(() => {});
-        }
+        if (!this.ctx || this.ctx.state !== 'running') return;
 
         try {
           const now = this.ctx.currentTime;
@@ -1109,9 +1245,7 @@
 
     const audio = new AudioEngine();
 
-    // Auto-start Audio on Load & Instant Unmute Multi-Listener
-    audio.init();
-
+    // Universal background interaction listener ensures audio stays unlocked on any interaction
     function autoResumeAudio() {
       if (audio.ctx && audio.ctx.state === 'suspended') {
         audio.ctx.resume().catch(() => {});
@@ -1119,7 +1253,7 @@
         audio.init();
       }
     }
-    ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown', 'mousemove', 'scroll'].forEach(evt => {
+    ['click', 'touchstart', 'touchend', 'pointerdown', 'mousedown', 'keydown'].forEach(evt => {
       window.addEventListener(evt, autoResumeAudio, { passive: true });
     });
 
@@ -1141,12 +1275,34 @@
       }
     }
 
+    /* Start Simulation Session from "READY TO GO" Button */
+    function startSimulationSession() {
+      // 1. Initialize and resume Web Audio immediately on direct user click
+      audio.init();
+      if (audio.ctx && audio.ctx.state === 'suspended') {
+        audio.ctx.resume();
+      }
+
+      // 2. Play initial chime sound to confirm active audio
+      audio.playCorrectSound();
+
+      // 3. Hide the pop-up overlay smoothly
+      const readyBackdrop = document.getElementById('readyModalBackdrop');
+      readyBackdrop.classList.add('hidden');
+
+      // 4. Ensure canvas animation and first stage are ready
+      if (!animRunning) {
+        animRunning = true;
+        animateECG();
+      }
+    }
+
     /* ==========================================================
-       2. FAST CALIBRATED SVT ECG ENGINE (Continuous Gaussian Model)
-       - SVT: Calibrated high-velocity 200 BPM (cycleLength = 41 px at 2.3 px/frame)
-       - Lead II narrow QRS (<80ms, sharp spike) with pseudo ST depression
-       - ROSC: Decelerates to regular Normal Sinus Rhythm (76 BPM, cycleLength = 110 px)
-       - Asystole: Flatline with continuous alarm tone
+       2. REFINED ULTRA-NARROW & RAPID SVT ECG ENGINE
+       - True clinical SVT: Narrow QRS (<0.075s, needle-thin spike)
+       - High rate (200–210 BPM): cycle length = 32 px at 2.4 px/frame
+       - J-point depression & smooth conjoined T-wave
+       - Decelerates to Normal Sinus Rhythm (76 BPM) on ROSC
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
@@ -1156,6 +1312,7 @@
     let isBeatArmed = true;
     let globalSample = 0;
     let currentRhythmMode = 'SVT'; // 'SVT', 'ASYSTOLE', 'ROSC_SINUS'
+    let animRunning = false;
 
     function resizeCanvas() {
       const parent = canvas.parentElement;
@@ -1172,25 +1329,26 @@
 
     function calculateLeadIISample(sampleIndex) {
       const baseline = canvasH * 0.54;
-      const amp = canvasH * 0.38;
+      const amp = canvasH * 0.40;
 
       if (currentRhythmMode === 'SVT') {
-        // Fast SVT at 200 BPM: cycle length = 41 px
-        const cycle = 41;
+        // Ultra-narrow and fast SVT at 200–210 BPM (cycle length = 32 px)
+        const cycle = 32;
         const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        const qWave = -0.09 * Math.exp(-Math.pow((phi - 0.12) / 0.012, 2));
-        const rWave =  1.10 * Math.exp(-Math.pow((phi - 0.155) / 0.016, 2)); // Razor-sharp spike
-        const sWave = -0.28 * Math.exp(-Math.pow((phi - 0.19) / 0.014, 2));
-        const stDep = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.06, 2));  // J-point depression
-        const tWave =  0.26 * Math.exp(-Math.pow((phi - 0.52) / 0.12, 2));  // T wave
+        // Needle-sharp narrow QRS complex (< 0.075s)
+        const qWave = -0.10 * Math.exp(-Math.pow((phi - 0.14) / 0.007, 2));
+        const rWave =  1.28 * Math.exp(-Math.pow((phi - 0.17) / 0.009, 2)); // Ultra-narrow vertical needle spike
+        const sWave = -0.32 * Math.exp(-Math.pow((phi - 0.20) / 0.008, 2));
+        const stDep = -0.06 * Math.exp(-Math.pow((phi - 0.28) / 0.045, 2)); // Rate-dependent ST/J-point depression
+        const tWave =  0.28 * Math.exp(-Math.pow((phi - 0.54) / 0.13, 2));  // Smooth conjoined repolarization wave
 
         const wave = qWave + rWave + sWave + stDep + tWave;
-        const noise = (Math.random() - 0.5) * 0.015;
+        const noise = (Math.random() - 0.5) * 0.012;
         const y = baseline - (wave + noise) * amp;
 
-        // Beep synchronized with peak R-wave
-        if (phi >= 0.145 && phi <= 0.185 && isBeatArmed) {
+        // Beep synchronized with razor-thin R-wave peak
+        if (phi >= 0.155 && phi <= 0.185 && isBeatArmed) {
           audio.playECGBeep(950);
           isBeatArmed = false;
         }
@@ -1228,7 +1386,7 @@
     }
 
     function animateECG() {
-      const step = 2.3;
+      const step = 2.4;
       const eraseWidth = 26;
 
       ctx.fillStyle = '#01080e';
@@ -1743,16 +1901,10 @@
       loadStageUI(0);
     }
 
-    // Auto-start initialization when DOM loads
+    // Initialize application structure on load
     window.addEventListener('DOMContentLoaded', () => {
-      audio.init();
       resizeCanvas();
-      animateECG();
       loadStageUI(0);
-    });
-
-    window.addEventListener('load', () => {
-      audio.init();
     });
   </script>
 </body>
