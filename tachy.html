@@ -936,12 +936,12 @@
     </div>
   </footer>
 
-  <!-- JAVASCRIPT: ADVANCED 6-STAGE ENGINE, DYNAMIC ECG & WEB AUDIO SYNTHESIS -->
+  <!-- JAVASCRIPT: ADVANCED 6-STAGE ENGINE, CALIBRATED RAPID VT ECG & IMMEDIATE AUTOPLAY AUDIO -->
   <script>
     /* ==========================================================
-       1. SYNTHETIC AUDIO ENGINE (Web Audio API)
-       Pure Web Audio: Synchronous QRS beeps, harmonic chime,
-       dissonant buzzer, and capacitor discharge sound.
+       1. SYNTHETIC AUDIO ENGINE WITH IMMEDIATE AUTO-START ON LOAD
+       Web Audio API: Automatically creates and resumes AudioContext
+       on page loading, with transparent multi-event unlock fallback.
        ========================================================== */
     class AudioEngine {
       constructor() {
@@ -950,18 +950,26 @@
       }
 
       init() {
-        if (!this.ctx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          this.ctx = new AudioContext();
-        }
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume();
+        if (!this.enabled) return;
+        try {
+          if (!this.ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+              this.ctx = new AudioContextClass();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        } catch (e) {
+          console.warn("AudioContext auto-start notice:", e);
         }
       }
 
       playECGBeep(pitch = 880) {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx || this.ctx.state !== 'running') return;
         try {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
@@ -970,23 +978,25 @@
           osc.frequency.setValueAtTime(pitch, this.ctx.currentTime);
           
           gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.04);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.055);
+          osc.stop(this.ctx.currentTime + 0.045);
         } catch (e) {}
       }
 
       playCorrectSound() {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx) return;
         const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
         notes.forEach((freq, idx) => {
           setTimeout(() => {
             try {
+              if (this.ctx.state !== 'running') this.ctx.resume();
               const osc = this.ctx.createOscillator();
               const gain = this.ctx.createGain();
               osc.type = 'triangle';
@@ -1008,7 +1018,9 @@
       playWrongSound() {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx) return;
         try {
+          if (this.ctx.state !== 'running') this.ctx.resume();
           const osc1 = this.ctx.createOscillator();
           const osc2 = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
@@ -1036,7 +1048,9 @@
       playShockSound() {
         if (!this.enabled) return;
         this.init();
+        if (!this.ctx) return;
         try {
+          if (this.ctx.state !== 'running') this.ctx.resume();
           const bufferSize = this.ctx.sampleRate * 0.35;
           const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
           const data = buffer.getChannelData(0);
@@ -1056,6 +1070,22 @@
 
     const audio = new AudioEngine();
 
+    // Trigger auto-start of Web Audio during loading
+    audio.init();
+
+    // Universal background listener: if the browser blocks immediate unprompted autoplay,
+    // seamlessly resume the audio context on the user's very first interaction (tap, scroll, mousemove)
+    function autoResumeAudio() {
+      if (audio.ctx && audio.ctx.state === 'suspended') {
+        audio.ctx.resume().catch(() => {});
+      } else if (!audio.ctx) {
+        audio.init();
+      }
+    }
+    ['click', 'touchstart', 'touchend', 'pointerdown', 'keydown', 'mousemove', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, autoResumeAudio, { passive: true });
+    });
+
     function toggleAudioState() {
       audio.enabled = !audio.enabled;
       const icon = document.getElementById('audioIcon');
@@ -1071,13 +1101,12 @@
     }
 
     /* ==========================================================
-       2. DYNAMIC REAL-TIME DUAL-MODE ECG ENGINE
-       Supports:
-       1) Mode 'VT': Monomorphic broad-complex VT (214 bpm),
-          notched Josephson ascending limb, discordant inverted T,
-          ambulance transport vibration.
-       2) Mode 'SINUS': Narrow-complex Sinus Tachycardia post-ROSC (98 bpm),
-          distinct P wave, PR interval, crisp R-wave spike, T wave.
+       2. RAPID MONOMORPHIC VENTRICULAR TACHYCARDIA ENGINE
+       Calibrated for realistic high-velocity 214 BPM:
+       - Fast visual sweep with zero isoelectric flatline delay
+       - Broad QRS (>160ms) with notched Josephson upstroke
+       - Steep downslope to deep discordant S wave
+       - Discordant inverted T wave merging directly into next complex
        ========================================================== */
     const canvas = document.getElementById('ecgCanvas');
     const ctx = canvas.getContext('2d');
@@ -1107,42 +1136,49 @@
       let yOffset = 0;
 
       if (currentRhythmMode === 'VT') {
-        const cycleLength = 70;
+        // High-velocity Monomorphic VT (214 bpm): cycleLength = 38 px
+        const cycleLength = 38;
         const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
         const phi = phase / cycleLength;
-        const amplitude = canvasH * 0.36;
+        const amplitude = canvasH * 0.38;
         let wave = 0;
 
         if (phi < 0.28) {
+          // Broad, slurred upstroke with Josephson's notch
           const t = phi / 0.28;
           const mainR = Math.sin(t * Math.PI * 0.5);
-          const notch = (phi > 0.08 && phi < 0.16) ? -0.12 * Math.sin((phi - 0.08) / 0.08 * Math.PI) : 0;
+          const notch = (phi > 0.08 && phi < 0.16) ? -0.14 * Math.sin((phi - 0.08) / 0.08 * Math.PI) : 0;
           wave = (mainR + notch) * 1.0;
-        } else if (phi < 0.48) {
-          const t = (phi - 0.28) / 0.20;
-          wave = 1.0 - (t * 1.85);
-        } else if (phi < 0.76) {
-          const t = (phi - 0.48) / 0.28;
-          wave = -0.85 + (Math.sin(t * Math.PI * 0.5) * 0.65);
+        } else if (phi < 0.50) {
+          // Steep downstroke plunging into deep discordant S-wave
+          const t = (phi - 0.28) / 0.22;
+          wave = 1.0 - (t * 1.88);
+        } else if (phi < 0.78) {
+          // Wide discordant secondary repolarization (inverted T-wave)
+          const t = (phi - 0.50) / 0.28;
+          wave = -0.88 + (Math.sin(t * Math.PI * 0.5) * 0.68);
         } else {
-          const t = (phi - 0.76) / 0.24;
+          // Rapid ascent straight into next ectopic wide complex
+          const t = (phi - 0.78) / 0.22;
           wave = -0.20 + (t * 0.20);
         }
 
         const roadTremor = (Math.sin(sampleIndex * 0.85) * 0.015) + ((Math.random() - 0.5) * 0.035);
-        const baselineWander = Math.sin(sampleIndex * 0.018) * 0.04;
+        const baselineWander = Math.sin(sampleIndex * 0.02) * 0.03;
         yOffset = -((wave + roadTremor + baselineWander) * amplitude);
 
-        if (phi >= 0.26 && phi <= 0.30 && isBeatArmed) {
+        // Sound trigger exactly at peak R-wave
+        if (phi >= 0.24 && phi <= 0.30 && isBeatArmed) {
           audio.playECGBeep(880);
           isBeatArmed = false;
         }
-        if (phi > 0.55) {
+        if (phi > 0.52) {
           isBeatArmed = true;
         }
 
       } else {
-        const cycleLength = 152;
+        // Mode 'SINUS' (Post-ROSC Sinus Rhythm ~98 bpm)
+        const cycleLength = 84;
         const phase = ((sampleIndex % cycleLength) + cycleLength) % cycleLength;
         const phi = phase / cycleLength;
         const amplitude = canvasH * 0.42;
@@ -1181,7 +1217,7 @@
     }
 
     function animateECG() {
-      const step = 2.2;
+      const step = 2.25;
       const eraseWidth = 26;
 
       ctx.fillStyle = '#01080e';
@@ -1658,16 +1694,16 @@
       loadStageUI(0);
     }
 
-    // Initialize application on load
+    // Auto-start initialization when DOM loads
     window.addEventListener('DOMContentLoaded', () => {
+      audio.init();
       resizeCanvas();
       animateECG();
       loadStageUI(0);
+    });
 
-      // Auto-unlock Web Audio on first user interaction anywhere
-      document.body.addEventListener('click', () => {
-        audio.init();
-      }, { once: true });
+    window.addEventListener('load', () => {
+      audio.init();
     });
   </script>
 </body>
