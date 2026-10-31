@@ -1341,34 +1341,52 @@
     window.addEventListener('resize', resizeCanvas);
 
     function calculateLeadIISample(sampleIndex) {
-      const baseline = canvasH * 0.54;
-      const amp = canvasH * 0.40;
+  const baseline = canvasH * 0.54;
+  const amp = canvasH * 0.40;
 
-      if (currentRhythmMode === 'SVT') {
-        // Highly realistic SVT: 204 BPM. 
-        // 25mm/s standard speed -> step = 2.1 px/frame (approx 125 px/sec).
-        // 204 BPM = 3.4 beats/sec. 125 / 3.4 = ~37 px per beat.
-        const cycle = 37;
-        const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
+  if (currentRhythmMode === 'SVT') {
+    // Fast & Accurate SVT: ~220 BPM (3.67 beats/sec)
+    // 25mm/s speed (~125 px/sec) -> cycle length = ~34 px/beat
+    const cycle = 34;
+    const phi = ((sampleIndex % cycle) + cycle) % cycle / cycle;
 
-        // Narrow QRS complex (< 0.10s), absent P wave, rate-dependent ST depression
-        const qWave = -0.15 * Math.exp(-Math.pow((phi - 0.15) / 0.02, 2));
-        const rWave =  1.35 * Math.exp(-Math.pow((phi - 0.20) / 0.018, 2)); // Needle-sharp R spike
-        const sWave = -0.45 * Math.exp(-Math.pow((phi - 0.25) / 0.018, 2)); // Deep narrow S
-        const stDep = -0.15 * Math.exp(-Math.pow((phi - 0.35) / 0.04, 2));  // ST depression / retrograde P
-        const tWave =  0.30 * Math.exp(-Math.pow((phi - 0.65) / 0.15, 2));  // T wave blending into next beat
+    // Fast Gaussian-like helper function to reduce Math.exp overhead
+    // Fast approximation of Math.exp(-x^2)
+    const fastGauss = (x, width) => {
+      const z = (phi - x) / width;
+      const z2 = z * z;
+      if (z2 > 9) return 0; // Skip tiny values outside 3-sigma
+      return Math.exp(-z2);
+    };
 
-        const wave = qWave + rWave + sWave + stDep + tWave;
-        const noise = (Math.random() - 0.5) * 0.015;
-        const y = baseline - (wave + noise) * amp;
+    // Waveform Synthesis
+    // 1. Narrow, high-amplitude QRS Complex (< 0.08s)
+    const rWave = 1.40 * fastGauss(0.18, 0.015);  // Sharp R spike
+    const sWave = -0.50 * fastGauss(0.22, 0.016);  // S wave
 
-        // Beep triggers directly on the razor-sharp R-wave peak
-        if (phi >= 0.18 && phi <= 0.22 && isBeatArmed) {
-          audio.playECGBeep(950);
-          isBeatArmed = false;
-        }
-        if (phi > 0.45) isBeatArmed = true;
-        return y;
+    // 2. Retrograde P-wave / Pseudo-S' notch & ST Depression
+    const retP = -0.20 * fastGauss(0.27, 0.025);   // Inverted retrograde P-wave / ST dip
+
+    // 3. Fast T-wave merging into next cycle
+    const tWave = 0.25 * fastGauss(0.60, 0.12);    // Rapid T-wave
+
+    // Baseline drift / high-frequency trace noise
+    const noise = (Math.random() - 0.5) * 0.012;
+    const wave = rWave + sWave + retP + tWave + noise;
+
+    const y = baseline - wave * amp;
+
+    // Audio trigger on sharp R-wave crest
+    if (phi >= 0.16 && phi <= 0.20 && isBeatArmed) {
+      audio.playECGBeep(980);
+      isBeatArmed = false;
+    }
+    if (phi > 0.40) {
+      isBeatArmed = true;
+    }
+
+    return y;
+  
 
       } else if (currentRhythmMode === 'ASYSTOLE') {
         // Flatline with subtle biological wander
