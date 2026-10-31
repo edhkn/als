@@ -1356,45 +1356,63 @@
     window.addEventListener('resize', resizeCanvas);
 
     function calculateLeadIISample(sampleIndex) {
-      const baseline = canvasH * 0.54;
-      const amp = canvasH * 0.40;
+  const baseline = canvasH * 0.54;
+  const amp = canvasH * 0.40;
 
-      if (currentRhythmMode === 'AF_RVR') {
-        // Continuous fine fibrillatory baseline waves (f-waves, 400–600/min)
-        const t = sampleIndex * 0.35;
-        const fWave = (Math.sin(t * 1.0) * 0.045 + Math.sin(t * 2.3 + 0.6) * 0.035 + (Math.random() - 0.5) * 0.03);
+  if (currentRhythmMode === 'AF_RVR') {
+    // 1. Continuous chaotic f-waves (fibrillatory baseline, ~450-500/min)
+    const t = sampleIndex * 0.45;
+    const fWave = (Math.sin(t) * 0.035) + 
+                 (Math.sin(t * 2.13 + 1.2) * 0.025) + 
+                 ((Math.random() - 0.5) * 0.020);
 
-        samplesSinceLastAfBeat++;
-        const targetInterval = afIntervals[currentAfIntervalIdx];
-        let qrsWave = 0;
+    samplesSinceLastAfBeat++;
 
-        // Narrow QRS arrives when current interval is reached
-        if (samplesSinceLastAfBeat >= targetInterval) {
-          samplesSinceLastAfBeat = 0;
-          currentAfIntervalIdx = (currentAfIntervalIdx + 1) % afIntervals.length;
+    // 2. High heart rate with irregular RR intervals (~150-180 BPM range)
+    // Initialize target interval if unconfigured (22-38 samples per beat)
+    if (!this.nextAfInterval) {
+      this.nextAfInterval = Math.floor(22 + Math.random() * 16);
+    }
+
+    let qrsWave = 0;
+
+    // Trigger next irregular beat
+    if (samplesSinceLastAfBeat >= this.nextAfInterval) {
+      samplesSinceLastAfBeat = 0;
+      // Recalculate next random RR interval for irregular irregularity
+      this.nextAfInterval = Math.floor(22 + Math.random() * 16);
+    }
+
+    // 3. Narrow QRS complex (< 0.08s / ~8 ticks)
+    if (samplesSinceLastAfBeat < 8) {
+      const p = samplesSinceLastAfBeat / 8;
+      
+      if (p < 0.25) {
+        // Narrow Q dip
+        qrsWave = -0.15 * Math.sin((p / 0.25) * Math.PI);
+      } else if (p < 0.70) {
+        // High-amplitude, needle-sharp R peak
+        const rPhase = (p - 0.25) / 0.45;
+        qrsWave = 1.45 * Math.sin(rPhase * Math.PI);
+        
+        // Exact R-wave peak audio trigger
+        if (samplesSinceLastAfBeat === 3) {
+          audio.playECGBeep(880);
         }
+      } else {
+        // Sharp S wave recovery
+        const sPhase = (p - 0.70) / 0.30;
+        qrsWave = -0.38 * Math.sin(sPhase * Math.PI);
+      }
+    } 
+    // 4. Compact T-Wave immediately following S (due to high ventricular rate)
+    else if (samplesSinceLastAfBeat >= 9 && samplesSinceLastAfBeat < 19) {
+      const tp = (samplesSinceLastAfBeat - 9) / 10;
+      qrsWave = 0.18 * Math.sin(tp * Math.PI);
+    }
 
-        // QRS complex profile across 10 sample ticks
-        if (samplesSinceLastAfBeat < 10) {
-          const p = samplesSinceLastAfBeat / 10;
-          if (p < 0.2) {
-            qrsWave = -0.12 * Math.sin(p / 0.2 * Math.PI); // Q dip
-          } else if (p < 0.6) {
-            qrsWave = 1.30 * Math.sin((p - 0.2) / 0.4 * Math.PI); // Sharp R spike
-            if (samplesSinceLastAfBeat === 3) {
-              audio.playECGBeep(840);
-            }
-          } else {
-            qrsWave = -0.32 * Math.sin((p - 0.6) / 0.4 * Math.PI); // S wave
-          }
-        } else if (samplesSinceLastAfBeat >= 12 && samplesSinceLastAfBeat < 24) {
-          // Asymmetric T wave
-          const tp = (samplesSinceLastAfBeat - 12) / 12;
-          qrsWave = 0.22 * Math.sin(tp * Math.PI);
-        }
-
-        const y = baseline - ((fWave + qrsWave) * amp);
-        return y;
+    const y = baseline - ((fWave + qrsWave) * amp);
+    return y;
 
       } else if (currentRhythmMode === 'ROSC_SINUS') {
         // Regular Normal Sinus Rhythm at 78 BPM (cycle = 100 px)
