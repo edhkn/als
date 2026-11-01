@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Clinical Scenarios & Algorithms | Hospital Kuala Nerang</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --card-border: rgba(56, 189, 248, 0.2);
+            --card-border-hover: rgba(56, 189, 248, 0.6);
+            --accent-red: #ef4444;
+            --accent-cyan: #38bdf8;
+            --accent-blue: #3b82f6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --btn-dark-bg: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.25) 0%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(14, 165, 233, 0.1) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- FLOATING STICKY HEADER --- */
+        .floating-header {
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            max-width: 1140px;
+            width: calc(100% - 2rem);
+            margin: 1rem auto 0 auto;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.15);
+            padding: 0.75rem 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .header-logo {
+            height: 42px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+            transition: transform 0.2s ease;
+        }
+
+        .header-brand:hover .header-logo {
+            transform: scale(1.05);
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .header-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            background: rgba(13, 148, 136, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* HOME BUTTON */
+        .btn-home {
+            background: rgba(2, 132, 199, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-home:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+            color: #ffffff;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .user-badge-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.45rem 0.9rem;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-size: 0.8rem;
+        }
+
+        .user-badge-info .user-name {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .user-badge-info .user-id {
+            color: var(--accent-cyan);
+            font-size: 0.72rem;
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 0.45rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.3);
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero-section {
+            text-align: center;
+            margin: 2rem auto 2.5rem auto;
+        }
+
+        .main-logo {
+            max-height: 90px;
+            width: auto;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .main-logo:hover {
+            transform: scale(1.04);
+        }
+
+        .hospital-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .hero-section h1 {
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+            margin-bottom: 0.35rem;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .hero-section p {
+            font-size: 1rem;
+            color: var(--accent-cyan);
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto 3.5rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+        }
+
+        /* --- SCENARIO CARDS --- */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .scenario-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--card-border-hover);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.2);
+        }
+
+        .card-header-bar {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.65rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-red { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+        .badge-yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }
+        .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-launch {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-launch:hover {
+            opacity: 0.95;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+            color: #ffffff;
+        }
+
+        /* --- FOOTER STYLES --- */
+        footer {
+            background-color: #020617;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.5rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 640px) {
+            .footer-container {
+                flex-direction: row;
+            }
+        }
+
+        .footer-logos {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .footer-logos img {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.2));
+        }
+
+        .logo-divider {
+            height: 28px;
+            width: 1px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .footer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .pulse-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .footer-copyright {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.8rem;
+            letter-spacing: 0.02em;
+        }
+
+        @media (max-width: 640px) {
+            .brand-title span:first-child { font-size: 0.88rem; }
+            .brand-sub { display: none; }
+            .btn-home span { display: none; }
+            .btn-home { padding: 0.5rem 0.75rem; }
+            .user-badge-info .user-name {
+                max-width: 80px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- FLOATING STICKY HEADER -->
+    <header class="floating-header">
+        <div class="header-container">
+            <!-- Brand / Logo Link -->
+            <div class="header-brand" onclick="goHome()" title="Hospital Kuala Nerang Portal">
+                <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="Logo" class="header-logo">
+                <div>
+                    <div class="brand-title">
+                        <span>Hospital Kuala Nerang</span>
+                        <span class="header-badge">ALS PORTAL</span>
+                    </div>
+                    <p class="brand-sub">Jabatan Kecemasan & Trauma</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons: Home & User Profile -->
+            <div class="header-actions">
+                <!-- HOME BUTTON -->
+                <button onclick="goHome()" class="btn-home" title="Return to Home">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </button>
+
+                <!-- LOGGED-IN PRACTITIONER INFO & LOGOUT -->
+                <div id="nav-user-info" class="hidden sm:flex" style="align-items: center; gap: 0.6rem;">
+                    <div class="user-badge-info">
+                        <i class="fa-solid fa-user-doctor text-cyan-400"></i>
+                        <div>
+                            <span id="user-display-name" class="user-name">Healthcare Practitioner</span>
+                            <span id="user-display-id" class="user-id block text-[10px] leading-tight">MOH-ACTIVE</span>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="btn-logout" title="Log Out">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="hidden sm:inline">Log Out</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- HERO BANNER -->
+        <div class="hero-section">
+            <img src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="Hospital Kuala Nerang Logo" class="main-logo">
+            <br>
+            <span class="hospital-badge">Jabatan Kecemasan & Trauma</span>
+            <h1>Hospital Kuala Nerang</h1>
+            <p>Advanced Life Support (ALS) Clinical Scenario Library</p>
+        </div>
+
+        <!-- SCENARIOS GRID -->
+        <div class="scenario-grid">
+
+            <!-- 1. VT CORE -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-red">Shockable / Wide QRS</span>
+                    <i class="fa-solid fa-bolt text-rose-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Ventricular Tachycardia (VT)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Core pulseless VT and monomorphic VT resuscitation algorithm, early high-energy defibrillation, continuous compression coordination, and refractory antiarrhythmic pathways.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/vt" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. VT 1 -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-yellow">Hemodynamic Instability</span>
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Monomorphic VT (VT 1)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Clinical case management of sustained monomorphic wide-complex tachycardia with hypotension, chest pain, and heart failure requiring synchronized electrical cardioversion.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/vt1" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3. VT 2 -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-red">Polymorphic VT</span>
+                    <i class="fa-solid fa-wave-square text-rose-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Torsades de Pointes (VT 2)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Polymorphic Ventricular Tachycardia in prolonged baseline QT interval; rapid initiation of IV Magnesium Sulfate, unsynchronized defibrillation, and electrolyte correction.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/vt2" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. AF -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-blue">Narrow / Irregular</span>
+                    <i class="fa-solid fa-heart-pulse text-blue-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Atrial Fibrillation (AF w/ RVR)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Acute management of irregular narrow-complex tachycardia with rapid ventricular response; pharmacological rate control (beta-blockers/diltiazem) versus urgent synchronized cardioversion.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/af" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 5. BRADY -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-cyan">Conduction Block / Brady</span>
+                    <i class="fa-solid fa-gauge-simple-low text-cyan-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Symptomatic Bradycardia</span>
+                        </h3>
+                        <p class="card-desc">
+                            Treatment algorithm for severe bradycardia with hypoperfusion; IV Atropine administration, transcutaneous pacing (TCP) setup, and secondary Adrenaline/Dopamine infusions.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/brady" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 6. PEA -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-purple">Non-Shockable Arrest</span>
+                    <i class="fa-solid fa-heart-circle-xmark text-purple-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Pulseless Electrical Activity (PEA)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Systematic non-shockable cardiac arrest resuscitation; immediate IV/IO Epinephrine 1mg administration, continuous compressions, and capnography monitoring for ROSC.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/pea" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 7. PEA 1 -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-purple">5 Hs & 5 Ts</span>
+                    <i class="fa-solid fa-magnifying-glass-chart text-purple-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>PEA Reversible Causes (PEA 1)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Clinical case simulation targeting the rapid detection of the 5 Hs and 5 Ts, point-of-care ultrasound (POCUS) diagnostics, and pseudo-PEA shock state management.
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/pea1" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 8. SVT -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-emerald">Narrow / Regular</span>
+                    <i class="fa-solid fa-heart-circle-bolt text-emerald-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Supraventricular Tachycardia (SVT)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Evaluation and treatment of regular narrow-complex tachyarrhythmias; execution of the modified Valsalva maneuver followed by rapid push IV Adenosine (6mg / 12mg).
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/svt" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 9. SVT 1 -->
+            <div class="scenario-card">
+                <div class="card-header-bar">
+                    <span class="badge-tag badge-yellow">Unstable SVT</span>
+                    <i class="fa-solid fa-radiation text-amber-400"></i>
+                </div>
+                <div class="card-content">
+                    <div>
+                        <h3 class="card-title">
+                            <span>Unstable SVT (SVT 1)</span>
+                        </h3>
+                        <p class="card-desc">
+                            Refractory or hemodynamic compromise in rapid supraventricular tachycardia; sedation protocols and synchronized electrical cardioversion (50–100J biphasic).
+                        </p>
+                    </div>
+                    <a href="https://edhkn.github.io/als/svt1" class="btn-launch" target="_blank" rel="noopener noreferrer">
+                        <span>Launch Scenario</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logos">
+                <img id="img-footer-logo-1" src="https://lh3.googleusercontent.com/d/1O2Nj1Dr4U6wo7ISjdkDRukPYwZUkOOuJ" alt="Footer Logo 1">
+                <div class="logo-divider"></div>
+                <img id="img-footer-logo-2" src="https://lh3.googleusercontent.com/d/1LdMRx-PF49CWOcrjthClGLJg-yQoJ2mt" alt="Footer Logo 2">
+            </div>
+
+            <div class="footer-status">
+                <span class="pulse-dot"></span>
+                <span>EDHKN : ONLINE LEARNING SYSTEM Ver 1.2</span>
+            </div>
+
+            <p class="footer-copyright">© 2026 Yassin Razak | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <!-- SESSION SCRIPT -->
+    <script>
+        let currentUser = null;
+
+        window.onload = () => {
+            // Restore session if user authenticated from main portal
+            const savedSession = localStorage.getItem('edhkn_active_session') || 
+                                 sessionStorage.getItem('edhkn_active_session');
+
+            if (savedSession) {
+                currentUser = JSON.parse(savedSession);
+                const nameEl = document.getElementById('user-display-name');
+                const idEl = document.getElementById('user-display-id');
+                if (nameEl && currentUser.name) nameEl.innerText = currentUser.name;
+                if (idEl && currentUser.id) idEl.innerText = `(${currentUser.id})`;
+            }
+        };
+
+        function goHome() {
+            window.location.href = "https://yassinrazak.github.io/edhkn/";
+        }
+
+        function logout() {
+            localStorage.removeItem('edhkn_active_session');
+            sessionStorage.removeItem('edhkn_active_session');
+            currentUser = null;
+            window.location.href = "https://yassinrazak.github.io/edhkn/";
+        }
+    </script>
+</body>
+</html>
